@@ -3,12 +3,266 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id    String @id
-  name  String
-  price Int
+model User {
+  id        Int       @id @default(autoincrement())
+  fullname  String?
+  username  String    @unique
+  email     String    @unique
+  dob       DateTime?
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  UserProfile       UserProfile[]
+  InstructorProfile InstructorProfile[]
+
+  Communities      Community[]   @relation("CommunityMembers")
+  OwnedCommunities Community[]   @relation("CommunityOwner")
+  MemberRoles      MemberRoles[]
+  Post             Post[]
+  Comment          Comment[]
+  PostVote         PostVote[]
+  CommentVote      CommentVote[]
+}
+
+model UserProfile {
+  id                Int     @id @default(autoincrement())
+  userId            Int
+  bio               String?
+  twitter           String?
+  facebook          String?
+  instagram         String?
+  linkedin          String?
+  youtube           String?
+  profilePictureURL String?
+
+  Tags Tag[]
+  User User  @relation(fields: [userId], references: [id])
+}
+
+model InstructorProfile {
+  id           Int      @id @default(autoincrement())
+  userId       Int?
+  education    String?
+  experience   String?
+  certificates String[]
+
+  User User? @relation(fields: [userId], references: [id])
+}
+
+model Tag {
+  id              Int      @id @default(autoincrement())
+  name            String
+  isCommunityOnly Boolean
+  communityId     Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  Community    Community?    @relation(fields: [communityId], references: [id])
+  UserProfiles UserProfile[]
+}
+
+model Community {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  coverImgURL String?
+  logoImgURL  String?
+
+  ownerId Int
+  Owner   User @relation("CommunityOwner", fields: [ownerId], references: [id])
+
+  Members     User[]        @relation("CommunityMembers")
+  MemberRoles MemberRoles[]
+  Forums      Forum[]
+  Classrooms  Classroom[]
+  Tags        Tag[]
+}
+
+model MemberRoles {
+  communityId Int
+  userId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Role      Role
+  Community Community @relation(fields: [communityId], references: [id])
+  User      User      @relation(fields: [userId], references: [id])
+
+  @@id([communityId, userId])
+}
+
+model Material {
+  id           Int          @id @default(autoincrement())
+  materialType MaterialType
+  fileUrl      String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  Lessons      Lesson[]
+}
+
+model Forum {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  description String?
+  communityId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Community Community @relation(fields: [communityId], references: [id])
+  Posts     Post[]
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String?
+  attchments String[] // video, image, file
+  forumId    Int
+  authorId   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Forum     Forum      @relation(fields: [forumId], references: [id])
+  Comments  Comment[]
+  Author    User       @relation(fields: [authorId], references: [id])
+  PostVotes PostVote[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String?
+  parentId  Int?
+  postId    Int
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Parent       Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  Children     Comment[]     @relation("CommentReplies")
+  Post         Post          @relation(fields: [postId], references: [id])
+  Author       User          @relation(fields: [authorId], references: [id])
+  CommentVotes CommentVote[]
+}
+
+model PostVote {
+  type   Boolean
+  userId Int
+  postId Int
+  Post   Post    @relation(fields: [postId], references: [id])
+  User   User    @relation(fields: [userId], references: [id])
+
+  @@id([userId, postId])
+}
+
+model CommentVote {
+  type      Boolean
+  userId    Int
+  commentId Int
+  Comment   Comment @relation(fields: [commentId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+
+  @@id([userId, commentId])
+}
+
+model Classroom {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  coverImg    String?
+  communityId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // TODO: save progress of the user
+  Community Community? @relation(fields: [communityId], references: [id])
+  Sections  Section[]
+  Quiz      Quiz[]
+}
+
+model Section {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  classroomId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Classroom Classroom  @relation(fields: [classroomId], references: [id])
+  Lessons   Lesson[]
+  Questions Question[]
+}
+
+model Lesson {
+  id         Int      @id @default(autoincrement())
+  name       String
+  notes      String?
+  materialId Int
+  sectionId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Section  Section  @relation(fields: [sectionId], references: [id])
+  Material Material @relation(fields: [materialId], references: [id])
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  text      String?
+  options   String[]
+  answers   String[]
+  sectionId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Section Section @relation(fields: [sectionId], references: [id])
+  Quiz    Quiz[]
+}
+
+model Quiz {
+  id        Int        @id @default(autoincrement())
+  name      String
+  questions Question[]
+  duration  Int
+  active    Boolean
+
+  classroomId Int
+  Classroom   Classroom @relation(fields: [classroomId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MaterialType {
+  VIDEO
+  AUDIO
+  IMG
+  DOC
+  FILE
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  MODERATOR
+  MEMBER
 }
