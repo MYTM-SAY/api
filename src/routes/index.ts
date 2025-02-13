@@ -1,9 +1,9 @@
 import express from 'express';
-import product from './productRouter';
-  
+import community from './communityRouter';
+
 const router = express.Router();
     
-router.use('/products', product);
+router.use('/communities', community);
 
 export default router;
     
