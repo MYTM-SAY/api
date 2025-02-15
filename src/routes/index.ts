@@ -1,9 +1,8 @@
 import express from 'express';
-import product from './productRouter';
-  
+import post from './post.route';
+
 const router = express.Router();
-    
-router.use('/products', product);
+
+router.use('/posts', post);
 
 export default router;
-    
