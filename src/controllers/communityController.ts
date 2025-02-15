@@ -15,22 +15,3 @@ export const getCommunities = async (
     next(error);
   }
 };
-
-
-export const getCommunity = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const id = +req.params.id;
-  try {
-    const community = await CommunityRepo.findCommunity(id);
-
-    if (!community) {
-      return res.status(404).json({ message: 'No community found' });
-    }
-    return res.json(community);
-  } catch (error) {
-    next(error);
-  }
-};
