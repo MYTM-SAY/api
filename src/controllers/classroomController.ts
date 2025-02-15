@@ -39,6 +39,7 @@ export const createClassroom = async (
     const validatedData = ClassroomSchema.parse(req.body);
 
     await ClassroomRepo.create(validatedData);
+    
     return res.status(201).json('Classroom created successfuly');
   } catch (error) {
     return res.status(400).json({ message: 'Invalid data', error });
