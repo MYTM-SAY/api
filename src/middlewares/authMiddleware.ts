@@ -55,13 +55,11 @@ export const isOwner = async (
     const userRole = await prisma.memberRoles.findFirst({
       where: {
         userId: req.user?.id,
-      },
-      select: {
-        Role: true,
+        Role:'OWNER',
       },
     });
 
-    if (!userRole || userRole.Role !== 'OWNER') {
+    if (!userRole) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
