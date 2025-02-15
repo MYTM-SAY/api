@@ -23,7 +23,7 @@ export const getClassroom = async (
   next: NextFunction,
 ) => {
   try {
-    const classroom = await ClassroomRepo.findbyId(Number(req.params.id));
+    const classroom = await ClassroomRepo.findbyId(+(req.params.id));
     if (!classroom) throw new APIError('Classroom not found', 404);
     return res.status(200).json(classroom);
   } catch (error) {
@@ -40,7 +40,7 @@ export const createClassroom = async (
 
     await ClassroomRepo.create(validatedData);
     
-    return res.status(201).json('Classroom created successfuly');
+    return res.status(201).json('Classroom created successfully');
   } catch (error) {
     return res.status(400).json({ message: 'Invalid data', error });
   }
@@ -52,10 +52,28 @@ export const deleteClassroom = async (
   res: Response,
 ) => {
   try {
-    const classroom  = await ClassroomRepo.delete(Number(req.params.id));
+    const classroom  = await ClassroomRepo.delete(+(req.params.id));
     if (!classroom) throw new APIError('Classroom not found', 404);
-    return res.status(204).json('Classroom deleted successfuly');
+    return res.status(204).json('Classroom deleted successfully');
   } catch (error) {
     return res.status(400).json({ message: 'Invalid data', error });
   }
+};
+
+
+export const updateClassroom = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const validateData = ClassroomSchema.partial().parse(req.body);
+    
+    const classroom = await ClassroomRepo.update(+(req.params.id), validateData);
+    if (!classroom) {
+      return res.status(404).json({ message: 'Classroom not found' });
+    }
+
+    return res.status(200).json({ message: 'Classroom updated successfully', classroom });
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid data', error });
+  }
+
+
 };

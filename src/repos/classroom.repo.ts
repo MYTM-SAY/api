@@ -1,6 +1,7 @@
-import { prisma } from '../db/PrismaClient';
-import { ClassroomSchema } from '../utils';
 import { z } from 'zod';
+import { prisma } from '../db/PrismaClient';
+import APIError from '../errors/APIError';
+import { ClassroomSchema } from '../utils';
 
 export const ClassroomRepo = {
   async findAll() {
@@ -37,4 +38,23 @@ export const ClassroomRepo = {
     });
     return classroom;
   },
+
+  async update(id: number, data: Partial<z.infer<typeof ClassroomSchema>>) {
+    const classroom = await prisma.classroom.findUnique({
+      where: { id },
+    });
+  
+    if (!classroom) {
+      throw new APIError('Classroom not found', 404);
+    }
+  
+    const updatedClassroom = await prisma.classroom.update({
+      where: { id },
+      data,
+    });
+  
+    return updatedClassroom;
+  },
 };
+
+
