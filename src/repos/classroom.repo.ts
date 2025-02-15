@@ -9,4 +9,14 @@ export const ClassroomRepo = {
     });
     return classrooms;
   },
+
+  async findbyId(id: number) {
+    const classroom = await prisma.classroom.findUnique({
+      where:{ id },
+      include: {
+        Community: true,
+      },
+    });
+    return classroom;
+  },
 };
