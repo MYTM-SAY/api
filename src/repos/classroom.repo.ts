@@ -28,4 +28,13 @@ export const ClassroomRepo = {
     });
     return classroom;
   },
+
+  async delete(id : number) {
+    const classroom = await prisma.classroom.delete({
+      where:{
+        id,
+      },
+    });
+    return classroom;
+  },
 };

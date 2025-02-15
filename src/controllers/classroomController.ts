@@ -45,3 +45,17 @@ export const createClassroom = async (
     return res.status(400).json({ message: 'Invalid data', error });
   }
 };
+
+
+export const deleteClassroom = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const classroom  = await ClassroomRepo.delete(Number(req.params.id));
+    if (!classroom) throw new APIError('Classroom not found', 404);
+    return res.status(204).json('Classroom deleted successfuly');
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid data', error });
+  }
+};
