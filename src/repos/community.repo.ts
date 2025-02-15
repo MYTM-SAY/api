@@ -7,7 +7,6 @@ export const CommunityRepo = {
         Classrooms: true,
       },
     });
-
     return results;
   },
 };
