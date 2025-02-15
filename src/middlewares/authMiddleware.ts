@@ -2,6 +2,8 @@ import { Response, NextFunction, Request } from 'express';
 import { UserRepo } from '../repos/user.repo';
 import { AuthObject, clerkClient } from '@clerk/express';
 import { User } from '@prisma/client';
+import { prisma } from '../db/PrismaClient';
+
 
 export interface AuthenticatedRequest extends Request {
   auth?: AuthObject;
@@ -43,3 +45,28 @@ export const isAuthenticated = async (
 };
 
 
+export const isOwner = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+
+    const userRole = await prisma.memberRoles.findFirst({
+      where: {
+        userId: req.user?.id,
+      },
+      select: {
+        Role: true,
+      },
+    });
+
+    if (!userRole || userRole.Role !== 'OWNER') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
