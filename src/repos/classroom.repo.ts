@@ -1,4 +1,6 @@
 import { prisma } from '../db/PrismaClient';
+import { ClassroomSchema } from '../utils';
+import { z } from 'zod';
 
 export const ClassroomRepo = {
   async findAll() {
@@ -16,6 +18,13 @@ export const ClassroomRepo = {
       include: {
         Community: true,
       },
+    });
+    return classroom;
+  },
+
+  async create(data: z.infer<typeof ClassroomSchema>) {
+    const classroom = await prisma.classroom.create({
+      data,
     });
     return classroom;
   },

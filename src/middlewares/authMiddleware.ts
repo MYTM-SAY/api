@@ -41,3 +41,5 @@ export const isAuthenticated = async (
     return res.status(500).json({ message: 'Authentication error', error });
   }
 };
+
+
