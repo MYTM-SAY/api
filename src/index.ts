@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import router from './routes';
+import communityRouter from './routes/community.route';
 import error from './middlewares/error';
 import { clerkMiddleware } from '@clerk/express';
 
@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api/v1', router);
+app.use('/api/v1/communities', communityRouter);
 
 app.use(error);
 

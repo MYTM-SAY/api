@@ -15,3 +15,39 @@ export const getCommunities = async (
     next(error);
   }
 };
+
+export const discoverCommunities = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { name, tagIds } = req.query;
+    const tagIdsArray: number[] = tagIds
+      ? tagIds.toString().split(',').map(Number)
+      : [];
+
+    // If search parameters are provided, run search logic.
+    if (name || tagIdsArray.length) {
+      const searchResults = await CommunityRepo.searchCommunities(
+        name as string,
+        tagIdsArray,
+      );
+      return res.json({ searchResults });
+    }
+
+    // Optionally, if the user is authenticated, provide recommended communities.
+    // Otherwise, return popular communities as the default discover data.
+    if (req.user) {
+      const recommended = await CommunityRepo.getRecommendedCommunities(
+        req.user.id,
+      );
+      return res.json({ recommended });
+    }
+
+    const popular = await CommunityRepo.getPopularCommunities();
+    return res.json({ popular });
+  } catch (error) {
+    next(error);
+  }
+};
