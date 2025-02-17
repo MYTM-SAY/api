@@ -10,6 +10,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 dotenv.config();
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -27,7 +28,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/communities', communityRouter);
 
 app.use(error);
-
+``;
 app.listen(port, () => {
   console.log(`Listening: http://localhost:${port}`);
 });
