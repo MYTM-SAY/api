@@ -10,6 +10,13 @@ export const UserRepo = {
     return result;
   },
 
+  async findById(id: number) {
+    const result = await prisma.user.findUnique({
+      where: { id },
+    });
+    return result;
+  },
+
   async createUser({
     clerkId,
     email,
