@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import communityRouter from './routes/community.route';
 import error from './middlewares/error';
 import { clerkMiddleware } from '@clerk/express';
+import router from './routes';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api/v1/communities', communityRouter);
+app.use('/api/v1/', router);
 
 app.use(error);
 
