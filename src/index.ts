@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/communities', communityRouter);
 
 app.use(error);
-``;
+
 app.listen(port, () => {
   console.log(`Listening: http://localhost:${port}`);
 });
