@@ -39,4 +39,49 @@ export const CommunityRepo = {
     });
     return result;
   },
+
+  async getRecommendedCommunities(userTagIds: number[]) {
+    // Query communities that share any of the user's tags
+    const recommendedCommunities = await prisma.community.findMany({
+      where: {
+        Tags: {
+          some: {
+            id: { in: userTagIds },
+          },
+        },
+      },
+      include: { Tags: true, Owner: true },
+    });
+    return recommendedCommunities;
+  },
+
+  // Get popular communities (fallback if user has no tags).
+  async getPopularCommunities() {
+    return prisma.community.findMany({
+      orderBy: [{ Members: { _count: 'desc' } }, { createdAt: 'desc' }],
+      include: {
+        Tags: true,
+        Owner: true,
+      },
+    });
+  },
+
+  // Search by Name and Tags (if tags sended if not search by name only)
+  async searchCommunities(searchTerm: string = '', filterTagIds: number[] = []) {
+    return prisma.community.findMany({
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+        ...(filterTagIds && filterTagIds.length > 0
+          ? { Tags: { some: { id: { in: filterTagIds } } } }
+          : {}),
+      },
+      include: {
+        Tags: true,
+        Owner: true,
+      },
+    });
+  },
 };

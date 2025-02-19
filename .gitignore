@@ -1,3 +1,5 @@
 node_modules/
 .env
 dist/
+prisma/migrations/
+prisma/seed.mjs

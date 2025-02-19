@@ -3,6 +3,8 @@ import APIError from '../errors/APIError';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
 import { CommunityRepo } from '../repos/community.repo';
 import { UserRepo } from '../repos/user.repo';
+import { UserProfileRepo } from '../repos/userProfile.repo';
+
 export const getCommunities = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -71,6 +73,48 @@ export const deleteCommunity = async (
     if (!communityExist) throw new APIError('Community not found', 404);
     await CommunityRepo.delete(+req.params.id);
     return res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const discoverCommunities = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { searchTerm, tagIds } = req.query;
+    const tagIdsArray: number[] = tagIds
+      ? tagIds.toString().split(',').map(Number)
+      : [];
+
+    // If search parameters are provided, return search results
+    if (searchTerm || tagIdsArray.length > 0) {
+      const communities = await CommunityRepo.searchCommunities(
+        searchTerm as string,
+        tagIdsArray,
+      );
+      return res.json({ data: communities, type: 'search' });
+    }
+
+    // For authenticated users, return recommended communities
+    if (req.user) {
+      const userProfile = await UserProfileRepo.findByUserId(req.user.id);
+      if (!userProfile) {
+        throw new APIError('User profile not found', 404);
+      }
+      if (userProfile.Tags.length > 0) {
+        const userTagIds = userProfile.Tags.map((tag) => tag.id);
+        const communities = await CommunityRepo.getRecommendedCommunities(
+          userTagIds,
+        );
+        return res.json({ data: communities, type: 'recommended' });
+      }
+    }
+    // Fallback: Return popular communities
+    const communities = await CommunityRepo.getPopularCommunities();
+    return res.json({ data: communities, type: 'popular' });
   } catch (error) {
     next(error);
   }

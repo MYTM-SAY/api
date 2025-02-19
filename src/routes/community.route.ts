@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  discoverCommunities,
   getCommunities,
   createCommunity,
   deleteCommunity,
@@ -8,12 +9,14 @@ import {
 } from '../controllers/communityController';
 import { isAuthenticated } from '../middlewares/authMiddleware';
 
-const router = express.Router();
+const app = express.Router();
 
-router.get('/', getCommunities);
-router.post('/', createCommunity);
-router.delete('/:id', deleteCommunity);
-router.put('/:id', updateCommunity);
-router.get('/:id', getCommunity);
+app.get('/discover', discoverCommunities);
+app.get('/', getCommunities);
+app.post('/', createCommunity);
+app.delete('/:id', deleteCommunity);
+app.put('/:id', updateCommunity);
+app.get('/:id', getCommunity);
+app.get('/', isAuthenticated, getCommunities);
 
-export default router;
+export default app;
