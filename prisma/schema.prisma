@@ -13,7 +13,7 @@ model User {
   username  String    @unique
   email     String    @unique
   dob       DateTime?
-  clerkId   String  @unique
+  clerkId   String    @unique
   lastLogin DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -32,7 +32,7 @@ model User {
 
 model UserProfile {
   id                Int     @id @default(autoincrement())
-  userId            Int
+  userId            Int     @unique
   bio               String?
   twitter           String?
   facebook          String?
@@ -63,8 +63,10 @@ model Tag {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  Community    Community?    @relation(fields: [communityId], references: [id])
+  Communities  Community[]
   UserProfiles UserProfile[]
+
+  @@unique([name])
 }
 
 model Community {
