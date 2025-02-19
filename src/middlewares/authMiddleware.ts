@@ -13,8 +13,10 @@ export const isAuthenticated = async (
   res: Response,
   next: NextFunction,
 ) => {
+
   try {
     if (!req.auth || !req.auth.userId) {
+      
       return res.status(401).json({ message: 'Unauthorized: Please log in.' });
     }
 
