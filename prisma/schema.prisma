@@ -195,6 +195,7 @@ model Section {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
+  isComplete  Boolean @default(false)
 
   classroomId Int
   createdAt   DateTime @default(now())
