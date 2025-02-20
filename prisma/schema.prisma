@@ -179,6 +179,7 @@ model Classroom {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
+  progress    Int      @default(0)
   coverImg    String?
   communityId Int
   createdAt   DateTime @default(now())
