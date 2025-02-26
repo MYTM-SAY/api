@@ -28,6 +28,7 @@ model User {
   Comment          Comment[]
   PostVote         PostVote[]
   CommentVote      CommentVote[]
+  QuizScore        QuizScore[]
 }
 
 model UserProfile {
@@ -195,7 +196,7 @@ model Section {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
-  isCompleted   Boolean @default(false)
+  isCompleted Boolean @default(false)
 
   classroomId Int
   createdAt   DateTime @default(now())
@@ -245,8 +246,21 @@ model Quiz {
   startDate DateTime
   endDate   DateTime
 
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  QuizScore QuizScore[]
+}
+
+model QuizScore {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  quizId    Int
+  score     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+  Quiz Quiz @relation(fields: [quizId], references: [id])
 }
 
 model File {
