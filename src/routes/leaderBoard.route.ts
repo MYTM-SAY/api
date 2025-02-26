@@ -1,8 +1,8 @@
 import express from 'express';
 
-import { getLeaderboardByQuiz } from '../controllers/leaderBoardController';
+import { getTopTenByScore } from '../controllers/leaderBoardController';
 const app = express.Router();
 
-app.get('/leaderboard/:commId', getLeaderboardByQuiz);
+app.get('/score-leaderboard/:commId', getTopTenByScore);
 
 export default app;

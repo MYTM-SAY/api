@@ -1,7 +1,7 @@
 import { prisma } from '../db/PrismaClient';
 
 export const leaderBoardRepo = {
-  async getTopTen(commId: number) {
+  async getTopTenByScore(commId: number) {
     const result = await prisma.quizScore.findMany({
       where: {
         Quiz: {
@@ -12,7 +12,7 @@ export const leaderBoardRepo = {
       },
       include: {
         User: {
-          select: { 
+          select: {
             id: true,
             username: true,
             fullname: true,
@@ -27,4 +27,3 @@ export const leaderBoardRepo = {
     return result;
   },
 };
-
