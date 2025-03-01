@@ -21,6 +21,7 @@ export const CommentRepo = {
             },
           },
         },
+        Children: true,
       },
     });
     return results;
@@ -45,6 +46,7 @@ export const CommentRepo = {
             },
           },
         },
+        Children: true,
       },
     });
     return result;
