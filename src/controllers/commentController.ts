@@ -15,3 +15,20 @@ export const findAllComments = async (
     next(error);
   }
 };
+
+export const findComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const comments = await CommentRepo.findComment(
+      +req.params.postId,
+      +req.params.commentId,
+    );
+    if (!comments) throw new APIError('Comment not found', 404);
+    return res.status(200).json(comments);
+  } catch (error) {
+    next(error);
+  }
+};
