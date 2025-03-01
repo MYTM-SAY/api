@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { prisma } from '../db/PrismaClient';
 import APIError from '../errors/APIError';
 import { CommentSchema } from '../utils';
-import { z } from 'zod';
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -79,6 +79,20 @@ export const CommentRepo = {
       },
       data,
     });
+    return result;
+  },
+
+  async deleteComment(commentId: number) {
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+    if (!comment) throw new APIError('Comment not found', 404);
+    const result = await prisma.comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+
     return result;
   },
 };
