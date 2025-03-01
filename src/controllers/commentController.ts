@@ -58,3 +58,30 @@ export const createComment = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Invalid data', error });
   }
 };
+
+export const updateComment = async (req: Request, res: Response) => {
+  try {
+    const validatedData = CommentSchema.partial().parse(req.body);
+    const comment = await CommentRepo.updateComment(
+      +req.params.commentId,
+      validatedData,
+    );
+    return res.status(200).json(comment);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const errorMessages = error.errors.map((err) => ({
+        field: err.path.join('.'),
+        message: err.message,
+      }));
+      return res
+        .status(400)
+        .json({ message: 'Validation failed', errors: errorMessages });
+    }
+    if (error instanceof Error) {
+      return res
+        .status(400)
+        .json({ message: 'Invalid data', error: error.message });
+    }
+    return res.status(400).json({ message: 'Invalid data', error });
+  }
+};

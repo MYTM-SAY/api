@@ -1,4 +1,5 @@
 import { prisma } from '../db/PrismaClient';
+import APIError from '../errors/APIError';
 import { CommentSchema } from '../utils';
 import { z } from 'zod';
 
@@ -57,6 +58,26 @@ export const CommentRepo = {
       data: {
         ...data,
       },
+    });
+    return result;
+  },
+
+  async updateComment(
+    commentId: number,
+    data: Partial<z.infer<typeof CommentSchema>>,
+  ) {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+    if (!comment) throw new APIError('Comment not found', 404);
+
+    const result = await prisma.comment.update({
+      where: {
+        id: commentId,
+      },
+      data,
     });
     return result;
   },
