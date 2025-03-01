@@ -1,4 +1,6 @@
 import { prisma } from '../db/PrismaClient';
+import { CommentSchema } from '../utils';
+import { z } from 'zod';
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -43,6 +45,15 @@ export const CommentRepo = {
             },
           },
         },
+      },
+    });
+    return result;
+  },
+
+  async createComment(data: z.infer<typeof CommentSchema>) {
+    const result = await prisma.comment.create({
+      data: {
+        ...data,
       },
     });
     return result;
