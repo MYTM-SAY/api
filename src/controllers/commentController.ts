@@ -8,7 +8,7 @@ export const findAll = async (
   next: NextFunction,
 ) => {
   try {
-    const comments = await CommentRepo.findAll();
+    const comments = await CommentRepo.findAll(+req.params.postId);
     if (!comments) throw new APIError('Comments not found', 404);
     return res.status(200).json(comments);
   } catch (error) {
