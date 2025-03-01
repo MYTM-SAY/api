@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { CommentRepo } from '../repos/comment.repo';
 import APIError from '../errors/APIError';
 
-export const findAll = async (
+export const findAllComments = async (
   req: Request,
   res: Response,
   next: NextFunction,
