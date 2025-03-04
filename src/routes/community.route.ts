@@ -27,4 +27,4 @@ app.put('/:id', updateCommunity);
 app.get('/:id', getCommunity);
 app.get('/', isAuthenticated, getCommunities);
 
-export default app;
+export default app; 

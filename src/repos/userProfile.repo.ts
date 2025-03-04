@@ -8,4 +8,4 @@ export const UserProfileRepo = {
     });
     return result;
   },
-};
+}; 

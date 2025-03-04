@@ -104,7 +104,7 @@ export const discoverCommunities = async (
       if (!userProfile) {
         throw new APIError('User profile not found', 404);
       }
-      if (userProfile.Tags.length > 0) {
+      if (userProfile.Tags?.length > 0) {
         const userTagIds = userProfile.Tags.map((tag) => tag.id);
         const communities = await CommunityRepo.getRecommendedCommunities(
           userTagIds,
