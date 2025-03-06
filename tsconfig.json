@@ -1,21 +1,17 @@
 {
-  "compilerOptions": {
-    "outDir": "dist",
-    "sourceMap": true,
-    "target": "esnext",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "strict": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    "./*.js",
-    "src/**/*.ts",
-    "test/**/*.ts",
-    "prisma/seed.mjs",
-  ],
+	"compilerOptions": {
+		"outDir": "dist",
+		"sourceMap": true,
+		"target": "esnext",
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitAny": true,
+		"strict": true,
+		"skipLibCheck": true
+	},
+	"paths": {
+      "@/*": ["./src/*"]
+    },
+	"include": ["./*.js", "src/**/*.ts", "test/**/*.ts", "prisma/seed.mjs"]
 }
-
-    
