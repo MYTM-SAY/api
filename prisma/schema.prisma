@@ -181,7 +181,6 @@ model Classroom {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  progress    Int      @default(0)
   coverImg    String?
   communityId Int
   createdAt   DateTime @default(now())
@@ -194,21 +193,10 @@ model Classroom {
   Progress  Progress[]
 }
 
-model Progress {
-  id          Int @id @default(autoincrement())
-  userId      Int
-  classroomId Int
-  progress    Int
-
-  Classroom Classroom @relation(fields: [classroomId], references: [id])
-  User      User      @relation(fields: [userId], references: [id])
-}
-
 model Section {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
-  isCompleted Boolean @default(false)
 
   classroomId Int
   createdAt   DateTime @default(now())
@@ -220,16 +208,27 @@ model Section {
 }
 
 model Lesson {
-  id         Int      @id @default(autoincrement())
-  name       String
-  notes      String?
-  materialId Int
-  sectionId  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  notes       String?
+  isCompleted Boolean  @default(false)
+  materialId  Int
+  sectionId   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   Section  Section  @relation(fields: [sectionId], references: [id])
   Material Material @relation(fields: [materialId], references: [id])
+}
+
+model Progress {
+  id          Int @unique @default(autoincrement())
+  userId      Int
+  classroomId Int
+  progress    Int
+
+  Classroom Classroom @relation(fields: [classroomId], references: [id])
+  User      User      @relation(fields: [userId], references: [id])
 }
 
 model Question {
