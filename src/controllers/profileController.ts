@@ -42,10 +42,13 @@ export const updateProfile = async (
    ) => {
    try {
          const { userId, bio, twitter, facebook, instagram, linkedin, youtube, profilePictureURL } = req.body;
+         console.log(userId);
          if (userId !== req.user?.id) {
           return res.status(403).json({ message: 'Forbidden: You can only update your profile' });
          }
+         console.log(userId);
          const profile = await UserProfileRepo.updateProfile({ userId, bio, twitter, facebook, instagram, linkedin, youtube, profilePictureURL });
          res.status(200).json({ data: profile });
     } catch (error) {
          next(error); }}
+

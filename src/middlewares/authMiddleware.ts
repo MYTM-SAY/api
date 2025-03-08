@@ -38,6 +38,9 @@ export const isAuthenticated = async (
       });
     }
     req.user = user;
+    // update last login using User Repo
+    await UserRepo.updateLastLogin( +user.id);
+
     next();
   } catch (error) {
     return res.status(500).json({ message: 'Authentication error', error });
