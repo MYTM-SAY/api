@@ -1,12 +1,12 @@
 import express from 'express'
 import {
-	modifiedSection,
+	modifiedLessons,
 	updatedProgress,
 } from '../controllers/progressBarController'
 
 const router = express.Router()
 
-router.post('/change-section-status/:secId', modifiedSection)
-router.post('/update-progress/:classId', updatedProgress)
+router.post('/change-lesson-status/:lessonId/:userId', modifiedLessons)
+router.post('/update-progress/:classroomId/:userId', updatedProgress)
 
 export default router

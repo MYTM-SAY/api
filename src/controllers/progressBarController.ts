@@ -2,14 +2,14 @@ import { NextFunction, Response } from 'express'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { progressBarRepo } from '../repos/progressBar.repo'
 
-export const modifiedSection = async (
+export const modifiedLessons = async (
 	req: AuthenticatedRequest,
 	res: Response,
 	next: NextFunction,
 ) => {
 	try {
-		const section = await progressBarRepo.changeSectionStatus(+req.params.secId)
-		res.status(200).json({ message: 'Updated successfully', data: section })
+		const lesson = await progressBarRepo.changeLessonStatus(+req.params.lessonId, +req.params.userId)
+		res.status(200).json({ message: 'Updated successfully', data: lesson })
 	} catch (error) {
 		next(error)
 	}
@@ -21,8 +21,9 @@ export const updatedProgress = async (
 	next: NextFunction,
 ) => {
 	try {
-		const updatedClassroomProgress = await progressBarRepo.updatedProgress(
-			+req.params.classId,
+		const updatedClassroomProgress = await progressBarRepo.updateClassroomProgress(
+			+req.params.classroomId,
+			+req.params.userId
 		)
 		res.status(200).json({ progress: updatedClassroomProgress.progress })
 	} catch (error) {

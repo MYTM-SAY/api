@@ -21,8 +21,8 @@ model User {
   UserProfile       UserProfile[]
   InstructorProfile InstructorProfile[]
 
-  Communities      Community[]   @relation("CommunityMembers")
-  OwnedCommunities Community[]   @relation("CommunityOwner")
+  Communities      Community[]        @relation("CommunityMembers")
+  OwnedCommunities Community[]        @relation("CommunityOwner")
   MemberRoles      MemberRoles[]
   Post             Post[]
   Comment          Comment[]
@@ -30,6 +30,7 @@ model User {
   CommentVote      CommentVote[]
   QuizScore        QuizScore[]
   Progress         Progress[]
+  CompletedLessons CompletedLessons[]
 }
 
 model UserProfile {
@@ -211,24 +212,35 @@ model Lesson {
   id          Int      @id @default(autoincrement())
   name        String
   notes       String?
-  isCompleted Boolean  @default(false)
   materialId  Int
   sectionId   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  Section  Section  @relation(fields: [sectionId], references: [id])
-  Material Material @relation(fields: [materialId], references: [id])
+  Section          Section            @relation(fields: [sectionId], references: [id])
+  Material         Material           @relation(fields: [materialId], references: [id])
+  CompletedLessons CompletedLessons[]
+}
+
+model CompletedLessons {
+  userId   Int
+  lessonId Int
+
+  Lesson Lesson @relation(fields: [lessonId], references: [id])
+  User   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, lessonId])
 }
 
 model Progress {
-  id          Int @unique @default(autoincrement())
   userId      Int
   classroomId Int
   progress    Int
 
   Classroom Classroom @relation(fields: [classroomId], references: [id])
   User      User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, classroomId])
 }
 
 model Question {
