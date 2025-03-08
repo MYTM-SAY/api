@@ -29,6 +29,7 @@ model User {
   PostVote         PostVote[]
   CommentVote      CommentVote[]
   QuizScore        QuizScore[]
+  Progress         Progress[]
 }
 
 model UserProfile {
@@ -190,6 +191,17 @@ model Classroom {
   Community Community? @relation(fields: [communityId], references: [id])
   Sections  Section[]
   Quiz      Quiz[]
+  Progress  Progress[]
+}
+
+model Progress {
+  id          Int @id @default(autoincrement())
+  userId      Int
+  classroomId Int
+  progress    Int
+
+  Classroom Classroom @relation(fields: [classroomId], references: [id])
+  User      User      @relation(fields: [userId], references: [id])
 }
 
 model Section {
