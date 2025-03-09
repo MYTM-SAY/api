@@ -85,7 +85,11 @@ model Community {
 
   Members     User[]        @relation("CommunityMembers")
   MemberRoles MemberRoles[]
-  Forums      Forum[]
+  Forums      Forum[] 
+  Posts       Post[]
+  Comments    Comment[]
+  CommentVotes CommentVote[]
+  PostVotes   PostVote[]
   Classrooms  Classroom[]
   Tags        Tag[]
 }
@@ -131,10 +135,11 @@ model Post {
   attchments String[] // video, image, file
   forumId    Int
   authorId   Int
+  communityId   Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  Forum     Forum      @relation(fields: [forumId], references: [id])
+  Community Community @relation(fields: [communityId], references: [id])
+  Forum     Forum      @relation(fields: [forumId], references: [id]) 
   Comments  Comment[]
   Author    User       @relation(fields: [authorId], references: [id])
   PostVotes PostVote[]
@@ -148,7 +153,8 @@ model Comment {
   authorId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  communityId   Int
+  Community Community @relation(fields: [communityId], references: [id])
   Parent       Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
   Children     Comment[]     @relation("CommentReplies")
   Post         Post          @relation(fields: [postId], references: [id])
@@ -160,6 +166,8 @@ model PostVote {
   type   Boolean
   userId Int
   postId Int
+  communityId Int
+  Community Community @relation(fields: [communityId], references: [id])
   Post   Post    @relation(fields: [postId], references: [id])
   User   User    @relation(fields: [userId], references: [id])
 
@@ -170,9 +178,10 @@ model CommentVote {
   type      Boolean
   userId    Int
   commentId Int
+  communityId   Int
   Comment   Comment @relation(fields: [commentId], references: [id])
   User      User    @relation(fields: [userId], references: [id])
-
+  Community Community @relation(fields: [communityId], references: [id])
   @@id([userId, commentId])
 }
 
