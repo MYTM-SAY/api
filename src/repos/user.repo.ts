@@ -123,6 +123,6 @@ export const UserRepo = {
     });
     
     return { posts, comments, postVotes, commentVotes };
-  }
+  },
 
 };
