@@ -3,11 +3,7 @@ import { prisma } from '../db/PrismaClient';
 
 export const CommunityRepo = {
   async findAll() {
-    const results = await prisma.community.findMany({
-      include: {
-        Classrooms: true,
-      },
-    });
+    const results = await prisma.community.findMany({});
     return results;
   },
 
@@ -67,7 +63,10 @@ export const CommunityRepo = {
   },
 
   // Search by Name and Tags (if tags sended if not search by name only)
-  async searchCommunities(searchTerm: string = '', filterTagIds: number[] = []) {
+  async searchCommunities(
+    searchTerm: string = '',
+    filterTagIds: number[] = [],
+  ) {
     return prisma.community.findMany({
       where: {
         OR: [

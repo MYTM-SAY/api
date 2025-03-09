@@ -14,7 +14,7 @@ router.use('/communities', community);
 router.use('/classrooms', classroom);
 router.use('/progress', progress);
 router.use('/leader-board', leaderBoard);
-router.use('/comment', comment);
+router.use('/comments', comment);
 router.use('/profile', profile);
 
 export default router;

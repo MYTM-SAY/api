@@ -3,6 +3,8 @@ import { CommentRepo } from '../repos/comment.repo';
 import APIError from '../errors/APIError';
 import { CommentSchema } from '../utils';
 import { ZodError } from 'zod';
+import { UserRepo } from '../repos/user.repo';
+import { CommunityRepo } from '../repos/community.repo';
 
 export const findAllComments = async (
   req: Request,
@@ -84,6 +86,36 @@ export const deleteComment = async (
   try {
     await CommentRepo.deleteComment(+req.params.commentId);
     return res.status(200).json('Comment deleted successfully!');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCommentsByUserIdAndCommunityId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = Number(req.query.userId);
+    const communityId = Number(req.query.communityId);
+
+    if (!userId || !communityId) {
+      throw new APIError('Missing userId or communityId', 400);
+    }
+
+    const user = await UserRepo.findById(userId);
+    if (!user) throw new APIError('User not found', 404);
+
+    const community = await CommunityRepo.findById(communityId);
+    if (!community) throw new APIError('Community not found', 404);
+
+    const comments = await CommentRepo.getCommentsByUserIdAndCommunityId(
+      userId,
+      communityId,
+    );
+
+    return res.status(200).json(comments);
   } catch (error) {
     next(error);
   }

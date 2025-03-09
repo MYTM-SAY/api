@@ -82,6 +82,26 @@ export const CommentRepo = {
     return result;
   },
 
+  async getCommentsByUserIdAndCommunityId(userId: number, communityId: number) {
+    const comments = await prisma.comment.findMany({
+      where: {
+        authorId: userId,
+        Post: {
+          Forum: {
+            communityId: communityId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        content: true,
+        postId: true,
+        createdAt: true,
+      },
+    });
+
+    return comments;
+  },
   async deleteComment(commentId: number) {
     const comment = await prisma.comment.findUnique({
       where: { id: commentId },
