@@ -1,10 +1,10 @@
 import express from 'express'
 import {
-	getPosts,
-	createPost,
-	deletePost,
-	getPost,
-	updatePost,
+  getPosts,
+  createPost,
+  deletePost,
+  getPost,
+  updatePost,
 } from '../controllers/postController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 

@@ -1,7 +1,7 @@
 import express from 'express'
 import {
-	modifiedSection,
-	updatedProgress,
+  modifiedSection,
+  updatedProgress,
 } from '../controllers/progressBarController'
 
 const router = express.Router()

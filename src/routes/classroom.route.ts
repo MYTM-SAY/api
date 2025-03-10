@@ -1,10 +1,10 @@
 import express from 'express'
 import {
-	getClassrooms,
-	getClassroom,
-	createClassroom,
-	deleteClassroom,
-	updateClassroom,
+  getClassrooms,
+  getClassroom,
+  createClassroom,
+  deleteClassroom,
+  updateClassroom,
 } from '../controllers/classroomController'
 import { isAuthenticated, isOwner } from '../middlewares/authMiddleware'
 
