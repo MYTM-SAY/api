@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'
 import {
   findAllComments,
   findComment,
@@ -6,15 +6,15 @@ import {
   updateComment,
   deleteComment,
   getCommentsByUserIdAndCommunityId,
-} from '../controllers/commentController';
+} from '../controllers/commentController'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get('/:postId', findAllComments);
-router.get('/:postId/:commentId', findComment);
-router.post('/create-comment/:postId', createComment);
-router.put('/update-comment/:commentId', updateComment);
-router.delete('/delete-comment/:commentId', deleteComment);
+router.get('/:postId', findAllComments)
+router.get('/:postId/:commentId', findComment)
+router.post('/create-comment/:postId', createComment)
+router.put('/update-comment/:commentId', updateComment)
+router.delete('/delete-comment/:commentId', deleteComment)
 /**
  * @swagger
  * /api/v1/comments:
@@ -57,6 +57,6 @@ router.delete('/delete-comment/:commentId', deleteComment);
  *       500:
  *         description: Server error
  */
-router.get('/', getCommentsByUserIdAndCommunityId);
+router.get('/', getCommentsByUserIdAndCommunityId)
 
-export default router;
+export default router

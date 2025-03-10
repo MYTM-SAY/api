@@ -1,4 +1,4 @@
-import { prisma } from '../db/PrismaClient';
+import { prisma } from '../db/PrismaClient'
 
 export const leaderBoardRepo = {
   async getTopTenByScore(commId: number) {
@@ -23,7 +23,7 @@ export const leaderBoardRepo = {
         score: 'desc',
       },
       take: 10,
-    });
-    return result;
+    })
+    return result
   },
-};
+}

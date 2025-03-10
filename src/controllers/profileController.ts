@@ -1,8 +1,7 @@
-import e, { NextFunction, Request, Response } from 'express';
-import { UserProfileRepo } from '../repos/userProfile.repo';
-import APIError from '../errors/APIError';
-import { AuthenticatedRequest } from '../middlewares/authMiddleware';
-import exp from 'constants';
+import { NextFunction, Response } from 'express'
+import { UserProfileRepo } from '../repos/userProfile.repo'
+import APIError from '../errors/APIError'
+import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 
 // public profile
 export const getProfile = async (
@@ -11,14 +10,14 @@ export const getProfile = async (
   next: NextFunction,
 ) => {
   try {
-    const profile = await UserProfileRepo.getProfile(Number(+req.params.id));
-    if (!profile) throw new APIError('Profile not found', 404);
+    const profile = await UserProfileRepo.getProfile(Number(+req.params.id))
+    if (!profile) throw new APIError('Profile not found', 404)
 
-    res.status(200).json({ data: profile });
+    res.status(200).json({ data: profile })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 // create profile if you are the user
 export const createProfile = async (
@@ -36,11 +35,11 @@ export const createProfile = async (
       linkedin,
       youtube,
       profilePictureURL,
-    } = req.body;
+    } = req.body
     if (userId !== req.user?.id) {
       return res
         .status(403)
-        .json({ message: 'Forbidden: You can only create your profile' });
+        .json({ message: 'Forbidden: You can only create your profile' })
     }
     const profile = await UserProfileRepo.createProfile({
       userId,
@@ -51,12 +50,12 @@ export const createProfile = async (
       linkedin,
       youtube,
       profilePictureURL,
-    });
-    res.status(201).json({ data: profile });
+    })
+    res.status(201).json({ data: profile })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 // update profile if you are the user
 export const updateProfile = async (
@@ -74,11 +73,11 @@ export const updateProfile = async (
       linkedin,
       youtube,
       profilePictureURL,
-    } = req.body;
+    } = req.body
     if (userId !== req.user?.id) {
       return res
         .status(403)
-        .json({ message: 'Forbidden: You can only update your profile' });
+        .json({ message: 'Forbidden: You can only update your profile' })
     }
     const profile = await UserProfileRepo.updateProfile({
       userId,
@@ -89,9 +88,9 @@ export const updateProfile = async (
       linkedin,
       youtube,
       profilePictureURL,
-    });
-    res.status(200).json({ data: profile });
+    })
+    res.status(200).json({ data: profile })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

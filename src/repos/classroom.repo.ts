@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import { prisma } from '../db/PrismaClient';
-import APIError from '../errors/APIError';
-import { ClassroomSchema } from '../utils';
+import { z } from 'zod'
+import { prisma } from '../db/PrismaClient'
+import APIError from '../errors/APIError'
+import { ClassroomSchema } from '../utils'
 
 export const ClassroomRepo = {
   async findAll() {
@@ -9,52 +9,50 @@ export const ClassroomRepo = {
       include: {
         Community: true,
       },
-    });
-    return classrooms;
+    })
+    return classrooms
   },
 
   async findbyId(id: number) {
     const classroom = await prisma.classroom.findUnique({
-      where:{ id },
+      where: { id },
       include: {
         Community: true,
       },
-    });
-    return classroom;
+    })
+    return classroom
   },
 
   async create(data: z.infer<typeof ClassroomSchema>) {
     const classroom = await prisma.classroom.create({
       data,
-    });
-    return classroom;
+    })
+    return classroom
   },
 
-  async delete(id : number) {
+  async delete(id: number) {
     const classroom = await prisma.classroom.delete({
-      where:{
+      where: {
         id,
       },
-    });
-    return classroom;
+    })
+    return classroom
   },
 
   async update(id: number, data: Partial<z.infer<typeof ClassroomSchema>>) {
     const classroom = await prisma.classroom.findUnique({
       where: { id },
-    });
-  
+    })
+
     if (!classroom) {
-      throw new APIError('Classroom not found', 404);
+      throw new APIError('Classroom not found', 404)
     }
-  
+
     const updatedClassroom = await prisma.classroom.update({
       where: { id },
       data,
-    });
-  
-    return updatedClassroom;
+    })
+
+    return updatedClassroom
   },
-};
-
-
+}

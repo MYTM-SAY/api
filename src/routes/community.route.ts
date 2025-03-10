@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'
 import {
   discoverCommunities,
   getCommunities,
@@ -6,20 +6,24 @@ import {
   deleteCommunity,
   updateCommunity,
   getCommunity,
-} from '../controllers/communityController';
+} from '../controllers/communityController'
 
 import {
   promoteToModerator,
   demoteFromModerator,
-} from '../controllers/memberRoles';
+} from '../controllers/memberRoles'
 
-import { isAuthenticated } from '../middlewares/authMiddleware';
+import { isAuthenticated } from '../middlewares/authMiddleware'
+import validate from '../middlewares/validation'
+import { CommunitySchema } from '../utils'
 
-const app = express.Router();
+const app = express.Router()
 
-app.get('/discover', discoverCommunities);
-app.post('/remove-moderator', isAuthenticated, demoteFromModerator);
-app.post('/assign-moderator', isAuthenticated, promoteToModerator);
+// authed
+// TODO: app.get('/mine', isAuthenticated, getUserCommunities);
+app.get('/discover', discoverCommunities) // need revision
+app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) // done
+app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
 /**
  * @swagger
  * /api/v1/communities:
@@ -33,7 +37,7 @@ app.post('/assign-moderator', isAuthenticated, promoteToModerator);
  *       500:
  *         description: Server error.
  */
-app.get('/', getCommunities);
+app.get('/', getCommunities)
 /**
  * @swagger
  * /api/v1/communities:
@@ -82,7 +86,7 @@ app.get('/', getCommunities);
  *       500:
  *         description: Server error.
  */
-app.post('/', createCommunity);
+app.post('/', isAuthenticated, validate(CommunitySchema), createCommunity)
 /**
  * @swagger
  * /api/v1/communities/{id}:
@@ -105,7 +109,7 @@ app.post('/', createCommunity);
  *       500:
  *         description: Server error.
  */
-app.delete('/:id', deleteCommunity);
+app.delete('/:id', deleteCommunity)
 /**
  * @swagger
  * /api/v1/communities/{id}:
@@ -132,7 +136,7 @@ app.delete('/:id', deleteCommunity);
  *       500:
  *         description: Server error.
  */
-app.get('/:id', getCommunity);
+app.get('/:id', getCommunity)
 /**
  * @swagger
  * /api/v1/communities/{id}:
@@ -180,7 +184,7 @@ app.get('/:id', getCommunity);
  *       500:
  *         description: Server error.
  */
-app.put('/:id', updateCommunity);
-app.get('/', isAuthenticated, getCommunities);
+app.put('/:id', validate(CommunitySchema), updateCommunity)
+app.get('/', isAuthenticated, getCommunities)
 
-export default app;
+export default app

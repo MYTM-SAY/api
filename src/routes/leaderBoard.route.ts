@@ -1,8 +1,8 @@
-import express from 'express';
+import express from 'express'
 
-import { getTopTenByScore } from '../controllers/leaderBoardController';
-const app = express.Router();
+import { getTopTenByScore } from '../controllers/leaderBoardController'
+const app = express.Router()
 
-app.get('/score-leaderboard/:commId', getTopTenByScore);
+app.get('/score-leaderboard/:commId', getTopTenByScore)
 
-export default app;
+export default app

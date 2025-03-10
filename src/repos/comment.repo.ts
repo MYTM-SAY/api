@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import { prisma } from '../db/PrismaClient';
-import APIError from '../errors/APIError';
-import { CommentSchema } from '../utils';
+import { z } from 'zod'
+import { prisma } from '../db/PrismaClient'
+import APIError from '../errors/APIError'
+import { CommentSchema } from '../utils'
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -24,8 +24,8 @@ export const CommentRepo = {
         },
         Children: true,
       },
-    });
-    return results;
+    })
+    return results
   },
 
   async findComment(postId: number, commentId: number) {
@@ -49,8 +49,8 @@ export const CommentRepo = {
         },
         Children: true,
       },
-    });
-    return result;
+    })
+    return result
   },
 
   async createComment(data: z.infer<typeof CommentSchema>) {
@@ -58,8 +58,8 @@ export const CommentRepo = {
       data: {
         ...data,
       },
-    });
-    return result;
+    })
+    return result
   },
 
   async updateComment(
@@ -70,16 +70,16 @@ export const CommentRepo = {
       where: {
         id: commentId,
       },
-    });
-    if (!comment) throw new APIError('Comment not found', 404);
+    })
+    if (!comment) throw new APIError('Comment not found', 404)
 
     const result = await prisma.comment.update({
       where: {
         id: commentId,
       },
       data,
-    });
-    return result;
+    })
+    return result
   },
 
   async getCommentsByUserIdAndCommunityId(userId: number, communityId: number) {
@@ -98,21 +98,22 @@ export const CommentRepo = {
         postId: true,
         createdAt: true,
       },
-    });
+    })
 
-    return comments;
+    return comments
   },
+
   async deleteComment(commentId: number) {
     const comment = await prisma.comment.findUnique({
       where: { id: commentId },
-    });
-    if (!comment) throw new APIError('Comment not found', 404);
+    })
+    if (!comment) throw new APIError('Comment not found', 404)
     const result = await prisma.comment.delete({
       where: {
         id: commentId,
       },
-    });
+    })
 
-    return result;
+    return result
   },
-};
+}

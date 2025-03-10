@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from 'express';
-import { CommentRepo } from '../repos/comment.repo';
-import APIError from '../errors/APIError';
-import { CommentSchema } from '../utils';
-import { ZodError } from 'zod';
-import { UserRepo } from '../repos/user.repo';
-import { CommunityRepo } from '../repos/community.repo';
+import { NextFunction, Request, Response } from 'express'
+import { CommentRepo } from '../repos/comment.repo'
+import APIError from '../errors/APIError'
+import { CommentSchema } from '../utils'
+import { ZodError } from 'zod'
+import { UserRepo } from '../repos/user.repo'
+import { CommunityRepo } from '../repos/community.repo'
 
 export const findAllComments = async (
   req: Request,
@@ -12,13 +12,13 @@ export const findAllComments = async (
   next: NextFunction,
 ) => {
   try {
-    const comments = await CommentRepo.findAll(+req.params.postId);
-    if (!comments) throw new APIError('Comments not found', 404);
-    return res.status(200).json(comments);
+    const comments = await CommentRepo.findAll(+req.params.postId)
+    if (!comments) throw new APIError('Comments not found', 404)
+    return res.status(200).json(comments)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const findComment = async (
   req: Request,
@@ -29,37 +29,37 @@ export const findComment = async (
     const comments = await CommentRepo.findComment(
       +req.params.postId,
       +req.params.commentId,
-    );
-    if (!comments) throw new APIError('Comment not found', 404);
-    return res.status(200).json(comments);
+    )
+    if (!comments) throw new APIError('Comment not found', 404)
+    return res.status(200).json(comments)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const createComment = async (req: Request, res: Response) => {
   try {
-    const validatedData = CommentSchema.parse(req.body);
-    const comment = await CommentRepo.createComment(validatedData);
-    return res.status(200).json(comment);
+    const validatedData = CommentSchema.parse(req.body)
+    const comment = await CommentRepo.createComment(validatedData)
+    return res.status(200).json(comment)
   } catch (error) {
     if (error instanceof ZodError) {
       const errorMessages = error.errors.map((err) => ({
         field: err.path.join('.'),
         message: err.message,
-      }));
+      }))
       return res
         .status(400)
-        .json({ message: 'Validation failed', errors: errorMessages });
+        .json({ message: 'Validation failed', errors: errorMessages })
     }
     if (error instanceof Error) {
       return res
         .status(400)
-        .json({ message: 'Invalid data', error: error.message });
+        .json({ message: 'Invalid data', error: error.message })
     }
-    return res.status(400).json({ message: 'Invalid data', error });
+    return res.status(400).json({ message: 'Invalid data', error })
   }
-};
+}
 
 export const updateComment = async (
   req: Request,
@@ -67,16 +67,16 @@ export const updateComment = async (
   next: NextFunction,
 ) => {
   try {
-    const validatedData = CommentSchema.partial().parse(req.body);
+    const validatedData = CommentSchema.partial().parse(req.body)
     const comment = await CommentRepo.updateComment(
       +req.params.commentId,
       validatedData,
-    );
-    return res.status(200).json(comment);
+    )
+    return res.status(200).json(comment)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const deleteComment = async (
   req: Request,
@@ -84,12 +84,12 @@ export const deleteComment = async (
   next: NextFunction,
 ) => {
   try {
-    await CommentRepo.deleteComment(+req.params.commentId);
-    return res.status(200).json('Comment deleted successfully!');
+    await CommentRepo.deleteComment(+req.params.commentId)
+    return res.status(200).json('Comment deleted successfully!')
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const getCommentsByUserIdAndCommunityId = async (
   req: Request,
@@ -97,26 +97,26 @@ export const getCommentsByUserIdAndCommunityId = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = Number(req.query.userId);
-    const communityId = Number(req.query.communityId);
+    const userId = Number(req.query.userId)
+    const communityId = Number(req.query.communityId)
 
     if (!userId || !communityId) {
-      throw new APIError('Missing userId or communityId', 400);
+      throw new APIError('Missing userId or communityId', 400)
     }
 
-    const user = await UserRepo.findById(userId);
-    if (!user) throw new APIError('User not found', 404);
+    const user = await UserRepo.findById(userId)
+    if (!user) throw new APIError('User not found', 404)
 
-    const community = await CommunityRepo.findById(communityId);
-    if (!community) throw new APIError('Community not found', 404);
+    const community = await CommunityRepo.findById(communityId)
+    if (!community) throw new APIError('Community not found', 404)
 
     const comments = await CommentRepo.getCommentsByUserIdAndCommunityId(
       userId,
       communityId,
-    );
+    )
 
-    return res.status(200).json(comments);
+    return res.status(200).json(comments)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

@@ -1,4 +1,4 @@
-import { prisma } from '../db/PrismaClient';
+import { prisma } from '../db/PrismaClient'
 
 export const UserRepo = {
   async findUserByClerkId(id: string) {
@@ -6,15 +6,15 @@ export const UserRepo = {
       where: {
         clerkId: id,
       },
-    });
-    return result;
+    })
+    return result
   },
 
   async findById(id: number) {
     const result = await prisma.user.findUnique({
       where: { id },
-    });
-    return result;
+    })
+    return result
   },
 
   async createUser({
@@ -22,9 +22,9 @@ export const UserRepo = {
     email,
     username,
   }: {
-    clerkId: string;
-    email: string;
-    username: string;
+    clerkId: string
+    email: string
+    username: string
   }) {
     const result = await prisma.user.create({
       data: {
@@ -32,7 +32,7 @@ export const UserRepo = {
         email,
         username,
       },
-    });
-    return result;
+    })
+    return result
   },
-};
+}

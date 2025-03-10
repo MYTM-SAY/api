@@ -1,15 +1,14 @@
-import { prisma } from '../db/PrismaClient';
-import APIError from '../errors/APIError';
-import { UserRepo } from './user.repo';
+import { prisma } from '../db/PrismaClient'
+import APIError from '../errors/APIError'
+import { UserRepo } from './user.repo'
 
 export const UserProfileRepo = {
-
   async findByUserId(userId: number) {
     const result = await prisma.userProfile.findUnique({
       where: { userId },
       select: { Tags: true },
-    });
-    return result;
+    })
+    return result
   },
 
   // get details of a user profile
@@ -25,11 +24,11 @@ export const UserProfileRepo = {
         youtube: true,
         profilePictureURL: true,
       },
-    });
-    return result;
+    })
+    return result
   },
 
-  // create profile (insert) and link it to a user 
+  // create profile (insert) and link it to a user
 
   async createProfile({
     userId,
@@ -41,17 +40,17 @@ export const UserProfileRepo = {
     youtube,
     profilePictureURL,
   }: {
-    userId: number;
-    bio: string;
-    twitter: string;
-    facebook: string;
-    instagram: string;
-    linkedin: string;
-    youtube: string;
-    profilePictureURL: string;
+    userId: number
+    bio: string
+    twitter: string
+    facebook: string
+    instagram: string
+    linkedin: string
+    youtube: string
+    profilePictureURL: string
   }) {
-    const user = await UserRepo.findById(userId);
-    if (!user) throw new APIError('User not found', 404);
+    const user = await UserRepo.findById(userId)
+    if (!user) throw new APIError('User not found', 404)
 
     const result = await prisma.userProfile.create({
       data: {
@@ -64,24 +63,45 @@ export const UserProfileRepo = {
         youtube,
         profilePictureURL,
       },
-    });
-    return result;
+    })
+    return result
   },
-  
+
   // update profile
-  async updateProfile({ userId, bio, twitter, facebook, instagram, linkedin, youtube, profilePictureURL }: {
-    userId: number; bio: string; twitter: string; facebook: string; instagram: string; linkedin: string; youtube: string; profilePictureURL: string;
+  async updateProfile({
+    userId,
+    bio,
+    twitter,
+    facebook,
+    instagram,
+    linkedin,
+    youtube,
+    profilePictureURL,
+  }: {
+    userId: number
+    bio: string
+    twitter: string
+    facebook: string
+    instagram: string
+    linkedin: string
+    youtube: string
+    profilePictureURL: string
   }) {
-    const user = await UserRepo.findById(userId);
-    if (!user) throw new APIError('User not found', 404);
+    const user = await UserRepo.findById(userId)
+    if (!user) throw new APIError('User not found', 404)
 
     const result = await prisma.userProfile.update({
       where: { userId },
-      data: { bio, twitter, facebook, instagram, linkedin, youtube, profilePictureURL },
-    });
-    return result;
+      data: {
+        bio,
+        twitter,
+        facebook,
+        instagram,
+        linkedin,
+        youtube,
+        profilePictureURL,
+      },
+    })
+    return result
   },
-
-  
- 
-};
+}
