@@ -85,11 +85,12 @@ model Community {
   ownerId Int
   Owner   User @relation("CommunityOwner", fields: [ownerId], references: [id])
 
-  Members     User[]        @relation("CommunityMembers")
-  MemberRoles MemberRoles[]
-  Forums      Forum[]
-  Classrooms  Classroom[]
-  Tags        Tag[]
+  Members          User[]             @relation("CommunityMembers")
+  MemberRoles      MemberRoles[]
+  Forums           Forum[]
+  Classrooms       Classroom[]
+  Tags             Tag[]
+  CompletedLessons CompletedLessons[]
 }
 
 model MemberRoles {
@@ -188,10 +189,11 @@ model Classroom {
   updatedAt   DateTime @updatedAt
 
   // TODO: save progress of the user
-  Community Community? @relation(fields: [communityId], references: [id])
-  Sections  Section[]
-  Quiz      Quiz[]
-  Progress  Progress[]
+  Community        Community?         @relation(fields: [communityId], references: [id])
+  Sections         Section[]
+  Quiz             Quiz[]
+  Progress         Progress[]
+  CompletedLessons CompletedLessons[]
 }
 
 model Section {
@@ -209,13 +211,13 @@ model Section {
 }
 
 model Lesson {
-  id          Int      @id @default(autoincrement())
-  name        String
-  notes       String?
-  materialId  Int
-  sectionId   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String
+  notes      String?
+  materialId Int
+  sectionId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   Section          Section            @relation(fields: [sectionId], references: [id])
   Material         Material           @relation(fields: [materialId], references: [id])
@@ -223,13 +225,17 @@ model Lesson {
 }
 
 model CompletedLessons {
-  userId   Int
-  lessonId Int
+  userId      Int
+  lessonId    Int
+  communityId Int
+  classroomId Int
 
-  Lesson Lesson @relation(fields: [lessonId], references: [id])
-  User   User   @relation(fields: [userId], references: [id])
+  Lesson    Lesson    @relation(fields: [lessonId], references: [id])
+  User      User      @relation(fields: [userId], references: [id])
+  Community Community @relation(fields: [communityId], references: [id])
+  Classroom Classroom @relation(fields: [classroomId], references: [id])
 
-  @@unique([userId, lessonId])
+  @@unique([userId, lessonId, communityId, classroomId])
 }
 
 model Progress {

@@ -6,7 +6,7 @@ import {
 
 const router = express.Router()
 
-router.post('/change-lesson-status/:lessonId/:userId', modifiedLessons)
-router.post('/update-progress/:classroomId/:userId', updatedProgress)
+router.post('/change-lesson-status/:communityId/:classroomId/:lessonId/:userId', modifiedLessons)
+router.post('/update-progress/:communityId/:classroomId/:userId', updatedProgress)
 
 export default router
