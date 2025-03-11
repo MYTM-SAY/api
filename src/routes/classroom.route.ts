@@ -6,14 +6,20 @@ import {
   deleteClassroom,
   updateClassroom,
 } from '../controllers/classroomController'
-import { isAuthenticated, isOwner } from '../middlewares/authMiddleware'
+import {
+  hasCommunityRoleOrHigher,
+  isAuthenticated,
+} from '../middlewares/authMiddleware'
 
 const router = express.Router()
 
 router.get('/', isAuthenticated, getClassrooms)
 router.get('/:id', isAuthenticated, getClassroom)
-router.post('/', isAuthenticated, isOwner, createClassroom)
-router.delete('/:id', isAuthenticated, isOwner, deleteClassroom)
-router.patch('/:id', isAuthenticated, isOwner, updateClassroom)
+
+// Owner-only routes
+router.use(hasCommunityRoleOrHigher(['OWNER']))
+router.post('/', isAuthenticated, createClassroom)
+router.delete('/:id', isAuthenticated, deleteClassroom)
+router.patch('/:id', isAuthenticated, updateClassroom)
 
 export default router

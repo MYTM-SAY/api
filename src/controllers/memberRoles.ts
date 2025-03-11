@@ -17,23 +17,7 @@ export const promoteToModerator = async (
     }
 
     if (+userId === requesterId) {
-      return res.status(403).json({ message: "You can't remove your own role" })
-    }
-
-    const [isAdmin, isOwner, userIsMod] = await Promise.all([
-      MemberRolesRepo.isCommunityAdmin(requesterId, +communityId),
-      MemberRolesRepo.isCommunityOwner(requesterId, +communityId),
-      MemberRolesRepo.isCommunityMod(+userId, +communityId),
-    ])
-
-    if (!isAdmin && !isOwner) {
-      return res.status(403).json({
-        message: 'Forbidden: Only an admin or owner can assign moderators',
-      })
-    }
-
-    if (userIsMod) {
-      return res.status(403).json({ message: 'User is already a Moderator' })
+      return res.status(403).json({ message: 'You are already a moderator' })
     }
 
     const updatedMember = await MemberRolesRepo.assignModRole(
@@ -64,22 +48,6 @@ export const demoteFromModerator = async (
 
     if (+userId === requesterId) {
       return res.status(403).json({ message: "You can't remove your own role" })
-    }
-
-    const [isAdmin, isOwner, userIsMod] = await Promise.all([
-      MemberRolesRepo.isCommunityAdmin(requesterId, +communityId),
-      MemberRolesRepo.isCommunityOwner(requesterId, +communityId),
-      MemberRolesRepo.isCommunityMod(+userId, +communityId),
-    ])
-
-    if (!isAdmin && !isOwner) {
-      return res.status(403).json({
-        message: 'Forbidden: Only an admin or owner can remove moderators',
-      })
-    }
-
-    if (!userIsMod) {
-      return res.status(400).json({ message: 'User is not a Moderator' })
     }
 
     const updatedMember = await MemberRolesRepo.removeModRole(
