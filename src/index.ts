@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import error from './middlewares/error'
-import { clerkMiddleware } from '@clerk/express'
 import router from './routes'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
@@ -19,8 +18,22 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `http://localhost:${port}`,
+        url: `http://localhost:${port}/api/v1`,
         description: 'Development server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
       },
     ],
   },
@@ -36,7 +49,6 @@ app.use(
   }),
 )
 app.use(express.json())
-app.use(clerkMiddleware())
 app.get('/', (req, res) => {
   return res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
