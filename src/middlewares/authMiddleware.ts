@@ -3,7 +3,6 @@ import { UserRepo } from '../repos/user.repo'
 import { AuthObject, clerkClient, getAuth, requireAuth } from '@clerk/express'
 import { User } from '@prisma/client'
 import { MemberRolesRepo } from '../repos/memberRoles.repo'
-import { prisma } from '../db/PrismaClient'
 
 export interface AuthenticatedRequest extends Request {
   auth?: AuthObject
@@ -52,29 +51,6 @@ export const requestWithParsedUser = async (
 }
 
 export const isAuthenticated = [requireAuth(), requestWithParsedUser]
-
-export const isOwner = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const userRole = await prisma.memberRoles.findFirst({
-      where: {
-        userId: req.user?.id,
-        Role: 'OWNER',
-      },
-    })
-
-    if (!userRole) {
-      return res.status(403).json({ message: 'Access denied' })
-    }
-
-    next()
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' })
-  }
-}
 
 function getRoleLevel(role: Role | null): number {
   return role ? roleLevels[role] || 0 : 0
