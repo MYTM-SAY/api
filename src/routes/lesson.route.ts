@@ -9,7 +9,7 @@ import {
 import {
   hasCommunityRoleOrHigher,
   isAuthenticated,
-} from '../middlewares/authTesting'
+} from '../middlewares/authMiddleware'
 
 const router = express.Router()
 
