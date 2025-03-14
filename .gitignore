@@ -3,3 +3,4 @@ node_modules/
 dist/
 prisma/migrations/
 prisma/seed.mjs
+src/middlewares/authTesting.ts

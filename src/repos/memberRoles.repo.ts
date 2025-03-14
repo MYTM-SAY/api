@@ -30,16 +30,12 @@ export const MemberRolesRepo = {
     return !!(await this.getUserRoleInCommunity(userId, communityId))
   },
 
-  async hasCommunityRole(userId: number, communityId: number) {
+  async hasCommunityRoleOrHigher(userId: number, communityId: number) {
     return (await this.getUserRoleInCommunity(userId, communityId)) === 'MEMBER'
   },
 
   async isCommunityOwner(userId: number, communityId: number) {
     return (await this.getUserRoleInCommunity(userId, communityId)) === 'OWNER'
-  },
-
-  async isCommunityAdmin(userId: number, communityId: number) {
-    return (await this.getUserRoleInCommunity(userId, communityId)) === 'ADMIN' // TODO: fix this, admins are community inpedendent
   },
 
   async isCommunityMod(userId: number, communityId: number) {

@@ -13,17 +13,44 @@ import {
   demoteFromModerator,
 } from '../controllers/memberRoles'
 
-import { isAuthenticated } from '../middlewares/authMiddleware'
+import {
+  hasCommunityRoleOrHigher,
+  isAuthenticated,
+} from '../middlewares/authMiddleware'
 import validate from '../middlewares/validation'
 import { CommunitySchema } from '../utils'
 
 const app = express.Router()
 
-// authed
-// TODO: app.get('/mine', isAuthenticated, getUserCommunities);
+// public
 app.get('/discover', discoverCommunities) // need revision
-app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) // done
-app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
+/**
+ * @swagger
+ * /api/v1/communities/{id}:
+ *   get:
+ *     summary: Get a single community
+ *     description: Fetches details of a specific community by its ID.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to retrieve.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved community.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Community"
+ *       404:
+ *         description: Community not found.
+ *       500:
+ *         description: Server error.
+ */
+app.get('/:id', getCommunity) // done
 /**
  * @swagger
  * /api/v1/communities:
@@ -37,7 +64,11 @@ app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) /
  *       500:
  *         description: Server error.
  */
-app.get('/', getCommunities)
+app.get('/', getCommunities) // done
+
+// authed
+app.use(isAuthenticated)
+// TODO: app.get('/mine', isAuthenticated, getUserCommunities);
 /**
  * @swagger
  * /api/v1/communities:
@@ -86,57 +117,10 @@ app.get('/', getCommunities)
  *       500:
  *         description: Server error.
  */
-app.post('/', isAuthenticated, validate(CommunitySchema), createCommunity)
-/**
- * @swagger
- * /api/v1/communities/{id}:
- *   delete:
- *     summary: Delete a community
- *     description: Removes a community by its ID.
- *     tags: [Communities]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the community to delete.
- *     responses:
- *       204:
- *         description: Community deleted successfully.
- *       404:
- *         description: Community not found.
- *       500:
- *         description: Server error.
- */
-app.delete('/:id', deleteCommunity)
-/**
- * @swagger
- * /api/v1/communities/{id}:
- *   get:
- *     summary: Get a single community
- *     description: Fetches details of a specific community by its ID.
- *     tags: [Communities]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the community to retrieve.
- *     responses:
- *       200:
- *         description: Successfully retrieved community.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: "#/components/schemas/Community"
- *       404:
- *         description: Community not found.
- *       500:
- *         description: Server error.
- */
-app.get('/:id', getCommunity)
+app.post('/', validate(CommunitySchema), createCommunity)
+
+// Owner-only routes
+app.use(hasCommunityRoleOrHigher(['OWNER']))
 /**
  * @swagger
  * /api/v1/communities/{id}:
@@ -185,6 +169,30 @@ app.get('/:id', getCommunity)
  *         description: Server error.
  */
 app.put('/:id', validate(CommunitySchema), updateCommunity)
-app.get('/', isAuthenticated, getCommunities)
+app.post('/:id/remove-moderator/:userId', demoteFromModerator) // done
+app.post('/:id/assign-moderator/:userId', promoteToModerator) // done
+/**
+ * @swagger
+ * /api/v1/communities/{id}:
+ *   delete:
+ *     summary: Delete a community
+ *     description: Removes a community by its ID.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to delete.
+ *     responses:
+ *       204:
+ *         description: Community deleted successfully.
+ *       404:
+ *         description: Community not found.
+ *       500:
+ *         description: Server error.
+ */
+app.delete('/:id', deleteCommunity)
 
 export default app
