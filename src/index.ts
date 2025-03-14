@@ -19,12 +19,72 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `http://localhost:${port}`,
+        url: `http://localhost:${port}/api/v1`,
         description: 'Development server',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+      schemas: {
+        Lesson: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            notes: { type: 'string', nullable: true },
+            materialId: { type: 'integer' },
+            sectionId: { type: 'integer' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+            Section: {
+              $ref: '#/components/schemas/Section',
+            },
+          },
+          required: [
+            'id',
+            'name',
+            'materialId',
+            'sectionId',
+            'createdAt',
+            'updatedAt',
+            'Section',
+          ],
+        },
+        LessonCreate: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', minLength: 1, maxLength: 100 },
+            notes: { type: 'string', maxLength: 5000, nullable: true },
+            materialId: { type: 'integer' },
+            sectionId: { type: 'integer' },
+          },
+          required: ['name', 'materialId', 'sectionId'],
+        },
+        LessonUpdate: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', minLength: 1, maxLength: 100 },
+            notes: { type: 'string', maxLength: 5000, nullable: true },
+            materialId: { type: 'integer' },
+            sectionId: { type: 'integer' },
+          },
+          required: [],
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ['./src/routes/*.ts'],
+  apis: ['./src/routes/*.ts'], // Ensure this path matches your route files
 }
 const swaggerSpecs = swaggerJsdoc(options)
 dotenv.config()
