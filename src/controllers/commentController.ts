@@ -1,90 +1,68 @@
 import { NextFunction, Request, Response } from 'express'
-import { CommentRepo } from '../repos/comment.repo'
-import APIError from '../errors/APIError'
-import { CommentSchema } from '../utils'
-import { ZodError } from 'zod'
+import { CommentService } from '../services/commentService'
+import { AuthenticatedRequest } from '../middlewares/authMiddleware'
+import { asyncHandler } from '../utils/asyncHandler'
+import { ResponseHelper } from '../utils/responseHelper'
 
-export const findAllComments = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const comments = await CommentRepo.findAll(+req.params.postId)
-		if (!comments) throw new APIError('Comments not found', 404)
-		return res.status(200).json(comments)
-	} catch (error) {
-		next(error)
-	}
-}
+export const findAllComments = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const comments = await CommentService.findAllComments(+req.params.postId)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comments fetched successfully', comments))
+  },
+)
 
-export const findComment = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const comments = await CommentRepo.findComment(
-			+req.params.postId,
-			+req.params.commentId,
-		)
-		if (!comments) throw new APIError('Comment not found', 404)
-		return res.status(200).json(comments)
-	} catch (error) {
-		next(error)
-	}
-}
+export const findComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const comment = await CommentService.findComment(
+      +req.params.postId,
+      +req.params.commentId,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comment fetched successfully', comment))
+  },
+)
 
-export const createComment = async (req: Request, res: Response) => {
-	try {
-		const validatedData = CommentSchema.parse(req.body)
-		const comment = await CommentRepo.createComment(validatedData)
-		return res.status(200).json(comment)
-	} catch (error) {
-		if (error instanceof ZodError) {
-			const errorMessages = error.errors.map((err) => ({
-				field: err.path.join('.'),
-				message: err.message,
-			}))
-			return res
-				.status(400)
-				.json({ message: 'Validation failed', errors: errorMessages })
-		}
-		if (error instanceof Error) {
-			return res
-				.status(400)
-				.json({ message: 'Invalid data', error: error.message })
-		}
-		return res.status(400).json({ message: 'Invalid data', error })
-	}
-}
+export const createComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const comment = await CommentService.createComment(req.body)
+    res
+      .status(201)
+      .json(ResponseHelper.success('Comment created successfully', comment))
+  },
+)
 
-export const updateComment = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const validatedData = CommentSchema.partial().parse(req.body)
-		const comment = await CommentRepo.updateComment(
-			+req.params.commentId,
-			validatedData,
-		)
-		return res.status(200).json(comment)
-	} catch (error) {
-		next(error)
-	}
-}
+export const updateComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const comment = await CommentService.updateComment(
+      +req.params.commentId,
+      req.body,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comment updated successfully', comment))
+  },
+)
 
-export const deleteComment = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		await CommentRepo.deleteComment(+req.params.commentId)
-		return res.status(200).json('Comment deleted successfully!')
-	} catch (error) {
-		next(error)
-	}
-}
+export const deleteComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    await CommentService.deleteComment(+req.params.commentId)
+    res.status(200).json(ResponseHelper.success('Comment deleted successfully'))
+  },
+)
+
+export const getCommentsByUserIdAndCommunityId = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.claims!.id
+    const communityId = Number(req.query.communityId)
+    const comments = await CommentService.getCommentsByUserIdAndCommunityId(
+      userId,
+      communityId,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comments fetched successfully', comments))
+  },
+)

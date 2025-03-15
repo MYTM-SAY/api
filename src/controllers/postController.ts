@@ -1,74 +1,42 @@
-import { NextFunction, Request, Response } from 'express'
-import { PostRepo } from '../repos/post.repo'
-import APIError from '../errors/APIError'
+import { Request, Response } from 'express'
+import { PostService } from '../services/postService'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
+import { ResponseHelper } from '../utils/responseHelper'
+import { asyncHandler } from '../utils/asyncHandler'
 
-export const getPosts = async (
-	req: AuthenticatedRequest,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const posts = await PostRepo.findAll()
-		return res.status(200).json(posts)
-	} catch (error) {
-		next(error)
-	}
-}
+export const getPostsByForumId = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const posts = await PostService.getPostsByForumId(+req.params.id)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Posts fetched successfully', posts))
+  },
+)
 
-export const createPost = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const post = await PostRepo.create(req.body)
-		return res.status(201).json(post)
-	} catch (error) {
-		next(error)
-	}
-}
+export const createPost = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const post = await PostService.createPost(req.body, req.claims!.id)
+    res
+      .status(201)
+      .json(ResponseHelper.success('Post created successfully', post))
+  },
+)
 
-export const getPost = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const post = await PostRepo.findById(Number(req.params.id))
-		if (!post) throw new APIError('Post not found', 404)
-		return res.status(200).json(post)
-	} catch (error) {
-		next(error)
-	}
-}
+export const getPost = asyncHandler(async (req: Request, res: Response) => {
+  const post = await PostService.getPostById(+req.params.id)
+  res
+    .status(200)
+    .json(ResponseHelper.success('Post fetched successfully', post))
+})
 
-export const updatePost = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const postExist = await PostRepo.findById(Number(req.params.id))
-		if (!postExist) throw new APIError('Post not found', 404)
-		const post = await PostRepo.update(+req.params.id, req.body)
-		return res.status(200).json(post)
-	} catch (error) {
-		next(error)
-	}
-}
+export const updatePost = asyncHandler(async (req: Request, res: Response) => {
+  const post = await PostService.updatePost(+req.params.id, req.body)
+  res
+    .status(200)
+    .json(ResponseHelper.success('Post updated successfully', post))
+})
 
-export const deletePost = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const postExist = await PostRepo.findById(Number(req.params.id))
-		if (!postExist) throw new APIError('Post not found', 404)
-		await PostRepo.delete(+req.params.id)
-		return res.status(204).send()
-	} catch (error) {
-		next(error)
-	}
-}
+export const deletePost = asyncHandler(async (req: Request, res: Response) => {
+  await PostService.deletePost(+req.params.id)
+  res.status(204).json(ResponseHelper.success('Post deleted successfully'))
+})
