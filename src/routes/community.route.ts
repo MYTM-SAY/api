@@ -26,7 +26,7 @@ app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) 
 app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
 /**
  * @swagger
- * /api/v1/communities:
+ * /communities:
  *   get:
  *     summary: Get all communities
  *     description: Fetch a list of all communities.
@@ -37,10 +37,10 @@ app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) /
  *       500:
  *         description: Server error.
  */
-app.get('/', getCommunities)
+app.get('/', isAuthenticated, getCommunities)
 /**
  * @swagger
- * /api/v1/communities:
+ * /communities:
  *   post:
  *     summary: Create a new community
  *     description: Creates a new community with the provided details.
@@ -89,7 +89,7 @@ app.get('/', getCommunities)
 app.post('/', isAuthenticated, validate(CommunitySchema), createCommunity)
 /**
  * @swagger
- * /api/v1/communities/{id}:
+ * /communities/{id}:
  *   delete:
  *     summary: Delete a community
  *     description: Removes a community by its ID.
@@ -112,7 +112,7 @@ app.post('/', isAuthenticated, validate(CommunitySchema), createCommunity)
 app.delete('/:id', deleteCommunity)
 /**
  * @swagger
- * /api/v1/communities/{id}:
+ * /communities/{id}:
  *   get:
  *     summary: Get a single community
  *     description: Fetches details of a specific community by its ID.
@@ -139,7 +139,7 @@ app.delete('/:id', deleteCommunity)
 app.get('/:id', getCommunity)
 /**
  * @swagger
- * /api/v1/communities/{id}:
+ * /communities/{id}:
  *   put:
  *     summary: Update a community
  *     description: Updates an existing community with new data.
