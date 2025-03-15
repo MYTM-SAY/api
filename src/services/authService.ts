@@ -38,10 +38,10 @@ const register = async (
 
 const refreshToken = async (refreshToken: string) => {
   const payload = JwtService.verifyRefreshToken(refreshToken)
-  if (!payload) throw new Error('Invalid refresh token')
+  if (!payload) throw new APIError('Invalid refresh token', 401)
 
   const user = await UserRepo.findById(payload.id)
-  if (!user) throw new Error('User not found')
+  if (!user) throw new APIError('User not found', 404)
 
   return { accessToken: JwtService.generateAccessToken(user) }
 }

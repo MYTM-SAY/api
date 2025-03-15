@@ -7,20 +7,58 @@ import {
   updateCommunity,
   getCommunity,
 } from '../controllers/communityController'
-
 import {
   promoteToModerator,
   demoteFromModerator,
 } from '../controllers/memberRoles'
-
 import { isAuthenticated } from '../middlewares/authMiddleware'
 import validate from '../middlewares/validation'
-import { CommunitySchema } from '../utils'
+import { CommunitySchema } from '../utils/zod/communitySchemes'
 
 const app = express.Router()
 
-// authed
-// TODO: app.get('/mine', isAuthenticated, getUserCommunities);
+/**
+ * @swagger
+ * /communities/discover:
+ *   get:
+ *     summary: Discover communities based on search term, tags, or popularity
+ *     description: Retrieves a list of communities based on search criteria, recommended tags, or popularity.
+ *     tags:
+ *       - Communities
+ *     parameters:
+ *       - in: query
+ *         name: searchTerm
+ *         schema:
+ *           type: string
+ *           nullable: true
+ *         description: Optional search term to filter communities.
+ *       - in: query
+ *         name: tagIds
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: integer
+ *         description: Optional list of tag IDs to filter communities.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved communities.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   enum: [search, recommended, popular]
+ *                   description: Type of result returned.
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Community'
+ *       500:
+ *         description: Internal server error.
+ */
+
 app.get('/discover', discoverCommunities) // need revision
 app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) // done
 app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
@@ -69,9 +107,6 @@ app.get('/', isAuthenticated, getCommunities)
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/logo.jpg"
- *               ownerId:
- *                 type: integer
- *                 example: 1
  *     responses:
  *       201:
  *         description: Community created successfully.
@@ -86,7 +121,7 @@ app.get('/', isAuthenticated, getCommunities)
  *       500:
  *         description: Server error.
  */
-app.post('/', isAuthenticated, validate(CommunitySchema), createCommunity)
+app.post('/', isAuthenticated, createCommunity)
 /**
  * @swagger
  * /communities/{id}:
@@ -109,7 +144,7 @@ app.post('/', isAuthenticated, validate(CommunitySchema), createCommunity)
  *       500:
  *         description: Server error.
  */
-app.delete('/:id', deleteCommunity)
+app.delete('/:id', isAuthenticated, deleteCommunity)
 /**
  * @swagger
  * /communities/{id}:
@@ -184,7 +219,6 @@ app.get('/:id', getCommunity)
  *       500:
  *         description: Server error.
  */
-app.put('/:id', validate(CommunitySchema), updateCommunity)
-app.get('/', isAuthenticated, getCommunities)
+app.put('/:id', isAuthenticated, updateCommunity)
 
 export default app

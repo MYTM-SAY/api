@@ -1,10 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import error from './middlewares/error'
 import router from './routes'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import globalExceptionHandlerMiddleware from './middlewares/globalExceptionHandlingMiddleware'
 
 const app = express()
 const port = process.env.PORT || 4000
@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/', router)
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpecs))
-app.use(error)
+app.use(globalExceptionHandlerMiddleware)
 
 app.listen(port, () => {
   console.log(`Listening: http://localhost:${port}`)

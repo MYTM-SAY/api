@@ -69,21 +69,6 @@ export const TagSchema = z
   })
   .strict()
 
-export const CommunitySchema = z.object({
-  id: z.number().int().positive().optional(),
-  name: z
-    .string()
-    .min(1, 'Community name is required')
-    .max(100, 'Community name must be at most 100 characters'),
-  description: z
-    .string()
-    .max(500, 'Description must be at most 500 characters')
-    .optional(),
-  coverImgURL: z.string().url().optional(),
-  logoImgURL: z.string().url().optional(),
-  ownerId: z.number().int().positive().optional(),
-})
-
 export const MemberRolesSchema = z
   .object({
     communityId: z.number().int().positive(),
