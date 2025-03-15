@@ -1,13 +1,10 @@
 import { Response, NextFunction, Request } from 'express'
-import { UserRepo } from '../repos/user.repo'
-import { User } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 import { JwtService } from '../services/jwtService'
 import { TokenPayload } from '../interfaces/tokenPayload'
 
 export interface AuthenticatedRequest extends Request {
   claims?: TokenPayload
-  user?: User
 }
 
 const authenticationJwtToken = async (
@@ -34,7 +31,7 @@ export const isOwner = async (
   try {
     const userRole = await prisma.memberRoles.findFirst({
       where: {
-        userId: req.user?.id,
+        userId: req.claims?.id,
         Role: 'OWNER',
       },
     })

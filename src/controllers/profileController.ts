@@ -36,7 +36,7 @@ export const createProfile = async (
       youtube,
       profilePictureURL,
     } = req.body
-    if (userId !== req.user?.id) {
+    if (userId !== req.claims?.id) {
       return res
         .status(403)
         .json({ message: 'Forbidden: You can only create your profile' })
@@ -74,7 +74,7 @@ export const updateProfile = async (
       youtube,
       profilePictureURL,
     } = req.body
-    if (userId !== req.user?.id) {
+    if (userId !== req.claims?.id) {
       return res
         .status(403)
         .json({ message: 'Forbidden: You can only update your profile' })
