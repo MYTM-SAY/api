@@ -9,7 +9,10 @@ export const register = async (
 ) => {
   try {
     const { password, ...userData } = req.body
-    const newUser = await AuthService.register(userData, req.body.password)
+    const newUser = await AuthService.register({
+      ...userData,
+      password: req.body.password,
+    })
     return res.status(201).json(newUser)
   } catch (error) {
     next(error)
@@ -24,6 +27,20 @@ export const login = async (
   try {
     const { password, email } = req.body
     const result = await AuthService.login(email, password)
+    return res.status(201).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { refreshToken } = req.body
+    const result = await AuthService.refreshToken(refreshToken)
     return res.status(201).json(result)
   } catch (error) {
     next(error)

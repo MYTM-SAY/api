@@ -20,8 +20,7 @@ const authenticationJwtToken = async (
   if (!token) return res.status(401).json({ message: 'Unauthorized' })
   const payload = JwtService.verifyAccessToken(token)
   if (!payload) return res.status(401).json({ message: 'Unauthorized' })
-  req.claims = payload as TokenPayload
-  console.log(payload)
+  req.claims = payload
   next()
 }
 

@@ -14,7 +14,7 @@ const generateRefreshToken = (user: User): string =>
 
 const verifyAccessToken = (token: string) => {
   try {
-    return jwt.verify(token, ACCESS_TOKEN_SECRET)
+    return jwt.verify(token, ACCESS_TOKEN_SECRET) as TokenPayload
   } catch (error) {
     return null
   }
@@ -22,7 +22,7 @@ const verifyAccessToken = (token: string) => {
 
 const verifyRefreshToken = (token: string) => {
   try {
-    return jwt.verify(token, REFRESH_TOKEN_SECRET)
+    return jwt.verify(token, REFRESH_TOKEN_SECRET) as TokenPayload
   } catch (error) {
     return null
   }

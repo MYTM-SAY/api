@@ -16,17 +16,18 @@ const login = async (email: string, password: string) => {
   }
 }
 
-const register = async (user: Prisma.UserCreateInput, password: string) => {
+const register = async (
+  user: Prisma.UserCreateInput & { password: string },
+) => {
   const existingEmail = await UserRepo.findByEmail(user.email)
   if (existingEmail) throw new Error('username already in use')
+  const existingUsername = await UserRepo.findByUsername(user.username)
 
-  const existingUsername = await UserRepo.findByUsername(user.email)
   if (existingUsername) throw new Error('username already in use')
-  const hashedPassword = await bcrypt.hash(password, 10)
+  const hashedPassword = await bcrypt.hash(user.password, 10)
 
   user.hashedPassword = hashedPassword
   user.dob = user.dob ? new Date(user.dob) : undefined
-  console.log(user)
   const createdUser = await UserRepo.createUser(user)
 
   return {
@@ -35,18 +36,18 @@ const register = async (user: Prisma.UserCreateInput, password: string) => {
   }
 }
 
-// const refreshToken = async (refreshToken: string) => {
-//   const payload = JwtService.verifyRefreshToken(refreshToken)
-//   if (!payload) throw new Error('Invalid refresh token')
+const refreshToken = async (refreshToken: string) => {
+  const payload = JwtService.verifyRefreshToken(refreshToken)
+  if (!payload) throw new Error('Invalid refresh token')
 
-//   const user = await prisma.user.findUnique({ where: { id: payload.id } })
-//   if (!user) throw new Error('User not found')
+  const user = await UserRepo.findById(payload.id)
+  if (!user) throw new Error('User not found')
 
-//   return { accessToken: JwtService.generateAccessToken(user) }
-// }
+  return { accessToken: JwtService.generateAccessToken(user) }
+}
 
 const logout = async (userId: string) => {
   console.log(`User ${userId} logged out`)
 }
 
-export const AuthService = { login, register, logout }
+export const AuthService = { login, register, logout, refreshToken }

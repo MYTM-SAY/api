@@ -1,5 +1,5 @@
 import express from 'express'
-import { login, register } from '../controllers/authController'
+import { login, refreshToken, register } from '../controllers/authController'
 
 const router = express.Router()
 /**
@@ -71,5 +71,43 @@ router.post('/register', register)
  *         description: Login successful
  */
 router.post('/login', login)
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh the access token
+ *     description: Generates a new access token using a valid refresh token.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: The refresh token obtained during login
+ *     responses:
+ *       201:
+ *         description: Successfully refreshed access token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: The new access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: The new refresh token
+ *       400:
+ *         description: Invalid or missing refresh token
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/refresh-token', refreshToken)
 
 export default router
