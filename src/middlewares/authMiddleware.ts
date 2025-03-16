@@ -1,100 +1,104 @@
 import { Response, NextFunction, Request } from 'express'
-import { UserRepo } from '../repos/user.repo'
-import { AuthObject, clerkClient, getAuth, requireAuth } from '@clerk/express'
-import { User } from '@prisma/client'
+import { prisma } from '../db/PrismaClient'
 import { MemberRolesRepo } from '../repos/memberRoles.repo'
+import { JwtService } from '../services/jwtService'
+import { TokenPayload } from '../interfaces/tokenPayload'
 
 export interface AuthenticatedRequest extends Request {
-  auth?: AuthObject
-  user?: User
+  claims?: TokenPayload
 }
 
-type Role = 'ADMIN' | 'OWNER' | 'MODERATOR' | 'MEMBER'
-const roleLevels = {
-  MEMBER: 1,
-  MODERATOR: 2,
-  OWNER: 3,
-  ADMIN: 4,
+const authenticationJwtToken = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const token = req.headers.authorization?.split(' ')[1]
+
+  if (!token) return res.status(401).json({ message: 'Unauthorized' })
+  const payload = JwtService.verifyAccessToken(token)
+  if (!payload) return res.status(401).json({ message: 'Unauthorized' })
+  req.claims = payload
+  next()
 }
 
-export const requestWithParsedUser = async (
+export const isAuthenticated = [authenticationJwtToken]
+
+//TODO: don't remove this
+
+// type Role = 'ADMIN' | 'OWNER' | 'MODERATOR' | 'MEMBER'
+// const roleLevels = {
+//   MEMBER: 1,
+//   MODERATOR: 2,
+//   OWNER: 3,
+//   ADMIN: 4,
+// }
+
+// function getRoleLevel(role: Role | null): number {
+//   return role ? roleLevels[role] || 0 : 0
+// }
+// export const hasCommunityRoleOrHigher = (
+//   minimumRoles: Role[],
+//   communityIdParam = 'communityId',
+// ) => {
+//   return async (
+//     req: AuthenticatedRequest,
+//     res: Response,
+//     next: NextFunction,
+//   ) => {
+//     try {
+//       if (!req.user) {
+//         return res.status(401).json({ message: 'Unauthorized' })
+//       }
+//       const communityId = Number(
+//         req.params[communityIdParam] ||
+//           req.body[communityIdParam] ||
+//           req.query[communityIdParam],
+//       )
+//       if (!communityId) {
+//         return res.status(400).json({ message: 'community ID missing' })
+//       }
+//       const globalRoleLevel = getRoleLevel(req.user.globalRole)
+//       const communityRole = await MemberRolesRepo.getUserRoleInCommunity(
+//         req.user.id,
+//         communityId,
+//       )
+//       const communityRoleLevel = getRoleLevel(communityRole)
+//       const effectiveLevel = Math.max(
+//         globalRoleLevel ?? 0,
+//         communityRoleLevel ?? 0,
+//       )
+//       for (const minRole of minimumRoles) {
+//         if (effectiveLevel >= getRoleLevel(minRole)) {
+//           return next()
+//         }
+//       }
+//       return res.status(403).json({ message: 'Insufficient role' })
+//     } catch (error) {
+//       return res.status(500).json({ message: 'Role check failed', error })
+//     }
+//   }
+// }
+
+export const isOwner = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const auth = getAuth(req)
+    const userRole = await prisma.memberRoles.findFirst({
+      where: {
+        userId: req.claims?.id,
+        Role: 'OWNER',
+      },
+    })
 
-    if (!auth.userId) {
-      return res.status(401).json({ message: 'unauthorized' })
+    if (!userRole) {
+      return res.status(403).json({ message: 'Access denied' })
     }
-
-    let user = await UserRepo.findUserByClerkId(auth.userId)
-
-    if (!user) {
-      const clerkUser = await clerkClient.users.getUser(auth.userId)
-      user = await UserRepo.createUser({
-        email: clerkUser.emailAddresses[0].emailAddress,
-        clerkId: clerkUser.id,
-        username:
-          clerkUser.username || clerkUser.emailAddresses[0].emailAddress,
-      })
-    }
-
-    req.auth = auth
-    req.user = user
 
     next()
   } catch (error) {
-    return res.status(500).json({ message: 'Authentication error', error })
-  }
-}
-
-export const isAuthenticated = [requireAuth(), requestWithParsedUser]
-
-function getRoleLevel(role: Role | null): number {
-  return role ? roleLevels[role] || 0 : 0
-}
-
-export const hasCommunityRoleOrHigher = (
-  minimumRoles: Role[],
-  communityIdParam = 'communityId',
-) => {
-  return async (
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: 'Unauthorized' })
-      }
-      const communityId = Number(
-        req.params[communityIdParam] ||
-          req.body[communityIdParam] ||
-          req.query[communityIdParam],
-      )
-      if (!communityId) {
-        return res.status(400).json({ message: 'community ID missing' })
-      }
-      const globalRoleLevel = getRoleLevel(req.user.globalRole)
-      const communityRole = await MemberRolesRepo.getUserRoleInCommunity(
-        req.user.id,
-        communityId,
-      )
-      const communityRoleLevel = getRoleLevel(communityRole)
-      const effectiveLevel = Math.max(
-        globalRoleLevel ?? 0,
-        communityRoleLevel ?? 0,
-      )
-      for (const minRole of minimumRoles) {
-        if (effectiveLevel >= getRoleLevel(minRole)) {
-          return next()
-        }
-      }
-      return res.status(403).json({ message: 'Insufficient role' })
-    } catch (error) {
-      return res.status(500).json({ message: 'Role check failed', error })
-    }
+    res.status(500).json({ message: 'Internal server error' })
   }
 }

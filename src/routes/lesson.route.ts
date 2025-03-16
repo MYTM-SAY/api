@@ -1,98 +1,138 @@
+// src/routes/lesson.route.ts
 import express from 'express'
 import {
-  createLesson,
+  getLessonsBySectionId,
+  getLessonById,
+  createLessonWithNewMaterial,
   deleteLesson,
-  getLesson,
-  getLessons,
   updateLesson,
 } from '../controllers/lessonController'
-import {
-  hasCommunityRoleOrHigher,
-  isAuthenticated,
-} from '../middlewares/authTesting'
 
 const router = express.Router()
 
-router.use(isAuthenticated)
 /**
  * @swagger
- * /api/v1/lessons/:
+ * /lessons/sections/{sectionId}:
  *   get:
- *     summary: Get all lessons
- *     description: Fetches all lessons.
+ *     summary: Get all lessons by section ID
  *     tags: [Lessons]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sectionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the section to retrieve lessons for
  *     responses:
  *       200:
- *         description: Successfully retrieved list of lessons.
+ *         description: Lessons retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Lesson'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Lessons retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Lesson'
  *             example:
- *               - id: 1
- *                 name: "Introduction to Programming"
- *                 notes: "This is an introductory lesson."
- *                 materialId: 1
+ *               success: true
+ *               message: "Lessons retrieved successfully"
+ *               data:
+ *                 - id: 1
+ *                   name: "Introduction to Prisma"
+ *                   notes: "This lesson covers the basics of Prisma ORM."
+ *                   materialId: 5
+ *                   sectionId: 1
+ *                   createdAt: "2023-10-01T10:00:00Z"
+ *                   updatedAt: "2023-10-01T10:00:00Z"
+ *                   Section:
+ *                     id: 1
+ *                     name: "Prisma Basics"
+ *                     description: "An introduction to Prisma ORM."
+ *                     isCompleted: false
+ *                     classroomId: 1
+ *                     createdAt: "2023-10-01T10:00:00Z"
+ *                     updatedAt: "2023-10-01T10:00:00Z"
+ *       400:
+ *         description: Invalid section ID
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/sections/:sectionId', getLessonsBySectionId)
+
+/**
+ * @swagger
+ * /lessons/{id}:
+ *   get:
+ *     summary: Get a single lesson by ID
+ *     tags: [Lessons]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the lesson to retrieve
+ *     responses:
+ *       200:
+ *         description: Lesson retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Lesson retrieved successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/LessonWithSection'
+ *             example:
+ *               success: true
+ *               message: "Lesson retrieved successfully"
+ *               data:
+ *                 id: 2
+ *                 name: "Advanced Algebra"
+ *                 notes: "Exploring advanced algebraic concepts."
+ *                 materialId: 10
  *                 sectionId: 1
- *                 createdAt: "2023-01-01T00:00:00Z"
- *                 updatedAt: "2023-01-01T00:00:00Z"
+ *                 createdAt: "2023-10-01T10:00:00Z"
+ *                 updatedAt: "2023-10-01T10:00:00Z"
  *                 Section:
  *                   id: 1
- *                   name: "Programming Basics"
- *       500:
- *         description: Server error.
- */
-router.get('/', getLessons)
-
-/**
- * @swagger
- * /api/v1/lessons/{id}:
- *   get:
- *     summary: Get a single lesson
- *     description: Fetches details of a specific lesson by its ID.
- *     tags: [Lessons]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the lesson to retrieve.
- *     responses:
- *       200:
- *         description: Successfully retrieved lesson.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Lesson'
- *             example:
- *               id: 1
- *               name: "Introduction to Programming"
- *               notes: "This is an introductory lesson."
- *               materialId: 1
- *               sectionId: 1
- *               createdAt: "2023-01-01T00:00:00Z"
- *               updatedAt: "2023-01-01T00:00:00Z"
- *               Section:
- *                 id: 1
- *                 name: "Programming Basics"
+ *                   name: "Mathematics Fundamentals"
+ *                   description: "A comprehensive guide to foundational math topics."
+ *                   isCompleted: true
+ *                   classroomId: 1
+ *                   createdAt: "2023-10-01T10:00:00Z"
+ *                   updatedAt: "2023-10-01T10:00:00Z"
+ *       400:
+ *         description: Invalid lesson ID
  *       404:
- *         description: Lesson not found.
+ *         description: Lesson not found
  *       500:
- *         description: Server error.
+ *         description: Internal server error
  */
-router.get('/:id', getLesson)
+router.get('/:id', getLessonById)
 
-// Owner-only routes
-router.use(hasCommunityRoleOrHigher(['OWNER']))
 /**
  * @swagger
- * /api/v1/lessons/:
+ * /lessons:
  *   post:
- *     summary: Create a new lesson
- *     description: Creates a new lesson. Requires owner role.
+ *     summary: Create a new lesson with a new material in a single transaction
  *     tags: [Lessons]
  *     security:
  *       - bearerAuth: []
@@ -101,75 +141,65 @@ router.use(hasCommunityRoleOrHigher(['OWNER']))
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LessonCreate'
+ *             type: object
+ *             properties:
+ *               lesson:
+ *                 $ref: '#/components/schemas/CreateLessonInput'
+ *               material:
+ *                 $ref: '#/components/schemas/CreateMaterialInput'
  *           example:
- *             name: "Advanced Programming"
- *             notes: "This lesson covers advanced topics."
- *             materialId: 2
- *             sectionId: 2
+ *             lesson:
+ *               name: "Intro to Algebra"
+ *               notes: "Basic concepts"
+ *               sectionId: 1
+ *             material:
+ *               materialType: "VIDEO"
+ *               fileUrl: "https://example.com/video.mp4"
  *     responses:
  *       201:
- *         description: Lesson created successfully.
+ *         description: Lesson created successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
- *                 lesson:
- *                   $ref: '#/components/schemas/Lesson'
+ *                   example: "Lesson created successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/LessonWithMaterial'
  *             example:
+ *               success: true
  *               message: "Lesson created successfully"
- *               lesson:
- *                 id: 2
- *                 name: "Advanced Programming"
- *                 notes: "This lesson covers advanced topics."
- *                 materialId: 2
- *                 sectionId: 2
- *                 createdAt: "2023-01-02T00:00:00Z"
- *                 updatedAt: "2023-01-02T00:00:00Z"
+ *               data:
+ *                 id: 131
+ *                 name: "Intro to Algebra"
+ *                 notes: "Basic concepts"
+ *                 materialId: 121
+ *                 sectionId: 1
+ *                 createdAt: "2023-10-01T10:00:00Z"
+ *                 updatedAt: "2023-10-01T10:00:00Z"
+ *                 Material:
+ *                   id: 121
+ *                   materialType: "VIDEO"
+ *                   fileUrl: "https://example.com/video.mp4"
+ *                   createdAt: "2023-10-01T10:00:00Z"
+ *                   updatedAt: "2023-10-01T10:00:00Z"
  *       400:
- *         description: Validation failed or invalid data
+ *         description: Invalid input data
  *       500:
- *         description: Server error.
+ *         description: Internal server error
  */
-router.post('/', createLesson)
+router.post('/', createLessonWithNewMaterial)
 
 /**
  * @swagger
- * /api/v1/lessons/{id}:
- *   delete:
- *     summary: Delete a lesson
- *     description: Deletes a specific lesson by its ID.
- *     tags: [Lessons]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the lesson to delete.
- *     responses:
- *       204:
- *         description: Lesson deleted successfully.
- *       404:
- *         description: Lesson not found.
- *       400:
- *         description: Invalid data
- *       500:
- *         description: Server error.
- */
-router.delete('/:id', deleteLesson)
-
-/**
- * @swagger
- * /api/v1/lessons/{id}:
+ * /lessons/{id}:
  *   patch:
- *     summary: Update a lesson
- *     description: Updates a specific lesson by its ID.
+ *     summary: Update a lesson by ID
  *     tags: [Lessons]
  *     security:
  *       - bearerAuth: []
@@ -179,45 +209,91 @@ router.delete('/:id', deleteLesson)
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the lesson to update.
+ *         description: The ID of the lesson to update
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LessonUpdate'
+ *             $ref: '#/components/schemas/UpdateLessonInput'
  *           example:
- *             name: "Advanced Programming Updated"
- *             notes: "Updated notes for advanced topics."
+ *             name: "Updated Lesson Name"
+ *             notes: "Updated notes for this lesson."
  *     responses:
  *       200:
- *         description: Lesson updated successfully.
+ *         description: Lesson updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
- *                 lesson:
+ *                   example: "Lesson updated successfully"
+ *                 data:
  *                   $ref: '#/components/schemas/Lesson'
  *             example:
+ *               success: true
  *               message: "Lesson updated successfully"
- *               lesson:
+ *               data:
  *                 id: 2
- *                 name: "Advanced Programming Updated"
- *                 notes: "Updated notes for advanced topics."
- *                 materialId: 2
- *                 sectionId: 2
- *                 createdAt: "2023-01-02T00:00:00Z"
- *                 updatedAt: "2023-01-02T00:00:00Z"
- *       404:
- *         description: Lesson not found.
+ *                 name: "Updated Lesson Name"
+ *                 notes: "Updated notes for this lesson."
+ *                 materialId: 10
+ *                 sectionId: 1
+ *                 createdAt: "2023-10-01T10:00:00Z"
+ *                 updatedAt: "2023-10-02T12:00:00Z"
  *       400:
- *         description: Validation failed or invalid data
+ *         description: Invalid lesson ID or input data
+ *       404:
+ *         description: Lesson not found
  *       500:
- *         description: Server error.
+ *         description: Internal server error
  */
 router.patch('/:id', updateLesson)
+
+/**
+ * @swagger
+ * /lessons/{id}:
+ *   delete:
+ *     summary: Delete a lesson by ID
+ *     tags: [Lessons]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the lesson to delete
+ *     responses:
+ *       200:
+ *         description: Lesson deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Lesson deleted successfully"
+ *             example:
+ *               success: true
+ *               message: "Lesson deleted successfully"
+ *       400:
+ *         description: Invalid lesson ID
+ *       404:
+ *         description: Lesson not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete('/:id', deleteLesson)
 
 export default router

@@ -23,6 +23,13 @@ export const ClassroomRepo = {
     return classroom
   },
 
+  async findByCommunityId(communityId: number) {
+    const classrooms = await prisma.classroom.findMany({
+      where: { communityId },
+    })
+    return classrooms
+  },
+
   async create(data: z.infer<typeof ClassroomSchema>) {
     const classroom = await prisma.classroom.create({
       data,
@@ -40,14 +47,6 @@ export const ClassroomRepo = {
   },
 
   async update(id: number, data: Partial<z.infer<typeof ClassroomSchema>>) {
-    const classroom = await prisma.classroom.findUnique({
-      where: { id },
-    })
-
-    if (!classroom) {
-      throw new APIError('Classroom not found', 404)
-    }
-
     const updatedClassroom = await prisma.classroom.update({
       where: { id },
       data,

@@ -1,12 +1,16 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
-import { LessonSchema } from '../utils'
+import {
+  CreateLessonSchema,
+  UpdateLessonSchema,
+} from '../utils/zod/lessonSchema'
+import { MaterialSchema } from '../utils/zod/materialSchemes'
 
 export const LessonRepo = {
-  async findAll() {
+  async findBySectionId(id: number) {
     const lessons = await prisma.lesson.findMany({
-      include: {
-        Section: true,
+      where: {
+        sectionId: id,
       },
     })
     return lessons
@@ -22,11 +26,21 @@ export const LessonRepo = {
     return lesson
   },
 
-  async create(data: z.infer<typeof LessonSchema>) {
-    const lesson = await prisma.lesson.create({
-      data,
+  async createWithMaterial(
+    lessonData: z.infer<typeof CreateLessonSchema>,
+    materialData: z.infer<typeof MaterialSchema>,
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const material = await tx.material.create({ data: materialData })
+      const lesson = await tx.lesson.create({
+        data: {
+          ...lessonData,
+          materialId: material.id,
+        },
+        include: { Material: true },
+      })
+      return lesson
     })
-    return lesson
   },
 
   async delete(id: number) {
@@ -38,7 +52,7 @@ export const LessonRepo = {
     return lesson
   },
 
-  async update(id: number, data: Partial<z.infer<typeof LessonSchema>>) {
+  async update(id: number, data: z.infer<typeof UpdateLessonSchema>) {
     const updatedlesson = await prisma.lesson.update({
       where: { id },
       data,

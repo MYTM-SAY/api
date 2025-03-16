@@ -7,53 +7,62 @@ import {
   updateCommunity,
   getCommunity,
 } from '../controllers/communityController'
-
 import {
   promoteToModerator,
   demoteFromModerator,
 } from '../controllers/memberRoles'
-
-import {
-  hasCommunityRoleOrHigher,
-  isAuthenticated,
-} from '../middlewares/authMiddleware'
-import validate from '../middlewares/validation'
-import { CommunitySchema } from '../utils'
+import { isAuthenticated } from '../middlewares/authMiddleware'
 
 const app = express.Router()
 
-// public
-app.get('/discover', discoverCommunities) // need revision
 /**
  * @swagger
- * /api/v1/communities/{id}:
+ * /communities/discover:
  *   get:
- *     summary: Get a single community
- *     description: Fetches details of a specific community by its ID.
- *     tags: [Communities]
+ *     summary: Discover communities based on search term, tags, or popularity
+ *     description: Retrieves a list of communities based on search criteria, recommended tags, or popularity.
+ *     tags:
+ *       - Communities
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - in: query
+ *         name: searchTerm
  *         schema:
- *           type: integer
- *         description: The ID of the community to retrieve.
+ *           type: string
+ *           nullable: true
+ *         description: Optional search term to filter communities.
+ *       - in: query
+ *         name: tagIds
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: integer
+ *         description: Optional list of tag IDs to filter communities.
  *     responses:
  *       200:
- *         description: Successfully retrieved community.
+ *         description: Successfully retrieved communities.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Community"
- *       404:
- *         description: Community not found.
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   enum: [search, recommended, popular]
+ *                   description: Type of result returned.
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Community'
  *       500:
- *         description: Server error.
+ *         description: Internal server error.
  */
-app.get('/:id', getCommunity) // done
+
+app.get('/discover', discoverCommunities) // need revision
+app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) // done
+app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
 /**
  * @swagger
- * /api/v1/communities:
+ * /communities:
  *   get:
  *     summary: Get all communities
  *     description: Fetch a list of all communities.
@@ -64,14 +73,10 @@ app.get('/:id', getCommunity) // done
  *       500:
  *         description: Server error.
  */
-app.get('/', getCommunities) // done
-
-// authed
-app.use(isAuthenticated)
-// TODO: app.get('/mine', isAuthenticated, getUserCommunities);
+app.get('/', isAuthenticated, getCommunities)
 /**
  * @swagger
- * /api/v1/communities:
+ * /communities:
  *   post:
  *     summary: Create a new community
  *     description: Creates a new community with the provided details.
@@ -100,9 +105,6 @@ app.use(isAuthenticated)
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/logo.jpg"
- *               ownerId:
- *                 type: integer
- *                 example: 1
  *     responses:
  *       201:
  *         description: Community created successfully.
@@ -117,13 +119,60 @@ app.use(isAuthenticated)
  *       500:
  *         description: Server error.
  */
-app.post('/', validate(CommunitySchema), createCommunity)
-
-// Owner-only routes
-app.use(hasCommunityRoleOrHigher(['OWNER']))
+app.post('/', isAuthenticated, createCommunity)
 /**
  * @swagger
- * /api/v1/communities/{id}:
+ * /communities/{id}:
+ *   delete:
+ *     summary: Delete a community
+ *     description: Removes a community by its ID.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to delete.
+ *     responses:
+ *       204:
+ *         description: Community deleted successfully.
+ *       404:
+ *         description: Community not found.
+ *       500:
+ *         description: Server error.
+ */
+app.delete('/:id', isAuthenticated, deleteCommunity)
+/**
+ * @swagger
+ * /communities/{id}:
+ *   get:
+ *     summary: Get a single community
+ *     description: Fetches details of a specific community by its ID.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to retrieve.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved community.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Community"
+ *       404:
+ *         description: Community not found.
+ *       500:
+ *         description: Server error.
+ */
+app.get('/:id', getCommunity)
+/**
+ * @swagger
+ * /communities/{id}:
  *   put:
  *     summary: Update a community
  *     description: Updates an existing community with new data.
@@ -168,31 +217,6 @@ app.use(hasCommunityRoleOrHigher(['OWNER']))
  *       500:
  *         description: Server error.
  */
-app.put('/:id', validate(CommunitySchema), updateCommunity)
-app.post('/:id/remove-moderator/:userId', demoteFromModerator) // done
-app.post('/:id/assign-moderator/:userId', promoteToModerator) // done
-/**
- * @swagger
- * /api/v1/communities/{id}:
- *   delete:
- *     summary: Delete a community
- *     description: Removes a community by its ID.
- *     tags: [Communities]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the community to delete.
- *     responses:
- *       204:
- *         description: Community deleted successfully.
- *       404:
- *         description: Community not found.
- *       500:
- *         description: Server error.
- */
-app.delete('/:id', deleteCommunity)
+app.put('/:id', isAuthenticated, updateCommunity)
 
 export default app

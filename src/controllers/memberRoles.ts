@@ -10,7 +10,7 @@ export const promoteToModerator = async (
 ) => {
   try {
     const { communityId, userId } = req.params
-    const requesterId = req.user?.id!
+    const requesterId = req.claims?.id!
 
     if (isNaN(+communityId) || isNaN(+userId)) {
       return next(new APIError('Invalid communityId or userId', 400))
@@ -40,7 +40,7 @@ export const demoteFromModerator = async (
 ) => {
   try {
     const { communityId, userId } = req.params
-    const requesterId = req.user?.id!
+    const requesterId = req.claims?.id!
 
     if (isNaN(+communityId) || isNaN(+userId)) {
       return next(new APIError('Invalid communityId or userId', 400))

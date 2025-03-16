@@ -1,114 +1,90 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
+import { LessonService } from '../services/lessonService'
+import { ResponseHelper } from '../utils/responseHelper'
+import { asyncHandler } from '../utils/asyncHandler'
 import APIError from '../errors/APIError'
-import { LessonRepo } from '../repos/lesson.repo'
-import { LessonSchema } from '../utils'
-import { ZodError } from 'zod'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import {
+  CreateLessonSchema,
+  UpdateLessonSchema,
+} from '../utils/zod/lessonSchema'
+import { CreateMaterialSchema } from '../utils/zod/materialSchemes'
 
-export const getLessons = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const lessons = await LessonRepo.findAll()
-    return res.status(200).json(lessons)
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const getLesson = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const lesson = await LessonRepo.findById(+req.params.id)
-    if (!lesson) throw new APIError('Lesson not found', 404)
-    return res.status(200).json(lesson)
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const createLesson = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
-  try {
-    const validatedData = LessonSchema.parse(req.body)
-
-    const lesson = await LessonRepo.create(validatedData)
-    return res
-      .status(201)
-      .json({ message: 'Lesson created successfully', lesson })
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const errorMessages = error.errors.map((err) => ({
-        field: err.path.join('.'),
-        message: err.message,
-      }))
-      return res
-        .status(400)
-        .json({ message: 'Validation failed', errors: errorMessages })
+export const getLessonsBySectionId = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const sectionId = +req.params.sectionId
+    if (!sectionId || isNaN(sectionId)) {
+      throw new APIError('Invalid section ID', 400)
     }
-    if (error instanceof Error) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid data', error: error.message })
-    }
-    return res.status(400).json({ message: 'Invalid data', error })
-  }
-}
 
-export const deleteLesson = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
-  try {
-    await LessonRepo.delete(+req.params.id)
-    return res.status(204).send()
-  } catch (error) {
-    if (
-      //TODO: make Error Controller which have all errors like this
-      error instanceof PrismaClientKnownRequestError &&
-      error.code === 'P2025'
-    ) {
-      throw new APIError('Lesson not found', 404)
-    }
-    return res.status(400).json({ message: 'Invalid data', error })
-  }
-}
-
-export const updateLesson = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
-  try {
-    const validatedData = LessonSchema.partial().parse(req.body)
-    const lesson = await LessonRepo.update(+req.params.id, validatedData)
-    if (!lesson) throw new APIError('Lesson not found', 404)
-
+    const lessons = await LessonService.getLessonsBySectionId(sectionId)
     return res
       .status(200)
-      .json({ message: 'Lesson updated successfully', lesson })
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const errorMessages = error.errors.map((err) => ({
-        field: err.path.join('.'),
-        message: err.message,
-      }))
-      return res
-        .status(400)
-        .json({ message: 'Validation failed', errors: errorMessages })
+      .json(ResponseHelper.success('Lessons retrieved successfully', lessons))
+  },
+)
+
+export const getLessonById = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const id = +req.params.id
+    if (!id || isNaN(id)) {
+      throw new APIError('Invalid lesson ID', 400)
     }
-    if (error instanceof Error) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid data', error: error.message })
+
+    const lesson = await LessonService.getLessonById(id)
+    return res
+      .status(200)
+      .json(ResponseHelper.success('Lesson retrieved successfully', lesson))
+  },
+)
+
+export const createLessonWithNewMaterial = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const validatedLessonData = CreateLessonSchema.parse(req.body.lesson)
+    const validatedMaterialData = CreateMaterialSchema.parse(req.body.material)
+
+    const newLesson = await LessonService.createLessonWithNewMaterial(
+      validatedLessonData,
+      validatedMaterialData,
+    )
+
+    return res
+      .status(201)
+      .json(ResponseHelper.success('Lesson created successfully', newLesson))
+  },
+)
+
+export const deleteLesson = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const id = +req.params.id
+    if (!id || isNaN(id)) {
+      throw new APIError('Invalid lesson ID', 400)
     }
-    return res.status(400).json({ message: 'Invalid data', error })
-  }
-}
+
+    await LessonService.deleteLesson(id)
+    return res
+      .status(200)
+      .json(ResponseHelper.success('Lesson deleted successfully'))
+  },
+)
+
+export const updateLesson = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const id = +req.params.id
+    if (!id || isNaN(id)) {
+      throw new APIError('Invalid lesson ID', 400)
+    }
+
+    const validatedUpdateData = UpdateLessonSchema.parse(req.body)
+
+    const updatedLesson = await LessonService.updateLesson(
+      id,
+      validatedUpdateData,
+    )
+    return res
+      .status(200)
+      .json(
+        ResponseHelper.success('Lesson updated successfully', updatedLesson),
+      )
+  },
+)

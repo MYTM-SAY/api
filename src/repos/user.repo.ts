@@ -1,15 +1,7 @@
+import { Prisma, User } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 
 export const UserRepo = {
-  async findUserByClerkId(id: string) {
-    const result = await prisma.user.findUnique({
-      where: {
-        clerkId: id,
-      },
-    })
-    return result
-  },
-
   async findById(id: number) {
     const result = await prisma.user.findUnique({
       where: { id },
@@ -17,21 +9,30 @@ export const UserRepo = {
     return result
   },
 
-  async createUser({
-    clerkId,
-    email,
-    username,
-  }: {
-    clerkId: string
-    email: string
-    username: string
-  }) {
-    const result = await prisma.user.create({
-      data: {
-        clerkId,
-        email,
-        username,
-      },
+  async findByEmail(email: string) {
+    const result = await prisma.user.findUnique({
+      where: { email },
+    })
+    return result
+  },
+
+  async findByUsername(username: string) {
+    const result = await prisma.user.findUnique({
+      where: { username },
+    })
+    return result
+  },
+
+  async createUser(userData: Prisma.UserUncheckedCreateInput) {
+    return await prisma.user.create({
+      data: { ...userData },
+    })
+  },
+
+  async updateLastLogin(id: number) {
+    const result = await prisma.user.update({
+      where: { id },
+      data: { lastLogin: new Date() },
     })
     return result
   },

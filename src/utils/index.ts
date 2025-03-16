@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { z } from 'zod'
 
-const MaterialTypeEnum = z.enum(['VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE'], {})
-
 const RoleEnum = z.enum(['ADMIN', 'OWNER', 'MODERATOR', 'MEMBER'], {})
 
 export const UserSchema = z
@@ -69,36 +67,11 @@ export const TagSchema = z
   })
   .strict()
 
-export const CommunitySchema = z.object({
-  id: z.number().int().positive().optional(),
-  name: z
-    .string()
-    .min(1, 'Community name is required')
-    .max(100, 'Community name must be at most 100 characters'),
-  description: z
-    .string()
-    .max(500, 'Description must be at most 500 characters')
-    .optional(),
-  coverImgURL: z.string().url().optional(),
-  logoImgURL: z.string().url().optional(),
-  ownerId: z.number().int().positive().optional(),
-})
-
 export const MemberRolesSchema = z
   .object({
     communityId: z.number().int().positive(),
     userId: z.number().int().positive(),
     Role: RoleEnum,
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
-export const MaterialSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    materialType: MaterialTypeEnum,
-    fileUrl: z.string().url().nullable(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
   })
@@ -135,21 +108,6 @@ export const PostSchema = z
       .nullable(),
     attachments: z.array(z.string().url()).nullable(),
     forumId: z.number().int().positive(),
-    authorId: z.number().int().positive(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
-export const CommentSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    content: z
-      .string()
-      .max(1000, 'Content must be at most 1000 characters')
-      .nullable(),
-    parentId: z.number().int().positive().nullable().optional(),
-    postId: z.number().int().positive(),
     authorId: z.number().int().positive(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
@@ -202,24 +160,6 @@ export const SectionSchema = z
       .max(500, 'Description must be at most 500 characters')
       .nullable(),
     classroomId: z.number().int().positive(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
-export const LessonSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    name: z
-      .string()
-      .min(1, 'Lesson name is required')
-      .max(100, 'Lesson name must be at most 100 characters'),
-    notes: z
-      .string()
-      .max(5000, 'Notes must be at most 5000 characters')
-      .nullable(),
-    materialId: z.number().int().positive(),
-    sectionId: z.number().int().positive(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
   })

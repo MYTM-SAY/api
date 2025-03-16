@@ -1,0 +1,19 @@
+{
+    "dbcode.connections": [
+        {
+            "connectionId": "4xMNMEtQTnSyIUZaEPNkB",
+            "name": "db",
+            "driver": "postgres",
+            "color": "#00A6FF",
+            "connectionType": "host",
+            "host": "cbl-db-mohamedelshafae888-803f.b.aivencloud.com",
+            "port": 19059,
+            "ssl": true,
+            "sslTrustCertificate": true,
+            "username": "avnadmin",
+            "password": "",
+            "savePassword": "secretStorage",
+            "connectionTimeout": 30
+        }
+    ]
+}

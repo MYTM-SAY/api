@@ -1,19 +1,20 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
+import { CommunitySchema } from '../utils/zod/communitySchemes'
+import { z } from 'zod'
 
 export const CommunityRepo = {
   async findAll() {
-    const results = await prisma.community.findMany({
-      include: {
-        Classrooms: true,
-      },
-    })
+    const results = await prisma.community.findMany()
     return results
   },
 
-  async create(community: Prisma.CommunityCreateInput) {
+  async create(community: z.infer<typeof CommunitySchema>, userId: number) {
     const result = await prisma.community.create({
-      data: community,
+      data: {
+        ...community,
+        ownerId: userId,
+      },
     })
     return result
   },
@@ -21,6 +22,9 @@ export const CommunityRepo = {
   async findById(id: number) {
     const result = await prisma.community.findUnique({
       where: { id },
+      include: {
+        Classrooms: true,
+      },
     })
     return result
   },
@@ -55,7 +59,6 @@ export const CommunityRepo = {
     return recommendedCommunities
   },
 
-  // Get popular communities (fallback if user has no tags).
   async getPopularCommunities() {
     return prisma.community.findMany({
       orderBy: [{ Members: { _count: 'desc' } }, { createdAt: 'desc' }],

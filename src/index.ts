@@ -1,11 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import error from './middlewares/error'
-import { clerkMiddleware } from '@clerk/express'
 import router from './routes'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import globalExceptionHandlerMiddleware from './middlewares/globalExceptionHandlingMiddleware'
 
 const app = express()
 const port = process.env.PORT || 4000
@@ -42,47 +41,83 @@ const options: swaggerJsdoc.Options = {
             sectionId: { type: 'integer' },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
-            Section: {
-              $ref: '#/components/schemas/Section',
-            },
           },
-          required: [
-            'id',
-            'name',
-            'materialId',
-            'sectionId',
-            'createdAt',
-            'updatedAt',
-            'Section',
+        },
+        LessonWithMaterial: {
+          allOf: [
+            { $ref: '#/components/schemas/Lesson' },
+            {
+              type: 'object',
+              properties: {
+                Material: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'integer' },
+                    materialType: {
+                      type: 'string',
+                      enum: ['VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE'],
+                    },
+                    fileUrl: { type: 'string', format: 'uri' },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                  },
+                },
+              },
+            },
           ],
         },
-        LessonCreate: {
-          type: 'object',
-          properties: {
-            name: { type: 'string', minLength: 1, maxLength: 100 },
-            notes: { type: 'string', maxLength: 5000, nullable: true },
-            materialId: { type: 'integer' },
-            sectionId: { type: 'integer' },
-          },
-          required: ['name', 'materialId', 'sectionId'],
+        LessonWithSection: {
+          allOf: [
+            { $ref: '#/components/schemas/Lesson' },
+            {
+              type: 'object',
+              properties: {
+                Section: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'integer' },
+                    name: { type: 'string' },
+                    description: { type: 'string', nullable: true },
+                    isCompleted: { type: 'boolean' },
+                    classroomId: { type: 'integer' },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                  },
+                },
+              },
+            },
+          ],
         },
-        LessonUpdate: {
+        CreateLessonInput: {
           type: 'object',
           properties: {
             name: { type: 'string', minLength: 1, maxLength: 100 },
             notes: { type: 'string', maxLength: 5000, nullable: true },
-            materialId: { type: 'integer' },
             sectionId: { type: 'integer' },
           },
-          required: [],
+          required: ['name', 'sectionId'],
+        },
+        UpdateLessonInput: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', minLength: 1, maxLength: 100 },
+            notes: { type: 'string', maxLength: 5000, nullable: true },
+          },
+        },
+        CreateMaterialInput: {
+          type: 'object',
+          properties: {
+            materialType: {
+              type: 'string',
+              enum: ['VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE'],
+            },
+            fileUrl: { type: 'string', format: 'uri' },
+          },
+          required: ['materialType', 'fileUrl'],
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    security: [{ bearerAuth: [] }],
   },
   apis: ['./src/routes/*.ts'], // Ensure this path matches your route files
 }
@@ -96,7 +131,6 @@ app.use(
   }),
 )
 app.use(express.json())
-app.use(clerkMiddleware())
 app.get('/', (req, res) => {
   return res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
@@ -105,7 +139,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/', router)
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpecs))
-app.use(error)
+app.use(globalExceptionHandlerMiddleware)
 
 app.listen(port, () => {
   console.log(`Listening: http://localhost:${port}`)

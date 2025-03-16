@@ -1,107 +1,71 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
+import { ClassroomService } from '../services/classroomService'
+import { ResponseHelper } from '../utils/responseHelper'
+import { asyncHandler } from '../utils/asyncHandler'
+import { CommunityRepo } from '../repos/community.repo'
 import APIError from '../errors/APIError'
-import { ClassroomRepo } from '../repos/classroom.repo'
-import { ClassroomSchema } from '../utils'
-import { ZodError } from 'zod'
 
-export const getClassrooms = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const classrooms = await ClassroomRepo.findAll()
-    return res.status(200).json(classrooms)
-  } catch (error) {
-    next(error)
-  }
-}
+export const getClassrooms = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const id = +req.params.id
+    const community = await CommunityRepo.findById(id)
 
-export const getClassroom = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const classroom = await ClassroomRepo.findbyId(+req.params.id)
-    if (!classroom) throw new APIError('Classroom not found', 404)
-    return res.status(200).json(classroom)
-  } catch (error) {
-    next(error)
-  }
-}
+    if (!community) throw new APIError('Community not found', 404)
 
-export const createClassroom = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
-  try {
-    const validatedData = ClassroomSchema.parse(req.body)
-    await ClassroomRepo.create(validatedData)
-    return res.status(201).json('Classroom created successfully')
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const errorMessages = error.errors.map((err) => ({
-        field: err.path.join('.'),
-        message: err.message,
-      }))
-      return res
-        .status(400)
-        .json({ message: 'Validation failed', errors: errorMessages })
-    }
-    if (error instanceof Error) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid data', error: error.message })
-    }
-    return res.status(400).json({ message: 'Invalid data', error })
-  }
-}
-
-export const deleteClassroom = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
-  try {
-    const classroom = await ClassroomRepo.delete(+req.params.id)
-    if (!classroom) throw new APIError('Classroom not found', 404)
-    return res.status(204).json('Classroom deleted successfully')
-  } catch (error) {
-    return res.status(400).json({ message: 'Invalid data', error })
-  }
-}
-
-export const updateClassroom = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
-  try {
-    const validateData = ClassroomSchema.partial().parse(req.body)
-
-    const classroom = await ClassroomRepo.update(+req.params.id, validateData)
-    if (!classroom) {
-      return res.status(404).json({ message: 'Classroom not found' })
-    }
-
-    return res
+    const classrooms = await ClassroomService.getClassroomsByCommunityId(id)
+    res
       .status(200)
-      .json({ message: 'Classroom updated successfully', classroom })
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const errorMessages = error.errors.map((err) => ({
-        field: err.path.join('.'),
-        message: err.message,
-      }))
-      return res
-        .status(400)
-        .json({ message: 'Validation failed', errors: errorMessages })
-    }
-    if (error instanceof Error) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid data', error: error.message })
-    }
-    return res.status(400).json({ message: 'Invalid data', error: error })
-  }
-}
+      .json(
+        ResponseHelper.success('Classrooms retrieved successfully', classrooms),
+      )
+  },
+)
+
+export const getClassroom = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const classroom = await ClassroomService.getClassroomById(+req.params.id)
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success('Classroom retrieved successfully', classroom),
+      )
+  },
+)
+
+export const createClassroom = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const newClassroom = await ClassroomService.createClassroom(req.body)
+    res
+      .status(201)
+      .json(
+        ResponseHelper.success('Classroom created successfully', newClassroom),
+      )
+  },
+)
+
+export const deleteClassroom = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    await ClassroomService.deleteClassroom(+req.params.id)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Classroom deleted successfully'))
+  },
+)
+
+export const updateClassroom = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const updatedClassroom = await ClassroomService.updateClassroom(
+      +req.params.id,
+      req.body,
+    )
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success(
+          'Classroom updated successfully',
+          updatedClassroom,
+        ),
+      )
+  },
+)

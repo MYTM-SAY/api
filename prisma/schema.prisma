@@ -8,28 +8,28 @@ datasource db {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  fullname   String?
-  username   String    @unique
-  email      String    @unique
-  dob        DateTime?
-  clerkId    String    @unique
-  lastLogin  DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  globalRole Role?
+  id             Int       @id @default(autoincrement())
+  fullname       String?
+  username       String    @unique
+  email          String    @unique
+  dob            DateTime?
+  clerkId        String    @unique
+  lastLogin      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  hashedPassword String
+  globalRole     Role?
 
   UserProfile       UserProfile[]
   InstructorProfile InstructorProfile[]
-
-  Communities      Community[]   @relation("CommunityMembers")
-  OwnedCommunities Community[]   @relation("CommunityOwner")
-  MemberRoles      MemberRoles[]
-  Post             Post[]
-  Comment          Comment[]
-  PostVote         PostVote[]
-  CommentVote      CommentVote[]
-  QuizScore        QuizScore[]
+  Communities       Community[]         @relation("CommunityMembers")
+  OwnedCommunities  Community[]         @relation("CommunityOwner")
+  MemberRoles       MemberRoles[]
+  Post              Post[]
+  Comment           Comment[]
+  PostVote          PostVote[]
+  CommentVote       CommentVote[]
+  QuizScore         QuizScore[]
 }
 
 model UserProfile {
@@ -217,8 +217,8 @@ model Lesson {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  Section  Section  @relation(fields: [sectionId], references: [id])
-  Material Material @relation(fields: [materialId], references: [id])
+  Section Section @relation(fields: [sectionId], references: [id])
+  Material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
 }
 
 model Question {
