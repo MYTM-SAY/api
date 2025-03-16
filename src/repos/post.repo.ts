@@ -42,7 +42,6 @@ export const PostRepo = {
   async upVotePost(
     postId: number,
     forumId: number,
-    communityId: number,
     userId: number,
   ) {
     let result
@@ -51,9 +50,6 @@ export const PostRepo = {
       where: {
         id: postId,
         forumId,
-        Forum: {
-          communityId,
-        },
       },
     })
     if (!post) throw new APIError('Post not found', 404)
@@ -112,7 +108,6 @@ export const PostRepo = {
   async downVotePost(
     postId: number,
     forumId: number,
-    communityId: number,
     userId: number,
   ) {
     let result
@@ -121,9 +116,6 @@ export const PostRepo = {
       where: {
         id: postId,
         forumId,
-        Forum: {
-          communityId,
-        },
       },
     })
     if (!post) throw new APIError('Post not found', 404)

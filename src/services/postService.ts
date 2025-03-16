@@ -45,26 +45,24 @@ async function deletePost(postId: number) {
 async function upVotePost(
   postId: number,
   forumId: number,
-  communityId: number,
   userId: number,
 ) {
-  if (!postId || !forumId || !communityId || !userId)
+  if (!postId || !forumId || !userId)
     throw new APIError('Some parameter is missing', 400)
 
-  const result = PostRepo.upVotePost(postId, forumId, communityId, userId)
+  const result = PostRepo.upVotePost(postId, forumId, userId)
   return result
 }
 
 async function downVotePost(
   postId: number,
   forumId: number,
-  communityId: number,
   userId: number,
 ) {
-  if (!postId || !forumId || !communityId || !userId)
+  if (!postId || !forumId || !userId)
     throw new APIError('Some parameter is missing', 400)
 
-  const result = PostRepo.downVotePost(postId, forumId, communityId, userId)
+  const result = PostRepo.downVotePost(postId, forumId, userId)
   return result
 }
 

@@ -120,8 +120,7 @@ export const CommentRepo = {
   async upVoteComment(
     commentId: number,
     postId: number,
-    forumId: number,
-    communityId: number,
+
     userId: number
   ) {
     let result;
@@ -129,12 +128,6 @@ export const CommentRepo = {
       where: {
         id: commentId,
         postId: postId,
-        Post: {
-          forumId: forumId,
-          Forum: {
-            communityId: communityId,
-          },
-        },
       },
     });
   
@@ -188,8 +181,6 @@ export const CommentRepo = {
   async downVoteComment(
     commentId: number,
     postId: number,
-    forumId: number,
-    communityId: number,
     userId: number
   ) {
     let result;
@@ -197,12 +188,6 @@ export const CommentRepo = {
       where: {
         id: commentId,
         postId: postId,
-        Post: {
-          forumId: forumId,
-          Forum: {
-            communityId: communityId,
-          },
-        },
       },
     });
   

@@ -72,8 +72,6 @@ export const upVoteComment = asyncHandler(
     const result = await CommentService.upVoteComment(
       +req.params.commentId,
       +req.params.postId,
-      +req.params.forumId,
-      +req.params.communityId,
       +req.params.userId,
     );
     res.status(200).json(ResponseHelper.success('Comment upvoted successfully', result));
@@ -86,8 +84,6 @@ export const downVoteComment = asyncHandler(
     const result = await CommentService.downVoteComment(
       +req.params.commentId,
       +req.params.postId,
-      +req.params.forumId,
-      +req.params.communityId,
       +req.params.userId,
     );
     res.status(200).json(ResponseHelper.success('Comment downvoted successfully', result));

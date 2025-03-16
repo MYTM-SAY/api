@@ -52,17 +52,13 @@ async function getCommentsByUserIdAndCommunityId(
 async function upVoteComment(
   commentId: number,
   postId: number,
-  forumId: number,
-  communityId: number,
   userId: number,
 ) {
-  if (!commentId || !postId || !forumId || !communityId || !userId)
+  if (!commentId || !postId || !userId)
     throw new APIError('Some parameter is missing', 400)
   const result = await CommentRepo.upVoteComment(
     commentId,
     postId,
-    forumId,
-    communityId,
     userId,
   )
   return result;
@@ -71,17 +67,13 @@ async function upVoteComment(
 async function downVoteComment(
   commentId: number,
   postId: number,
-  forumId: number,
-  communityId: number,
   userId: number,
 ) {
-  if (!commentId || !postId || !forumId || !communityId || !userId)
+  if (!commentId || !postId || !userId)
     throw new APIError('Some parameter is missing', 400)
   const result = await CommentRepo.downVoteComment(
     commentId,
     postId,
-    forumId,
-    communityId,
     userId,
   )
   return result;

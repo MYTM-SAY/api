@@ -1,4 +1,4 @@
-import express from 'express'
+import express from 'express';
 import {
   findAllComments,
   findComment,
@@ -8,15 +8,16 @@ import {
   getCommentsByUserIdAndCommunityId,
   upVoteComment,
   downVoteComment,
-} from '../controllers/commentController'
+} from '../controllers/commentController';
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/:postId', findAllComments)
-router.get('/:postId/:commentId', findComment)
-router.post('/create-comment/:postId', createComment)
-router.put('/update-comment/:commentId', updateComment)
-router.delete('/delete-comment/:commentId', deleteComment)
+router.get('/:postId', findAllComments);
+router.get('/:postId/:commentId', findComment);
+router.post('/create-comment/:postId', createComment);
+router.put('/update-comment/:commentId', updateComment);
+router.delete('/delete-comment/:commentId', deleteComment);
+
 /**
  * @swagger
  * /api/v1/comments:
@@ -63,10 +64,10 @@ router.get('/', getCommentsByUserIdAndCommunityId);
 
 /**
  * @swagger
- * /api/v1/comments/comment-upvote/{commentId}/{postId}/{forumId}/{communityId}/{userId}:
+ * /api/v1/comments/comment-upvote/{commentId}/{postId}/{userId}:
  *   put:
  *     summary: Upvote a comment
- *     description: Increments the upvote count of a comment in a specific post, forum, and community by a specific user.
+ *     description: Increments the upvote count of a comment in a specific post by a specific user.
  *     tags:
  *       - Comments
  *     parameters:
@@ -82,18 +83,6 @@ router.get('/', getCommentsByUserIdAndCommunityId);
  *         schema:
  *           type: integer
  *         description: ID of the post containing the comment
- *       - in: path
- *         name: forumId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the forum containing the post
- *       - in: path
- *         name: communityId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the community containing the forum
  *       - in: path
  *         name: userId
  *         required: true
@@ -118,14 +107,14 @@ router.get('/', getCommentsByUserIdAndCommunityId);
  *       500:
  *         description: Server error
  */
-router.put('/comment-upvote/:commentId/:postId/:forumId/:communityId/:userId', upVoteComment);
+router.put('/upvote/:commentId/:postId/:userId', upVoteComment);
 
 /**
  * @swagger
- * /api/v1/comments/comment-downvote/{commentId}/{postId}/{forumId}/{communityId}/{userId}:
+ * /api/v1/comments/comment-downvote/{commentId}/{postId}/{userId}:
  *   put:
  *     summary: Downvote a comment
- *     description: Decreases the vote count of a comment by 1 for a specific user in a community.
+ *     description: Decreases the vote count of a comment by 1 for a specific user.
  *     tags:
  *       - Comments
  *     parameters:
@@ -140,19 +129,7 @@ router.put('/comment-upvote/:commentId/:postId/:forumId/:communityId/:userId', u
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the post that contains the comment
- *       - in: path
- *         name: forumId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the forum
- *       - in: path
- *         name: communityId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the community
+ *         description: ID of the post containing the comment
  *       - in: path
  *         name: userId
  *         required: true
@@ -167,26 +144,16 @@ router.put('/comment-upvote/:commentId/:postId/:forumId/:communityId/:userId', u
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 userId:
- *                   type: integer
- *                   example: 10
- *                 commentId:
- *                   type: integer
- *                   example: 5
- *                 count:
- *                   type: integer
- *                   example: -1
+ *                 message:
+ *                   type: string
+ *                   example: "Comment downvoted successfully"
  *       400:
- *         description: Invalid request
+ *         description: Invalid request parameters
  *       404:
  *         description: Comment not found
  *       500:
  *         description: Server error
  */
-
-router.put('/comment-downvote/:commentId/:postId/:forumId/:communityId/:userId', downVoteComment);
+router.put('/downvote/:commentId/:postId/:userId', downVoteComment);
 
 export default router;
