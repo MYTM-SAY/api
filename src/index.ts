@@ -5,6 +5,7 @@ import router from './routes'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import globalExceptionHandlerMiddleware from './middlewares/globalExceptionHandlingMiddleware'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 const port = process.env.PORT || 4000
@@ -49,6 +50,8 @@ app.use(
   }),
 )
 app.use(express.json())
+app.use(cookieParser())
+
 app.get('/', (req, res) => {
   return res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
