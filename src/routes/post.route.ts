@@ -5,6 +5,8 @@ import {
   deletePost,
   getPost,
   updatePost,
+  upVotePost,
+  downVotePost,
 } from '../controllers/postController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
@@ -239,5 +241,123 @@ router.put('/:id', isAuthenticated, updatePost)
  *         description: Post not found
  */
 router.delete('/:id', isAuthenticated, deletePost)
+/**
+ * @swagger
+ * /upvote-post/{postId}/{forumId}/{communityId}/{userId}:
+ *   put:
+ *     summary: Upvote a post
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the post to upvote
+ *       - in: path
+ *         name: forumId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the forum where the post belongs
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community where the forum belongs
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user upvoting the post
+ *     responses:
+ *       200:
+ *         description: Post upvoted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Post upvoted successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: integer
+ *                       example: 2
+ *                     userId:
+ *                       type: integer
+ *                       example: 1
+ *                     postId:
+ *                       type: integer
+ *                       example: 1
+ */
+router.put('/upvote-post/:postId/:forumId/:communityId/:userId', upVotePost)
+/**
+ * @swagger
+ * /downVote-post/{postId}/{forumId}/{communityId}/{userId}:
+ *   put:
+ *     summary: Downvote a post
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the post to downvote
+ *       - in: path
+ *         name: forumId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the forum where the post belongs
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community where the forum belongs
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user downvoting the post
+ *     responses:
+ *       200:
+ *         description: Post downvoted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Post downvoted successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: integer
+ *                       example: -2
+ *                     userId:
+ *                       type: integer
+ *                       example: 1
+ *                     postId:
+ *                       type: integer
+ *                       example: 1
+ */
+router.put('/downVote-post/:postId/:forumId/:communityId/:userId', downVotePost)
 
 export default router

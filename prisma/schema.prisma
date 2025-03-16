@@ -117,18 +117,19 @@ model Forum {
 }
 
 model Post {
-  id         Int        @id @default(autoincrement())
-  title      String
-  content    String?
-  attchments String[]
-  forumId    Int
-  authorId   Int
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  Comments   Comment[]
-  Author     User       @relation(fields: [authorId], references: [id])
-  Forum      Forum      @relation(fields: [forumId], references: [id])
-  PostVotes  PostVote[]
+  id          Int        @id @default(autoincrement())
+  title       String
+  content     String?
+  voteCounter Int        @default(0)
+  attchments  String[]
+  forumId     Int
+  authorId    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Comments    Comment[]
+  Author      User       @relation(fields: [authorId], references: [id])
+  Forum       Forum      @relation(fields: [forumId], references: [id])
+  PostVotes   PostVote[]
 }
 
 model Comment {

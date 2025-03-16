@@ -149,7 +149,8 @@ export const CommentRepo = {
       },
     });
   
-    if (existingVote) {
+    if (existingVote)
+       {
         result=  await prisma.commentVote.update({
         where: {
           userId_commentId: {
