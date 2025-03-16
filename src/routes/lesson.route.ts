@@ -7,8 +7,11 @@ import {
   deleteLesson,
   updateLesson,
 } from '../controllers/lessonController'
+import { isAuthenticated } from '../middlewares/authMiddleware'
 
 const router = express.Router()
+
+router.use(isAuthenticated)
 
 /**
  * @swagger

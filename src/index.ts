@@ -7,7 +7,7 @@ import swaggerUi from 'swagger-ui-express'
 import globalExceptionHandlerMiddleware from './middlewares/globalExceptionHandlingMiddleware'
 
 const app = express()
-const port = process.env.PORT || 4000
+const port = process.env.PORT || 5500
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
@@ -126,7 +126,7 @@ dotenv.config()
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:5500',
     credentials: true,
   }),
 )
