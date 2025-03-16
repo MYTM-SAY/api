@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
-import { CommentSchema } from '../utils'
+import { CommentSchema } from '../utils/zod/commentSchemes'
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -10,6 +10,7 @@ export const CommentRepo = {
         Post: {
           id: postId,
         },
+        parentId: null,
       },
       include: {
         Author: {
@@ -53,10 +54,33 @@ export const CommentRepo = {
     return result
   },
 
+  async findCommentById(commentId: number) {
+    const result = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      include: {
+        Author: {
+          select: {
+            username: true,
+            UserProfile: {
+              select: {
+                profilePictureURL: true,
+              },
+            },
+          },
+        },
+        Children: true,
+      },
+    })
+    return result
+  },
+
   async createComment(data: z.infer<typeof CommentSchema>) {
     const result = await prisma.comment.create({
       data: {
         ...data,
+        authorId: data.authorId!,
       },
     })
     return result
@@ -104,10 +128,6 @@ export const CommentRepo = {
   },
 
   async deleteComment(commentId: number) {
-    const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
-    })
-    if (!comment) throw new APIError('Comment not found', 404)
     const result = await prisma.comment.delete({
       where: {
         id: commentId,
