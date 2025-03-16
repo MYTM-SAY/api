@@ -113,7 +113,7 @@ router.get('/forums/:id', isAuthenticated, getPostsByForumId)
  *                   type: integer
  *                   example: 10
  */
-router.post('/', isAuthenticated, createPost)
+router.post('/:authorId/:forumId', isAuthenticated, createPost)
 /**
  * @swagger
  * /posts/{id}:

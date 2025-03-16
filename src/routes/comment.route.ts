@@ -119,6 +119,74 @@ router.get('/', getCommentsByUserIdAndCommunityId);
  *         description: Server error
  */
 router.put('/comment-upvote/:commentId/:postId/:forumId/:communityId/:userId', upVoteComment);
+
+/**
+ * @swagger
+ * /api/v1/comments/comment-downvote/{commentId}/{postId}/{forumId}/{communityId}/{userId}:
+ *   put:
+ *     summary: Downvote a comment
+ *     description: Decreases the vote count of a comment by 1 for a specific user in a community.
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the comment to downvote
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post that contains the comment
+ *       - in: path
+ *         name: forumId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the forum
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the community
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user downvoting the comment
+ *     responses:
+ *       200:
+ *         description: Comment downvoted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 userId:
+ *                   type: integer
+ *                   example: 10
+ *                 commentId:
+ *                   type: integer
+ *                   example: 5
+ *                 count:
+ *                   type: integer
+ *                   example: -1
+ *       400:
+ *         description: Invalid request
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
+ */
+
 router.put('/comment-downvote/:commentId/:postId/:forumId/:communityId/:userId', downVoteComment);
 
 export default router;

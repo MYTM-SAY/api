@@ -15,7 +15,7 @@ export const getPostsByForumId = asyncHandler(
 
 export const createPost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const post = await PostService.createPost(req.body, req.claims!.id)
+    const post = await PostService.createPost(req.body, +req.params.authorId, +req.params.forumId)
     res
       .status(201)
       .json(ResponseHelper.success('Post created successfully', post))

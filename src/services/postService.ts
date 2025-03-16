@@ -1,17 +1,17 @@
-import { PostRepo } from '../repos/post.repo'
-import APIError from '../errors/APIError'
-import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 import { z } from 'zod'
+import APIError from '../errors/APIError'
 import { ForumRepo } from '../repos/forum.repo'
+import { PostRepo } from '../repos/post.repo'
+import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 async function getPostsByForumId(forumId: number) {
   return await PostRepo.findPostsByForumId(forumId)
 }
 
-async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
+async function createPost(data: Omit<z.infer<typeof PostSchema>, 'forumId'>, authorId: number, forumId: number) {
   const validatedData = await PostSchema.parseAsync(data)
   console.log(validatedData)
-  const forumExist = await ForumRepo.findById(validatedData.forumId)
+  const forumExist = await ForumRepo.findById(forumId)
   if (!forumExist) throw new APIError('Forum not found', 404)
   return await PostRepo.create(validatedData, authorId)
 }
