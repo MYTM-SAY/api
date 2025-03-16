@@ -8,27 +8,26 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  fullname  String?
-  username  String    @unique
-  email     String    @unique
-  dob       DateTime?
-  lastLogin DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  hashedPassword String
-
-  UserProfile       UserProfile[]
+  id                Int                 @id @default(autoincrement())
+  fullname          String?
+  username          String              @unique
+  email             String              @unique
+  dob               DateTime?
+  lastLogin         DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  hashedPassword    String
+  Comment           Comment[]
+  CommentVote       CommentVote[]
+  OwnedCommunities  Community[]         @relation("CommunityOwner")
   InstructorProfile InstructorProfile[]
+  MemberRoles       MemberRoles[]
+  Post              Post[]
+  PostVote          PostVote[]
+  QuizScore         QuizScore[]
+  UserProfile       UserProfile?
+  Communities       Community[]         @relation("CommunityMembers")
 
-  Communities      Community[]        @relation("CommunityMembers")
-  OwnedCommunities Community[]        @relation("CommunityOwner")
-  MemberRoles      MemberRoles[]
-  Post             Post[]
-  Comment          Comment[]
-  PostVote         PostVote[]
-  CommentVote      CommentVote[]
-  QuizScore        QuizScore[]
   Progress         Progress[]
   CompletedLessons CompletedLessons[]
 }
@@ -43,9 +42,8 @@ model UserProfile {
   linkedin          String?
   youtube           String?
   profilePictureURL String?
-
-  Tags Tag[]
-  User User  @relation(fields: [userId], references: [id])
+  User              User    @relation(fields: [userId], references: [id])
+  Tags              Tag[]   @relation("TagToUserProfile")
 }
 
 model InstructorProfile {
@@ -54,54 +52,46 @@ model InstructorProfile {
   education    String?
   experience   String?
   certificates String[]
-
-  User User? @relation(fields: [userId], references: [id])
+  User         User?    @relation(fields: [userId], references: [id])
 }
 
 model Tag {
-  id              Int      @id @default(autoincrement())
-  name            String
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
   isCommunityOnly Boolean
   communityId     Int?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  Communities  Community[]
-  UserProfiles UserProfile[]
-
-  @@unique([name])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  Communities     Community[]   @relation("CommunityToTag")
+  UserProfiles    UserProfile[] @relation("TagToUserProfile")
 }
 
 model Community {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  coverImgURL String?
-  logoImgURL  String?
-
-  ownerId Int
-  Owner   User @relation("CommunityOwner", fields: [ownerId], references: [id])
-
-  Members          User[]             @relation("CommunityMembers")
-  MemberRoles      MemberRoles[]
-  Forums           Forum[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  description      String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  coverImgURL      String?
+  logoImgURL       String?
+  ownerId          Int
   Classrooms       Classroom[]
-  Tags             Tag[]
+  Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
+  Forums           Forum[]
+  MemberRoles      MemberRoles[]
+  Members          User[]             @relation("CommunityMembers")
+  Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
 }
 
 model MemberRoles {
   communityId Int
   userId      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  Role      Role
-  Community Community @relation(fields: [communityId], references: [id])
-  User      User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Role        Role
+  Community   Community @relation(fields: [communityId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
 
   @@id([communityId, userId])
 }
@@ -116,61 +106,59 @@ model Material {
 }
 
 model Forum {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String?
   description String?
   communityId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  Community Community @relation(fields: [communityId], references: [id])
-  Posts     Post[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Community   Community @relation(fields: [communityId], references: [id])
+  Posts       Post[]
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   title      String
   content    String?
-  attchments String[] // video, image, file
+  attchments String[]
   forumId    Int
   authorId   Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  Forum     Forum      @relation(fields: [forumId], references: [id])
-  Comments  Comment[]
-  Author    User       @relation(fields: [authorId], references: [id])
-  PostVotes PostVote[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  Comments   Comment[]
+  Author     User       @relation(fields: [authorId], references: [id])
+  Forum      Forum      @relation(fields: [forumId], references: [id])
+  PostVotes  PostVote[]
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String?
-  parentId  Int?
-  postId    Int
-  authorId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id           Int           @id @default(autoincrement())
+  content      String?
+  voteCounter  Int           @default(0)
+  parentId     Int?
+  postId       Int
+  authorId     Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Author       User          @relation(fields: [authorId], references: [id])
   Parent       Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
   Children     Comment[]     @relation("CommentReplies")
   Post         Post          @relation(fields: [postId], references: [id])
-  Author       User          @relation(fields: [authorId], references: [id])
   CommentVotes CommentVote[]
 }
 
 model PostVote {
-  type   Boolean
+  count  Int
   userId Int
   postId Int
-  Post   Post    @relation(fields: [postId], references: [id])
-  User   User    @relation(fields: [userId], references: [id])
+  Post   Post @relation(fields: [postId], references: [id])
+  User   User @relation(fields: [userId], references: [id])
 
   @@id([userId, postId])
 }
 
 model CommentVote {
-  type      Boolean
+  count     Int
   userId    Int
   commentId Int
   Comment   Comment @relation(fields: [commentId], references: [id])
@@ -180,34 +168,33 @@ model CommentVote {
 }
 
 model Classroom {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String?
   coverImg    String?
   communityId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  progress    Int       @default(0)
+  Community   Community @relation(fields: [communityId], references: [id])
+  Quiz        Quiz[]
+  Sections    Section[]
 
-  // TODO: save progress of the user
-  Community        Community?         @relation(fields: [communityId], references: [id])
-  Sections         Section[]
-  Quiz             Quiz[]
   Progress         Progress[]
   CompletedLessons CompletedLessons[]
 }
 
 model Section {
-  id          Int     @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   description String?
-
   classroomId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  Classroom Classroom  @relation(fields: [classroomId], references: [id])
-  Lessons   Lesson[]
-  Questions Question[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  isCompleted Boolean    @default(false)
+  Lessons     Lesson[]
+  Questions   Question[]
+  Classroom   Classroom  @relation(fields: [classroomId], references: [id])
 }
 
 model Lesson {
@@ -218,9 +205,9 @@ model Lesson {
   sectionId  Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  Material   Material @relation(fields: [materialId], references: [id])
+  Section    Section  @relation(fields: [sectionId], references: [id])
 
-  Section          Section            @relation(fields: [sectionId], references: [id])
-  Material         Material           @relation(fields: [materialId], references: [id])
   CompletedLessons CompletedLessons[]
 }
 
@@ -257,27 +244,23 @@ model Question {
   sectionId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  Section Section @relation(fields: [sectionId], references: [id])
-  Quiz    Quiz[]
+  Section   Section  @relation(fields: [sectionId], references: [id])
+  Quiz      Quiz[]   @relation("QuestionToQuiz")
 }
 
 model Quiz {
-  id        Int        @id @default(autoincrement())
-  name      String
-  questions Question[]
-  duration  Int
-  active    Boolean
-
+  id          Int         @id @default(autoincrement())
+  name        String
+  duration    Int
+  active      Boolean
   classroomId Int
-  Classroom   Classroom @relation(fields: [classroomId], references: [id])
-
-  startDate DateTime
-  endDate   DateTime
-
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  QuizScore QuizScore[]
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  Classroom   Classroom   @relation(fields: [classroomId], references: [id])
+  QuizScore   QuizScore[]
+  questions   Question[]  @relation("QuestionToQuiz")
 }
 
 model QuizScore {
@@ -287,9 +270,8 @@ model QuizScore {
   score     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  User User @relation(fields: [userId], references: [id])
-  Quiz Quiz @relation(fields: [quizId], references: [id])
+  Quiz      Quiz     @relation(fields: [quizId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 model File {

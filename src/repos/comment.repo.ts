@@ -116,4 +116,129 @@ export const CommentRepo = {
 
     return result
   },
+
+  async upVoteComment(
+    commentId: number,
+    postId: number,
+    forumId: number,
+    communityId: number,
+    userId: number
+  ) {
+    let result;
+    const comment = await prisma.comment.findFirst({
+      where: {
+        id: commentId,
+        postId: postId,
+        Post: {
+          forumId: forumId,
+          Forum: {
+            communityId: communityId,
+          },
+        },
+      },
+    });
+  
+    if (!comment) throw new APIError('Comment not found', 404);
+  
+    const existingVote = await prisma.commentVote.findUnique({
+      where: {
+        userId_commentId: {
+          userId,
+          commentId,
+        },
+      },
+    });
+  
+    if (existingVote) {
+        result=  await prisma.commentVote.update({
+        where: {
+          userId_commentId: {
+            userId,
+            commentId,
+          },
+        },
+        data: {
+          count: {
+            increment: 1,
+          },
+        },
+      });
+      await prisma.comment.update({
+        where: {
+          id: commentId,
+        },
+        data:{
+          voteCounter: result.count,
+        }
+
+      });
+    } else {
+      result = await prisma.commentVote.create({
+        data: {
+          userId,
+          commentId,
+          count: 1,
+        },
+      });
+    }
+    return result;
+  },
+
+  async downVoteComment(
+    commentId: number,
+    postId: number,
+    forumId: number,
+    communityId: number,
+    userId: number
+  ) {
+    let result;
+    const comment = await prisma.comment.findFirst({
+      where: {
+        id: commentId,
+        postId: postId,
+        Post: {
+          forumId: forumId,
+          Forum: {
+            communityId: communityId,
+          },
+        },
+      },
+    });
+  
+    if (!comment) throw new APIError('Comment not found', 404);
+  
+    const existingVote = await prisma.commentVote.findUnique({
+      where: {
+        userId_commentId: {
+          userId,
+          commentId,
+        },
+      },
+    });
+  
+    if (existingVote) {
+      result = await prisma.commentVote.update({
+        where: {
+          userId_commentId: {
+            userId,
+            commentId,
+          },
+        },
+        data: {
+          count: {
+            decrement: 1,
+          },
+        },
+      });
+    } else {
+      result = await prisma.commentVote.create({
+        data: {
+          userId,
+          commentId,
+          count: -1,
+        },
+      });
+    };
+    return result;
+  }  
 }
