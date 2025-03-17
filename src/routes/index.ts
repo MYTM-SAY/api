@@ -7,6 +7,7 @@ import leaderBoard from './leaderBoard.route'
 import comment from './comment.route'
 import profile from './profile.route'
 import auth from './auth.route'
+import user from './user.route'
 
 const router = express.Router()
 
@@ -18,5 +19,6 @@ router.use('/leaderboard', leaderBoard)
 router.use('/comments', comment)
 router.use('/profile', profile)
 router.use('/auth', auth)
+router.use('/users', user)
 
 export default router

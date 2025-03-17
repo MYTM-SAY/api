@@ -126,21 +126,6 @@ export const PostSchema = z
   })
   .strict()
 
-export const CommentSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    content: z
-      .string()
-      .max(1000, 'Content must be at most 1000 characters')
-      .nullable(),
-    parentId: z.number().int().positive().nullable().optional(),
-    postId: z.number().int().positive(),
-    authorId: z.number().int().positive(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
 export const PostVoteSchema = z
   .object({
     type: z.boolean(),

@@ -3,10 +3,11 @@ import { CommentService } from '../services/commentService'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
+import { CommentSchema } from '../utils/zod/commentSchemes'
 
 export const findAllComments = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const comments = await CommentService.findAllComments(+req.params.postId)
+    const comments = await CommentService.findAllComments(+req.params.id)
     res
       .status(200)
       .json(ResponseHelper.success('Comments fetched successfully', comments))
@@ -36,9 +37,11 @@ export const createComment = asyncHandler(
 
 export const updateComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
+    const validatedData = CommentSchema.partial().parse(req.body)
+
     const comment = await CommentService.updateComment(
-      +req.params.commentId,
-      req.body,
+      +req.params.id,
+      validatedData,
     )
     res
       .status(200)
@@ -48,7 +51,7 @@ export const updateComment = asyncHandler(
 
 export const deleteComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    await CommentService.deleteComment(+req.params.commentId)
+    await CommentService.deleteComment(+req.params.id)
     res.status(200).json(ResponseHelper.success('Comment deleted successfully'))
   },
 )
@@ -56,7 +59,7 @@ export const deleteComment = asyncHandler(
 export const getCommentsByUserIdAndCommunityId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.claims!.id
-    const communityId = Number(req.query.communityId)
+    const communityId = Number(req.params.id)
     const comments = await CommentService.getCommentsByUserIdAndCommunityId(
       userId,
       communityId,

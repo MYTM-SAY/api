@@ -199,23 +199,121 @@ router.delete('/delete/:commentId', deleteComment);
  * @swagger
  * /comments:
  *   get:
- *     summary: Get user comments in a community
- *     description: Retrieves all comments made by a specific user in a specific community.
- *     tags:
- *       - Comments
+ *     summary: Retrieve a specific comment on a post
+ *     description: Fetches a single comment by comment ID and post ID.
+ *     tags: [Comments]
  *     parameters:
- *       - in: query
- *         name: userId
+ *       - in: path
+ *         name: commentId
  *         required: true
  *         schema:
  *           type: integer
- *         description: User ID
- *       - in: query
- *         name: communityId
+ *         description: ID of the comment
+ *       - in: path
+ *         name: postId
  *         required: true
  *         schema:
  *           type: integer
- *         description: Community ID
+ *         description: ID of the post
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the comment
+ */
+router.get('/:commentId/posts/:postId', isAuthenticated, findComment)
+
+/**
+ * @swagger
+ * /comments:
+ *   post:
+ *     summary: Create a new comment
+ *     description: Adds a new comment to a post.
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: Content of the comment
+ *               postId:
+ *                 type: integer
+ *                 description: ID of the post to comment on
+ *               parentId:
+ *                  type: integer
+ *                  description: ID of the parent comment
+ *     responses:
+ *       201:
+ *         description: Successfully created the comment
+ */
+router.post('/', isAuthenticated, createComment)
+
+/**
+ * @swagger
+ * /comments/{id}:
+ *   put:
+ *     summary: Update an existing comment
+ *     description: Modifies the content of an existing comment.
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the comment to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: Updated content of the comment
+ *     responses:
+ *       200:
+ *         description: Successfully updated the comment
+ */
+router.put('/:id', isAuthenticated, updateComment)
+
+/**
+ * @swagger
+ * /comments/{id}:
+ *   delete:
+ *     summary: Delete a comment
+ *     description: Permanently removes a comment by its ID.
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the comment to delete
+ *     responses:
+ *       204:
+ *         description: Successfully deleted the comment
+ */
+router.delete('/:id', isAuthenticated, deleteComment)
+
+/**
+ * @swagger
+ * /comments/communities/{id}:
+ *   get:
+ *     summary: Get comments by user and community
+ *     description: Retrieves comments made by a user within a specific community.
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the community
  *     responses:
  *       200:
  *         description: List of comments

@@ -24,8 +24,13 @@ export const UserRepo = {
   },
 
   async createUser(userData: Prisma.UserUncheckedCreateInput) {
-    return await prisma.user.create({
-      data: { ...userData },
+    return prisma.user.create({
+      data: {
+        username: userData.username,
+        email: userData.email,
+        dob: userData.dob,
+        hashedPassword: userData.hashedPassword,
+      },
     })
   },
 

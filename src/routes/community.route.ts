@@ -12,8 +12,6 @@ import {
   demoteFromModerator,
 } from '../controllers/memberRoles'
 import { isAuthenticated } from '../middlewares/authMiddleware'
-import validate from '../middlewares/validation'
-import { CommunitySchema } from '../utils/zod/communitySchemes'
 
 const app = express.Router()
 

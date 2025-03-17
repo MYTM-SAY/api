@@ -1,8 +1,8 @@
 import { CommentRepo } from '../repos/comment.repo'
-import { UserRepo } from '../repos/user.repo'
 import { CommunityRepo } from '../repos/community.repo'
-import { CommentSchema } from '../utils'
 import APIError from '../errors/APIError'
+import { z } from 'zod'
+import { CommentSchema } from '../utils/zod/commentSchemes'
 
 async function findAllComments(postId: number) {
   const comments = await CommentRepo.findAll(postId)
@@ -28,6 +28,8 @@ async function updateComment(commentId: number, data: any) {
 }
 
 async function deleteComment(commentId: number) {
+  const comment = await CommentRepo.findCommentById(commentId)
+  if (!comment) throw new APIError('Comment not found', 404)
   return await CommentRepo.deleteComment(commentId)
 }
 
@@ -37,9 +39,6 @@ async function getCommentsByUserIdAndCommunityId(
 ) {
   if (!userId || !communityId)
     throw new APIError('Missing userId or communityId', 400)
-
-  const user = await UserRepo.findById(userId)
-  if (!user) throw new APIError('User not found', 404)
 
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
