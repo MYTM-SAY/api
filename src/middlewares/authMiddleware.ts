@@ -13,9 +13,11 @@ const authenticationJwtToken = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const token = req.cookies.accessToken
-
-  if (!token) return res.status(401).json({ message: 'Unauthorized' })
+  const tokenFromcookies = req.cookies.accessToken
+  const tokenFromHeader = req.headers.authorization?.split(' ')[1]
+  let token
+  if (tokenFromHeader) token = tokenFromHeader
+  else if (tokenFromcookies) token = tokenFromcookies
   const payload = JwtService.verifyAccessToken(token)
   if (!payload) return res.status(401).json({ message: 'Unauthorized' })
   req.claims = payload
