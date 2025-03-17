@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
 import { CommentSchema } from '../utils'
+import validate from '../middlewares/validation';
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -53,13 +54,16 @@ export const CommentRepo = {
     return result
   },
 
-  async createComment(data: z.infer<typeof CommentSchema>) {
-    const result = await prisma.comment.create({
-      data: {
-        ...data,
-      },
+  async createComment(
+    data: Omit<z.infer<typeof CommentSchema>, 'postId' | 'authorId'>,
+    postId: number,
+    authorId: number,
+  ) {
+    const validatedData = CommentSchema.parse({ ...data, postId, authorId })
+
+    return await prisma.comment.create({
+      data: validatedData,
     })
-    return result
   },
 
   async updateComment(
@@ -72,7 +76,6 @@ export const CommentRepo = {
       },
     })
     if (!comment) throw new APIError('Comment not found', 404)
-
     const result = await prisma.comment.update({
       where: {
         id: commentId,
@@ -121,18 +124,18 @@ export const CommentRepo = {
     commentId: number,
     postId: number,
 
-    userId: number
+    userId: number,
   ) {
-    let result;
+    let result
     const comment = await prisma.comment.findFirst({
       where: {
         id: commentId,
         postId: postId,
       },
-    });
-  
-    if (!comment) throw new APIError('Comment not found', 404);
-  
+    })
+
+    if (!comment) throw new APIError('Comment not found', 404)
+
     const existingVote = await prisma.commentVote.findUnique({
       where: {
         userId_commentId: {
@@ -140,11 +143,10 @@ export const CommentRepo = {
           commentId,
         },
       },
-    });
-  
-    if (existingVote)
-       {
-        result=  await prisma.commentVote.update({
+    })
+
+    if (existingVote) {
+      result = await prisma.commentVote.update({
         where: {
           userId_commentId: {
             userId,
@@ -156,16 +158,15 @@ export const CommentRepo = {
             increment: 1,
           },
         },
-      });
+      })
       await prisma.comment.update({
         where: {
           id: commentId,
         },
-        data:{
+        data: {
           voteCounter: result.count,
-        }
-
-      });
+        },
+      })
     } else {
       result = await prisma.commentVote.create({
         data: {
@@ -173,26 +174,22 @@ export const CommentRepo = {
           commentId,
           count: 1,
         },
-      });
+      })
     }
-    return result;
+    return result
   },
 
-  async downVoteComment(
-    commentId: number,
-    postId: number,
-    userId: number
-  ) {
-    let result;
+  async downVoteComment(commentId: number, postId: number, userId: number) {
+    let result
     const comment = await prisma.comment.findFirst({
       where: {
         id: commentId,
         postId: postId,
       },
-    });
-  
-    if (!comment) throw new APIError('Comment not found', 404);
-  
+    })
+
+    if (!comment) throw new APIError('Comment not found', 404)
+
     const existingVote = await prisma.commentVote.findUnique({
       where: {
         userId_commentId: {
@@ -200,8 +197,8 @@ export const CommentRepo = {
           commentId,
         },
       },
-    });
-  
+    })
+
     if (existingVote) {
       result = await prisma.commentVote.update({
         where: {
@@ -215,7 +212,7 @@ export const CommentRepo = {
             decrement: 1,
           },
         },
-      });
+      })
     } else {
       result = await prisma.commentVote.create({
         data: {
@@ -223,8 +220,8 @@ export const CommentRepo = {
           commentId,
           count: -1,
         },
-      });
-    };
-    return result;
-  }  
+      })
+    }
+    return result
+  },
 }

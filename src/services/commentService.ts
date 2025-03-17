@@ -16,10 +16,11 @@ async function findComment(postId: number, commentId: number) {
   return comment
 }
 
-async function createComment(data: any) {
-  const validatedData = CommentSchema.parse(data)
-  return await CommentRepo.createComment(validatedData)
+async function createComment(data: any, postId: number, authorId: number) {
+  const validatedData = CommentSchema.parse({ ...data, postId, authorId });
+  return await CommentRepo.createComment(validatedData, postId, authorId);
 }
+
 
 async function updateComment(commentId: number, data: any) {
   const validatedData = CommentSchema.partial().parse(data)

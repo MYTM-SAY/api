@@ -27,7 +27,7 @@ export const findComment = asyncHandler(
 
 export const createComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const comment = await CommentService.createComment(req.body)
+    const comment = await CommentService.createComment(req.body, +req.params.postId, +req.params.authorId)
     res
       .status(201)
       .json(ResponseHelper.success('Comment created successfully', comment))
