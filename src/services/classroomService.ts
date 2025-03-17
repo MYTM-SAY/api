@@ -5,7 +5,7 @@ import APIError from '../errors/APIError'
 import { CommunityRepo } from '../repos/community.repo'
 
 const getClassroomsByCommunityId = async (communityId: number) => {
-  return await ClassroomRepo.findByCommunityId(communityId)
+  return ClassroomRepo.findByCommunityId(communityId)
 }
 
 const getClassroomById = async (id: number) => {

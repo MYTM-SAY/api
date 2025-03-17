@@ -6,7 +6,7 @@ import {
   deleteClassroom,
   updateClassroom,
 } from '../controllers/classroomController'
-import { isAuthenticated, isOwner } from '../middlewares/authMiddleware'
+import { isAuthenticated } from '../middlewares/authMiddleware'
 
 const router = express.Router()
 /**
@@ -77,6 +77,7 @@ router.get('/:id', getClassroom)
  *       201:
  *         description: Classroom created successfully
  */
+
 router.post('/', createClassroom)
 /**
  * @swagger

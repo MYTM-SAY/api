@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Response } from 'express'
 import { CommentService } from '../services/commentService'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'

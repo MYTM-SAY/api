@@ -24,20 +24,20 @@ async function createComment(data: z.infer<typeof CommentSchema>) {
     )
     if (!commenteExist) throw new APIError('Parent Comment not found', 404)
   }
-  return await CommentRepo.createComment(data)
+  return CommentRepo.createComment(data)
 }
 
 async function updateComment(
   commentId: number,
   data: Partial<z.infer<typeof CommentSchema>>,
 ) {
-  return await CommentRepo.updateComment(commentId, data)
+  return CommentRepo.updateComment(commentId, data)
 }
 
 async function deleteComment(commentId: number) {
   const comment = await CommentRepo.findCommentById(commentId)
   if (!comment) throw new APIError('Comment not found', 404)
-  return await CommentRepo.deleteComment(commentId)
+  return CommentRepo.deleteComment(commentId)
 }
 
 async function getCommentsByUserIdAndCommunityId(
@@ -50,10 +50,7 @@ async function getCommentsByUserIdAndCommunityId(
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
-  return await CommentRepo.getCommentsByUserIdAndCommunityId(
-    userId,
-    communityId,
-  )
+  return CommentRepo.getCommentsByUserIdAndCommunityId(userId, communityId)
 }
 
 export const CommentService = {

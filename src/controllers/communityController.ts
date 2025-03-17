@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from 'express'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { CommunityService } from '../services/communityService'
 import { asyncHandler } from '../utils/asyncHandler'
