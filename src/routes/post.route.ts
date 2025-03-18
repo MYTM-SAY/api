@@ -5,10 +5,13 @@ import {
   deletePost,
   getPost,
   updatePost,
+  upVotePost,
+  downVotePost,
 } from '../controllers/postController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
 const router = express.Router()
+
 /**
  * @swagger
  * /posts/forums/{id}:
@@ -23,37 +26,32 @@ const router = express.Router()
  *           type: integer
  *         description: Forum ID
  *     security:
- *       - bearerAuth: []  # Assuming authentication is required
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully fetched posts
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Posts fetched successfully"
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
  *       401:
  *         description: Unauthorized
  *       404:
  *         description: Forum not found
  */
 router.get('/forums/:id', isAuthenticated, getPostsByForumId)
+
 /**
  * @swagger
- * /posts:
+ * /posts/forums/{forumId}:
  *   post:
  *     summary: Create a new post
  *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: forumId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the forum where the post is created
  *     requestBody:
  *       required: true
  *       content:
@@ -62,58 +60,24 @@ router.get('/forums/:id', isAuthenticated, getPostsByForumId)
  *             type: object
  *             required:
  *               - title
- *               - forumId
- *               - authorId
  *             properties:
  *               title:
  *                 type: string
- *                 example: "New Post Title"
  *               content:
  *                 type: string
- *                 example: "Content of the post."
- *               attchments:
+ *               attachments:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: url
- *                 example: ["https://example.com/image.png"]
- *               forumId:
- *                 type: integer
- *                 example: 5
- *               authorId:
- *                 type: integer
- *                 example: 10
  *     responses:
  *       201:
  *         description: Post created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 title:
- *                   type: string
- *                   example: "New Post Title"
- *                 content:
- *                   type: string
- *                   example: "Content of the post."
- *                 attchments:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: url
- *                   example: ["https://example.com/image.png"]
- *                 forumId:
- *                   type: integer
- *                   example: 5
- *                 authorId:
- *                   type: integer
- *                   example: 10
+ *       400:
+ *         description: Bad request
  */
-router.post('/', isAuthenticated, createPost)
+router.post('/forums/:forumId', isAuthenticated, createPost)
+
 /**
  * @swagger
  * /posts/{id}:
@@ -123,43 +87,18 @@ router.post('/', isAuthenticated, createPost)
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: ID of the post to retrieve
+ *         description: Post ID
  *     responses:
  *       200:
- *         description: Post data
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 title:
- *                   type: string
- *                   example: "My First Post"
- *                 content:
- *                   type: string
- *                   example: "This is the content of the post."
- *                 attchments:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: url
- *                   example: ["https://example.com/image.png"]
- *                 forumId:
- *                   type: integer
- *                   example: 5
- *                 authorId:
- *                   type: integer
- *                   example: 10
+ *         description: Successfully retrieved post
  *       404:
  *         description: Post not found
  */
 router.get('/:id', isAuthenticated, getPost)
+
 /**
  * @swagger
  * /posts/{id}:
@@ -169,10 +108,10 @@ router.get('/:id', isAuthenticated, getPost)
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: ID of the post to update
+ *         description: Post ID
  *     requestBody:
  *       required: true
  *       content:
@@ -182,43 +121,21 @@ router.get('/:id', isAuthenticated, getPost)
  *             properties:
  *               title:
  *                 type: string
- *                 example: "Updated Post Title"
  *               content:
  *                 type: string
- *                 example: "Updated content."
- *               attchments:
+ *               attachments:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: url
- *                 example: ["https://example.com/new-image.png"]
  *     responses:
  *       200:
  *         description: Post updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 title:
- *                   type: string
- *                   example: "Updated Post Title"
- *                 content:
- *                   type: string
- *                   example: "Updated content."
- *                 attchments:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: url
- *                   example: ["https://example.com/new-image.png"]
  *       404:
  *         description: Post not found
  */
 router.put('/:id', isAuthenticated, updatePost)
+
 /**
  * @swagger
  * /posts/{id}:
@@ -228,10 +145,10 @@ router.put('/:id', isAuthenticated, updatePost)
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: ID of the post to delete
+ *         description: Post ID
  *     responses:
  *       204:
  *         description: Post deleted successfully
@@ -239,5 +156,71 @@ router.put('/:id', isAuthenticated, updatePost)
  *         description: Post not found
  */
 router.delete('/:id', isAuthenticated, deletePost)
+
+/**
+ * @swagger
+ * /posts/upvote/{postId}/{forumId}/{userId}:
+ *   put:
+ *     summary: Upvote a post
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Post ID
+ *       - in: path
+ *         name: forumId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Forum ID
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Post upvoted successfully
+ *       404:
+ *         description: Post not found
+ */
+router.put('/upvote/:postId/:forumId/:userId', upVotePost)
+
+/**
+ * @swagger
+ * /posts/downvote/{postId}/{forumId}/{userId}:
+ *   put:
+ *     summary: Downvote a post
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Post ID
+ *       - in: path
+ *         name: forumId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Forum ID
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Post downvoted successfully
+ *       404:
+ *         description: Post not found
+ */
+router.put('/downvote/:postId/:forumId/:userId', downVotePost)
 
 export default router

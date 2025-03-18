@@ -52,6 +52,27 @@ async function getCommentsByUserIdAndCommunityId(
 
   return CommentRepo.getCommentsByUserIdAndCommunityId(userId, communityId)
 }
+async function upVoteComment(
+  commentId: number,
+  postId: number,
+  userId: number,
+) {
+  if (!commentId || !postId || !userId)
+    throw new APIError('Some parameter is missing', 400)
+  const result = await CommentRepo.upVoteComment(commentId, postId, userId)
+  return result
+}
+
+async function downVoteComment(
+  commentId: number,
+  postId: number,
+  userId: number,
+) {
+  if (!commentId || !postId || !userId)
+    throw new APIError('Some parameter is missing', 400)
+  const result = await CommentRepo.downVoteComment(commentId, postId, userId)
+  return result
+}
 
 export const CommentService = {
   findAllComments,
@@ -60,4 +81,6 @@ export const CommentService = {
   updateComment,
   deleteComment,
   getCommentsByUserIdAndCommunityId,
+  upVoteComment,
+  downVoteComment,
 }

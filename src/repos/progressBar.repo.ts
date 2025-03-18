@@ -2,40 +2,101 @@ import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
 
 export const progressBarRepo = {
-  async changeSectionStatus(secId: number) {
-    const section = await prisma.section.findUnique({
-      where: { id: secId },
-    })
-    if (!section) throw new APIError('No section found', 404)
-
-    const modifiedSection = await prisma.section.update({
-      where: { id: secId },
-      data: { isCompleted: !section.isCompleted },
-    })
-    return modifiedSection
-  },
-
-  async updatedProgress(classId: number) {
-    const classroom = await prisma.classroom.findUnique({
-      where: { id: classId },
-    })
-    if (!classroom) throw new APIError('No classroom found', 404)
-
-    const completedSections = await prisma.section.count({
+  async changeLessonStatus(
+    communityId: number,
+    classroomId: number,
+    lessonId: number,
+    userId: number,
+  ) {
+    const lesson = await prisma.lesson.findUnique({
       where: {
-        classroomId: classId,
-        isCompleted: true,
+        id: lessonId,
+        Section: {
+          classroomId,
+          Classroom: {
+            communityId,
+          },
+        },
       },
     })
 
-    const totalSections = await prisma.section.count({
-      where: { classroomId: classId },
+    if (!lesson) throw new APIError('Lesson not found', 404)
+
+    const existingCompletion = await prisma.completedLessons.findUnique({
+      where: {
+        userId_lessonId_communityId_classroomId: {
+          userId,
+          lessonId,
+          communityId,
+          classroomId,
+        },
+      },
     })
-    const progress = (completedSections / totalSections) * 100
-    const updatedClassroomProgress = await prisma.classroom.update({
-      where: { id: classId },
-      data: { progress },
+
+    if (existingCompletion) {
+      await prisma.completedLessons.delete({
+        where: {
+          userId_lessonId_communityId_classroomId: {
+            userId,
+            lessonId,
+            communityId,
+            classroomId,
+          },
+        },
+      })
+      return { message: 'Lesson status reverted to incomplete' }
+    }
+
+    await prisma.completedLessons.create({
+      data: { userId, lessonId, communityId, classroomId },
     })
-    return updatedClassroomProgress
+
+    return { message: 'Lesson marked as completed' }
+  },
+
+  async updateClassroomProgress(
+    communityId: number,
+    classroomId: number,
+    userId: number,
+  ) {
+    const classroom = await prisma.classroom.findUnique({
+      where: { id: classroomId, communityId },
+    })
+
+    if (!classroom) throw new APIError('Classroom not found', 404)
+
+    const totalLessons = await prisma.lesson.count({
+      where: { Section: { classroomId } },
+    })
+
+    const completedLessons = await prisma.completedLessons.count({
+      where: {
+        userId,
+        communityId,
+        Lesson: { Section: { classroomId } },
+      },
+    })
+
+    const progress =
+      totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
+
+    const updatedProgress = await prisma.progress.upsert({
+      where: { userId_classroomId: { userId, classroomId } },
+      update: { progress },
+      create: { userId, classroomId, progress },
+    })
+
+    await prisma.classroom.update({
+      where: {
+        id: communityId,
+      },
+      data: {
+        progress,
+      },
+    })
+
+    return {
+      progress: updatedProgress.progress,
+    }
   },
 }

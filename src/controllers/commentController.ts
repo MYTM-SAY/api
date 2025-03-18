@@ -74,3 +74,29 @@ export const getCommentsByUserIdAndCommunityId = asyncHandler(
       .json(ResponseHelper.success('Comments fetched successfully', comments))
   },
 )
+
+export const upVoteComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const result = await CommentService.upVoteComment(
+      +req.params.commentId,
+      +req.params.postId,
+      +req.params.userId,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comment upvoted successfully', result))
+  },
+)
+
+export const downVoteComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const result = await CommentService.downVoteComment(
+      +req.params.commentId,
+      +req.params.postId,
+      +req.params.userId,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comment downvoted successfully', result))
+  },
+)

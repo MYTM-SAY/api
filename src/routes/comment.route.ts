@@ -6,6 +6,8 @@ import {
   updateComment,
   deleteComment,
   getCommentsByUserIdAndCommunityId,
+  upVoteComment,
+  downVoteComment,
 } from '../controllers/commentController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
@@ -13,27 +15,88 @@ const router = express.Router()
 
 /**
  * @swagger
- * /posts/{id}:
+ * /comments/{postId}:
  *   get:
- *     summary: Get all comments for a specific post
- *     description: Retrieves all comments associated with the given post ID.
- *     tags: [Comments]
+ *     summary: Get all comments for a post
+ *     description: Retrieves all comments associated with a specific post.
+ *     tags:
+ *       - Comments
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: postId
  *         required: true
  *         schema:
  *           type: integer
  *         description: ID of the post
  *     responses:
  *       200:
- *         description: A list of comments for the post
+ *         description: List of comments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   content:
+ *                     type: string
+ *                   authorId:
+ *                     type: integer
+ *       400:
+ *         description: Invalid request
+ *       500:
+ *         description: Server error
  */
-router.get('/posts/:id', isAuthenticated, findAllComments)
+router.get('/:postId', findAllComments)
+
+/**
+ * @swagger
+ * /comments/{postId}/{commentId}:
+ *   get:
+ *     summary: Get a specific comment
+ *     description: Retrieves a specific comment from a post.
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the comment
+ *     responses:
+ *       200:
+ *         description: Comment details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 content:
+ *                   type: string
+ *                 authorId:
+ *                   type: integer
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:postId/:commentId', findComment)
 
 /**
  * @swagger
  * /comments/{commentId}/posts/{postId}:
+ * /comments:
  *   get:
  *     summary: Retrieve a specific comment on a post
  *     description: Fetches a single comment by comment ID and post ID.
@@ -159,5 +222,99 @@ router.get(
   isAuthenticated,
   getCommentsByUserIdAndCommunityId,
 )
+
+/**
+ * @swagger
+ * /comments/upvote/{commentId}/{postId}/{userId}:
+ *   put:
+ *     summary: Upvote a comment
+ *     description: Increments the upvote count of a comment in a specific post by a specific user.
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the comment to upvote
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post containing the comment
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user upvoting the comment
+ *     responses:
+ *       200:
+ *         description: Comment successfully upvoted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Comment upvoted successfully"
+ *       400:
+ *         description: Invalid request parameters
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/upvote/:commentId/:postId/:userId', upVoteComment)
+
+/**
+ * @swagger
+ * /comments/downvote/{commentId}/{postId}/{userId}:
+ *   put:
+ *     summary: Downvote a comment
+ *     description: Decreases the vote count of a comment by 1 for a specific user.
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the comment to downvote
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post containing the comment
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user downvoting the comment
+ *     responses:
+ *       200:
+ *         description: Comment downvoted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Comment downvoted successfully"
+ *       400:
+ *         description: Invalid request parameters
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/downvote/:commentId/:postId/:userId', downVoteComment)
 
 export default router
