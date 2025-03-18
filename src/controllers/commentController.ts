@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Response } from 'express'
 import { CommentService } from '../services/commentService'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'
@@ -72,5 +72,31 @@ export const getCommentsByUserIdAndCommunityId = asyncHandler(
     res
       .status(200)
       .json(ResponseHelper.success('Comments fetched successfully', comments))
+  },
+)
+
+export const upVoteComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const result = await CommentService.upVoteComment(
+      +req.params.commentId,
+      +req.params.postId,
+      +req.params.userId,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comment upvoted successfully', result))
+  },
+)
+
+export const downVoteComment = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const result = await CommentService.downVoteComment(
+      +req.params.commentId,
+      +req.params.postId,
+      +req.params.userId,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Comment downvoted successfully', result))
   },
 )

@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 
 async function getAllCommunities() {
-  return await CommunityRepo.findAll()
+  return CommunityRepo.findAll()
 }
 
 async function discoverCommunities(
@@ -51,7 +51,7 @@ async function createCommunity(
   userId: number,
 ) {
   const validatedData = await CommunitySchema.parseAsync(data)
-  return await CommunityRepo.create(validatedData, userId)
+  return CommunityRepo.create(validatedData, userId)
 }
 
 async function updateCommunity(
@@ -65,7 +65,7 @@ async function updateCommunity(
   const community = await CommunityRepo.findById(communityId)
 
   if (!community) throw new APIError('Community not found', 404)
-  return await CommunityRepo.update(communityId, data)
+  return CommunityRepo.update(communityId, data)
 }
 
 async function deleteCommunity(communityId: number, userId: number) {

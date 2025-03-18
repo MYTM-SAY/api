@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { ClassroomService } from '../services/classroomService'
 import { ResponseHelper } from '../utils/responseHelper'

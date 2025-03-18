@@ -1,5 +1,6 @@
 class APIError extends Error {
   public readonly statusCode: number
+
   public readonly data: any
 
   constructor(message: string, statusCode: number = 500, data: any = null) {

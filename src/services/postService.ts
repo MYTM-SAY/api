@@ -1,19 +1,17 @@
-import { PostRepo } from '../repos/post.repo'
-import APIError from '../errors/APIError'
-import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 import { z } from 'zod'
+import APIError from '../errors/APIError'
 import { ForumRepo } from '../repos/forum.repo'
+import { PostRepo } from '../repos/post.repo'
+import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 async function getPostsByForumId(forumId: number) {
   return await PostRepo.findPostsByForumId(forumId)
 }
 
 async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
-  const validatedData = await PostSchema.parseAsync(data)
-  console.log(validatedData)
-  const forumExist = await ForumRepo.findById(validatedData.forumId)
+  const forumExist = await ForumRepo.findById(data.forumId)
   if (!forumExist) throw new APIError('Forum not found', 404)
-  return await PostRepo.create(validatedData, authorId)
+  return await PostRepo.create(data, authorId)
 }
 
 async function getPostById(postId: number) {
@@ -38,10 +36,28 @@ async function deletePost(postId: number) {
   await PostRepo.delete(postId)
 }
 
+async function upVotePost(postId: number, forumId: number, userId: number) {
+  if (!postId || !forumId || !userId)
+    throw new APIError('Some parameter is missing', 400)
+
+  const result = PostRepo.upVotePost(postId, forumId, userId)
+  return result
+}
+
+async function downVotePost(postId: number, forumId: number, userId: number) {
+  if (!postId || !forumId || !userId)
+    throw new APIError('Some parameter is missing', 400)
+
+  const result = PostRepo.downVotePost(postId, forumId, userId)
+  return result
+}
+
 export const PostService = {
   getPostsByForumId,
   createPost,
   getPostById,
   updatePost,
   deletePost,
+  upVotePost,
+  downVotePost,
 }
