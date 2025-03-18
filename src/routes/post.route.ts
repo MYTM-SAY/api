@@ -159,68 +159,102 @@ router.delete('/:id', isAuthenticated, deletePost)
 
 /**
  * @swagger
- * /posts/upvote/{postId}/{forumId}/{userId}:
+ * /posts/upvote/{postId}/{userId}:
  *   put:
  *     summary: Upvote a post
- *     tags: [Posts]
+ *     description: Increments the upvote count for a specific post by a specific user. If the user has not upvoted before, a new vote record is created.
+ *     tags:
+ *       - Posts
  *     parameters:
  *       - in: path
  *         name: postId
  *         required: true
  *         schema:
  *           type: integer
- *         description: Post ID
- *       - in: path
- *         name: forumId
- *         required: true
- *         schema:
- *           type: integer
- *         description: Forum ID
+ *         description: ID of the post to upvote
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
  *           type: integer
- *         description: User ID
+ *         description: ID of the user upvoting the post
  *     responses:
  *       200:
  *         description: Post upvoted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Post upvoted successfully"
+ *                 vote:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                     postId:
+ *                       type: integer
+ *                     count:
+ *                       type: integer
+ *       400:
+ *         description: Invalid request parameters
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
-router.put('/upvote/:postId/:forumId/:userId', upVotePost)
+router.put('/upvote/:postId/:userId', upVotePost);
 
 /**
  * @swagger
- * /posts/downvote/{postId}/{forumId}/{userId}:
+ * /posts/downvote/{postId}/{userId}:
  *   put:
  *     summary: Downvote a post
- *     tags: [Posts]
+ *     description: Decreases the vote count of a specific post by a specific user. If the user has not voted before, a new vote record is created with a negative value.
+ *     tags:
+ *       - Posts
  *     parameters:
  *       - in: path
  *         name: postId
  *         required: true
  *         schema:
  *           type: integer
- *         description: Post ID
- *       - in: path
- *         name: forumId
- *         required: true
- *         schema:
- *           type: integer
- *         description: Forum ID
+ *         description: ID of the post to downvote
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
  *           type: integer
- *         description: User ID
+ *         description: ID of the user downvoting the post
  *     responses:
  *       200:
  *         description: Post downvoted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Post downvoted successfully"
+ *                 vote:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                     postId:
+ *                       type: integer
+ *                     count:
+ *                       type: integer
+ *       400:
+ *         description: Invalid request parameters
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
-router.put('/downvote/:postId/:forumId/:userId', downVotePost)
+router.put('/downvote/:postId/:userId', downVotePost);
 
 export default router

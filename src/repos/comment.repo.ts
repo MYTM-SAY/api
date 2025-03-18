@@ -169,7 +169,7 @@ export const CommentRepo = {
       create: {
         userId,
         commentId,
-        count: 1,
+        count: -1,
       },
     })
 
