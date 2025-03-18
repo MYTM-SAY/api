@@ -127,7 +127,7 @@ dotenv.config()
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5500',
+    origin: process.env.CLIENT_URL || `http://localhost:${port}`,
     credentials: true,
   }),
 )
