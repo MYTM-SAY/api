@@ -34,6 +34,17 @@ export const UserRepo = {
     })
   },
 
+  async updateUser(id: number, fullname: string, dob: Date ) { // update user name,dob by id
+    const result = await prisma.user.update({
+      where: { id },
+      data: { fullname, dob },
+    })
+    return result
+      }
+  ,
+
+
+
   async updateLastLogin(id: number) {
     const result = await prisma.user.update({
       where: { id },

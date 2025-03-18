@@ -69,9 +69,8 @@ async function updateCommunity(
 }
 
 async function deleteCommunity(communityId: number, userId: number) {
-  console.log(communityId, userId)
+  
   const community = await CommunityRepo.findById(communityId)
-
   if (!community) throw new APIError('Community not found', 404)
 
   await CommunityRepo.delete(communityId)
