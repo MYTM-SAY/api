@@ -9,6 +9,8 @@ import comment from './comment.route'
 import profile from './profile.route'
 import auth from './auth.route'
 import user from './user.route'
+import uploadRoutes from './upload.route'
+import fileRoutes from './files.route'
 
 const router = express.Router()
 
@@ -22,5 +24,7 @@ router.use('/comments', comment)
 router.use('/profile', profile)
 router.use('/auth', auth)
 router.use('/users', user)
+router.use('/upload', uploadRoutes)
+router.use('/files', fileRoutes)
 
 export default router
