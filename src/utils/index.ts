@@ -148,23 +148,6 @@ export const ClassroomSchema = z
   })
   .strict()
 
-export const SectionSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    name: z
-      .string()
-      .min(1, 'Section name is required')
-      .max(100, 'Section name must be at most 100 characters'),
-    description: z
-      .string()
-      .max(500, 'Description must be at most 500 characters')
-      .nullable(),
-    classroomId: z.number().int().positive(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
 export const QuestionSchema = z
   .object({
     id: z.number().int().positive().optional(),

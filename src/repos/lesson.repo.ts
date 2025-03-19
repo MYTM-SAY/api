@@ -3,7 +3,7 @@ import { prisma } from '../db/PrismaClient'
 import {
   CreateLessonSchema,
   UpdateLessonSchema,
-} from '../utils/zod/lessonSchema'
+} from '../utils/zod/lessonSchemes'
 import { MaterialSchema } from '../utils/zod/materialSchemes'
 
 export const LessonRepo = {

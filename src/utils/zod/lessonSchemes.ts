@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-// Common Fields
 const BaseLessonSchema = z.object({
   name: z
     .string()

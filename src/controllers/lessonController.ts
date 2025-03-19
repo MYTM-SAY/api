@@ -7,7 +7,7 @@ import APIError from '../errors/APIError'
 import {
   CreateLessonSchema,
   UpdateLessonSchema,
-} from '../utils/zod/lessonSchema'
+} from '../utils/zod/lessonSchemes'
 import { CreateMaterialSchema } from '../utils/zod/materialSchemes'
 
 export const getLessonsBySectionId = asyncHandler(

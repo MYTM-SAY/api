@@ -4,10 +4,13 @@ import z from 'zod'
 import {
   CreateLessonSchema,
   UpdateLessonSchema,
-} from '../utils/zod/lessonSchema'
+} from '../utils/zod/lessonSchemes'
 import { CreateMaterialSchema } from '../utils/zod/materialSchemes'
+import { SectionRepo } from '../repos/section.repo'
 
 const getLessonsBySectionId = async (sectionId: number) => {
+  const sectionExist = SectionRepo.findById(sectionId)
+  if (!sectionExist) throw new APIError('Section not found', 404)
   return LessonRepo.findBySectionId(sectionId)
 }
 
@@ -21,6 +24,8 @@ const createLessonWithNewMaterial = async (
   lessonData: z.infer<typeof CreateLessonSchema>,
   materialData: z.infer<typeof CreateMaterialSchema>,
 ) => {
+  const sectionExist = SectionRepo.findById(lessonData.sectionId)
+  if (!sectionExist) throw new APIError('Section not found', 404)
   return LessonRepo.createWithMaterial(lessonData, materialData)
 }
 
