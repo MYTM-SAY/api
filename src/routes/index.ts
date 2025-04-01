@@ -1,5 +1,6 @@
 import express from 'express'
 import classroom from './classroom.route'
+import sections from './section.route'
 import lesson from './lesson.route'
 import community from './community.route'
 import post from './post.route'
@@ -17,6 +18,7 @@ const router = express.Router()
 router.use('/posts', post)
 router.use('/communities', community)
 router.use('/classrooms', classroom)
+router.use('/sections', sections)
 router.use('/lessons', lesson)
 router.use('/progress', progress)
 router.use('/leaderboard', leaderBoard)
