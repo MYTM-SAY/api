@@ -54,7 +54,7 @@ export const getCommunity = asyncHandler(
 )
 
 export const createCommunity = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: AuthenticatedRequest, res: Response) => { 
     const newCommunity = await CommunityService.createCommunity(
       req.body,
       req.claims!.id,

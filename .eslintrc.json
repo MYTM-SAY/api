@@ -1,7 +1,8 @@
 {
 	"root": true,
 	"env": {
-		"jest": true
+		"jest": true,
+		"node": true
 	},
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
@@ -28,7 +29,8 @@
 		"no-redeclare": 0,
 		"import/extensions": 0,
 		"@typescript-eslint/no-redeclare": 0,
-		"prettier/prettier": "error"
+		"prettier/prettier": "error",
+		"no-console": "off"
 	},
 	"settings": {
 		"import/parsers": {

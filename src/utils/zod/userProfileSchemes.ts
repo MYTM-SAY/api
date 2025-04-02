@@ -11,3 +11,4 @@ export const UserProfileSchema = z.object({
   youtube: socialMediaUrl,
   profilePictureURL: z.string().url('Invalid profile picture URL').optional(),
 }).strict();
+

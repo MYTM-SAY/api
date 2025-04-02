@@ -225,10 +225,10 @@ router.get(
 
 /**
  * @swagger
- * /comments/upvote/{commentId}/{postId}/{userId}:
+ * /comments/upvote/{commentId}/{userId}:
  *   put:
  *     summary: Upvote a comment
- *     description: Increments the upvote count of a comment in a specific post by a specific user.
+ *     description: Increments the upvote count of a comment by a specific user. If the user has not upvoted before, a new vote record is created.
  *     tags:
  *       - Comments
  *     parameters:
@@ -238,12 +238,6 @@ router.get(
  *         schema:
  *           type: integer
  *         description: ID of the comment to upvote
- *       - in: path
- *         name: postId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the post containing the comment
  *       - in: path
  *         name: userId
  *         required: true
@@ -261,6 +255,15 @@ router.get(
  *                 message:
  *                   type: string
  *                   example: "Comment upvoted successfully"
+ *                 vote:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                     commentId:
+ *                       type: integer
+ *                     count:
+ *                       type: integer
  *       400:
  *         description: Invalid request parameters
  *       404:
@@ -268,11 +271,12 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.put('/upvote/:commentId/:postId/:userId', upVoteComment)
+
+router.put('/upvote/:commentId/:userId', upVoteComment)
 
 /**
  * @swagger
- * /comments/downvote/{commentId}/{postId}/{userId}:
+ * /comments/downvote/{commentId}/{userId}:
  *   put:
  *     summary: Downvote a comment
  *     description: Decreases the vote count of a comment by 1 for a specific user.
@@ -285,12 +289,6 @@ router.put('/upvote/:commentId/:postId/:userId', upVoteComment)
  *         schema:
  *           type: integer
  *         description: ID of the comment to downvote
- *       - in: path
- *         name: postId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the post containing the comment
  *       - in: path
  *         name: userId
  *         required: true
@@ -315,6 +313,6 @@ router.put('/upvote/:commentId/:postId/:userId', upVoteComment)
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:commentId/:postId/:userId', downVoteComment)
+router.put('/downvote/:commentId/:userId', downVoteComment)
 
 export default router

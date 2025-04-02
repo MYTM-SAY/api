@@ -1,31 +1,25 @@
-import { NextFunction, Response } from 'express'
-import { UserProfileRepo } from '../repos/userProfile.repo'
-import APIError from '../errors/APIError'
-import { AuthenticatedRequest } from '../middlewares/authMiddleware'
+import { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../middlewares/authMiddleware';
+import { UserProfileRepo } from '../repos/userProfile.repo';
+import { UserRepo } from '../repos/user.repo';
+import APIError from '../errors/APIError';
+import { asyncHandler } from '../utils/asyncHandler';
+import { ResponseHelper } from '../utils/responseHelper';
+import { UserProfileService } from '../services/userProfileService';
 
-// public profile
-export const getProfile = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const profile = await UserProfileRepo.getProfile(Number(+req.params.id))
-    if (!profile) throw new APIError('Profile not found', 404)
-
-    res.status(200).json({ data: profile })
-  } catch (error) {
-    next(error)
+export const getProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const profile = await UserProfileService.getUserProfile(+req.params.id);
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success('Profile retrieved successfully', profile)
+      );
   }
-}
+);
 
-// create profile if you are the user
-export const createProfile = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+export const createProfile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const {
       userId,
       bio,
@@ -35,35 +29,34 @@ export const createProfile = async (
       linkedin,
       youtube,
       profilePictureURL,
-    } = req.body
-    if (userId !== req.claims?.id) {
+     
+    } = req.body;
+
+    // Ensure the authenticated user is creating their own profile
+    if (userId !== req.claims!.id) {
       return res
         .status(403)
-        .json({ message: 'Forbidden: You can only create your profile' })
+        .json(
+          ResponseHelper.error('Forbidden: You can only create your profile')
+        );
     }
-    const profile = await UserProfileRepo.createProfile({
-      userId,
-      bio,
-      twitter,
-      facebook,
-      instagram,
-      linkedin,
-      youtube,
-      profilePictureURL,
-    })
-    res.status(201).json({ data: profile })
-  } catch (error) {
-    next(error)
-  }
-}
 
-// update profile if you are the user
-export const updateProfile = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+    // Call the service with the profile data and the userId separately.
+    const newProfile = await UserProfileService.createUserProfile(
+      { bio, twitter, facebook, instagram, linkedin, youtube, profilePictureURL },
+      userId,
+    );
+
+    res
+      .status(201)
+      .json(
+        ResponseHelper.success('Profile created successfully', newProfile)
+      );
+  }
+);
+
+export const updateProfile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const {
       userId,
       bio,
@@ -73,24 +66,31 @@ export const updateProfile = async (
       linkedin,
       youtube,
       profilePictureURL,
-    } = req.body
+    } = req.body;
+
     if (userId !== req.claims?.id) {
       return res
         .status(403)
-        .json({ message: 'Forbidden: You can only update your profile' })
+        .json(
+          ResponseHelper.error('Forbidden: You can only update your profile')
+        );
     }
-    const profile = await UserProfileRepo.updateProfile({
-      userId,
-      bio,
+
+    const profile = await UserProfileService.updateUserProfile(
+      
+      {bio,
       twitter,
       facebook,
       instagram,
       linkedin,
       youtube,
-      profilePictureURL,
-    })
-    res.status(200).json({ data: profile })
-  } catch (error) {
-    next(error)
+      profilePictureURL},userId,
+    );
+
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success('Profile updated successfully', profile)
+      );
   }
-}
+);

@@ -1,4 +1,4 @@
-import { Prisma, User } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { JwtService } from './jwtService'
 import APIError from '../errors/APIError'
 import { UserRepo } from '../repos/user.repo'
@@ -36,8 +36,8 @@ const register = async (
   }
 }
 
-const refreshToken = async (refreshToken: string) => {
-  const payload = JwtService.verifyRefreshToken(refreshToken)
+const refreshToken = async (rt: string) => {
+  const payload = JwtService.verifyRefreshToken(rt)
   if (!payload) throw new APIError('Invalid refresh token', 401)
 
   const user = await UserRepo.findById(payload.id)
