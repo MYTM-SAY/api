@@ -1,15 +1,12 @@
 import { LessonRepo } from '../repos/lesson.repo'
 import APIError from '../errors/APIError'
 import z from 'zod'
-import {
-  CreateLessonSchema,
-  UpdateLessonSchema,
-} from '../utils/zod/lessonSchemes'
-import { CreateMaterialSchema } from '../utils/zod/materialSchemes'
+import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
 import { SectionRepo } from '../repos/section.repo'
+import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
 
 const getLessonsBySectionId = async (sectionId: number) => {
-  const sectionExist = SectionRepo.findById(sectionId)
+  const sectionExist = await SectionRepo.findById(sectionId)
   if (!sectionExist) throw new APIError('Section not found', 404)
   return LessonRepo.findBySectionId(sectionId)
 }
@@ -21,12 +18,11 @@ const getLessonById = async (id: number) => {
 }
 
 const createLessonWithNewMaterial = async (
-  lessonData: z.infer<typeof CreateLessonSchema>,
-  materialData: z.infer<typeof CreateMaterialSchema>,
+  data: z.infer<typeof CreateLessonWithMaterialSchema>,
 ) => {
-  const sectionExist = SectionRepo.findById(lessonData.sectionId)
+  const sectionExist = await SectionRepo.findById(data.lesson.sectionId)
   if (!sectionExist) throw new APIError('Section not found', 404)
-  return LessonRepo.createWithMaterial(lessonData, materialData)
+  return LessonRepo.createWithMaterial(data)
 }
 
 const deleteLesson = async (id: number) => {
