@@ -2,9 +2,12 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 
 export const ForumRepo = {
-  async create(forum: Prisma.ForumCreateInput) {
+  async create(
+    forum: Omit<Prisma.ForumCreateInput, 'Community'>,
+    communityId: number,
+  ) {
     const result = await prisma.forum.create({
-      data: forum,
+      data: { ...forum, communityId }, // TypeScript will enforce no community property
     })
     return result
   },
