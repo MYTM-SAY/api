@@ -5,7 +5,7 @@ import { UserProfileSchema } from '../utils/zod/userProfileSchemes';
 import { z } from 'zod';
 
 export const UserProfileRepo = {
-  async findByUserId(userId: number) {
+  async findByUserId(userId: number,) {
     const result = await prisma.userProfile.findUnique({
       where: { userId },
       select: { Tags: true },

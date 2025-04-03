@@ -6,11 +6,11 @@ const router = express.Router();
 
 /**
  * @swagger
- * /profile/{id}:
+ * /profiles/{id}:
  *   get:
  *     summary: Get a user profile
  *     description: "Retrieves the profile details for the specified user ID."
- *     tags: [Profile]
+ *     tags: [Profiles]
  *     parameters:
  *       - in: path
  *         name: id
@@ -30,15 +30,15 @@ const router = express.Router();
  *       500:
  *         description: "Server error."
  */
-router.get('/:id', isAuthenticated, getProfile);
+router.get('/:id',  getProfile);
 
 /**
  * @swagger
- * /profile:
+ * /profiles:
  *   post:
  *     summary: Create a new user profile
  *     description: "Creates a new profile for the authenticated user."
- *     tags: [Profile]
+ *     tags: [Profiles]
  *     requestBody:
  *       required: true
  *       content:
@@ -95,7 +95,7 @@ router.post('/', isAuthenticated, createProfile);
 
 /**
  * @swagger
- * /profile/{id}:
+ * /profiles/{id}:
  *   put:
  *     summary: Update a user profile
  *     description: "Updates the profile details for the authenticated user."

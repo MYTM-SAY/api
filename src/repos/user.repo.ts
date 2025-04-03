@@ -27,6 +27,7 @@ export const UserRepo = {
     return prisma.user.create({
       data: {
         username: userData.username,
+        fullname: userData.fullname,
         email: userData.email,
         dob: userData.dob,
         hashedPassword: userData.hashedPassword,
