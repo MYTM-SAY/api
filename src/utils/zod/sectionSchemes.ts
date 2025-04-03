@@ -10,7 +10,6 @@ const BaseSectionSchema = z.object({
     .max(500, 'Description must be at most 500 characters')
     .nullable()
     .optional(),
-  isCompleted: z.boolean().optional(),
 })
 
 export const UpdateSectionSchema = BaseSectionSchema.strict().partial()

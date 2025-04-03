@@ -52,7 +52,6 @@ router.use(isAuthenticated)
  *                 - id: 1
  *                   name: "Mathematics Basics"
  *                   description: "Introduction to basic math concepts"
- *                   isCompleted: false
  *                   classroomId: 1
  *                   createdAt: "2023-10-01T10:00:00Z"
  *                   updatedAt: "2023-10-01T10:00:00Z"
@@ -106,7 +105,6 @@ router.get('/classrooms/:classroomId', getSectionsByClassroomId)
  *                 classroomId: 1
  *                 createdAt: "2025-03-18T21:58:24.971Z"
  *                 updatedAt: "2025-03-18T22:00:51.265Z"
- *                 isCompleted: true
  *                 Classroom:
  *                   id: 1
  *                   name: "Math 101"
@@ -143,7 +141,6 @@ router.get('/:id', getSectionById)
  *             name: "Algebra Basics"
  *             description: "Introduction to algebraic concepts"
  *             classroomId: 1
- *             isCompleted: false
  *     responses:
  *       201:
  *         description: Section created successfully
@@ -170,7 +167,6 @@ router.get('/:id', getSectionById)
  *                 classroomId: 1
  *                 createdAt: "2025-03-18T21:58:24.971Z"
  *                 updatedAt: "2025-03-18T21:58:24.971Z"
- *                 isCompleted: false
  *                 Classroom:
  *                   id: 1
  *                   name: "Math 101"
@@ -213,7 +209,6 @@ router.post('/', createSection)
  *           example:
  *             name: "Updated Section Name"
  *             description: "Updated description"
- *             isCompleted: true
  *     responses:
  *       200:
  *         description: Section updated successfully
@@ -240,7 +235,6 @@ router.post('/', createSection)
  *                 classroomId: 1
  *                 createdAt: "2025-03-18T21:58:24.971Z"
  *                 updatedAt: "2025-03-18T22:00:51.265Z"
- *                 isCompleted: true
  *       400:
  *         description: Invalid section ID or input data
  *       404:
