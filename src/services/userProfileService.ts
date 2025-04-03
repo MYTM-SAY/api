@@ -3,7 +3,8 @@ import { UserRepo } from '../repos/user.repo';
 import APIError from '../errors/APIError';
 import { UserProfileSchema } from '../utils/zod/userProfileSchemes';
 import { z } from 'zod';
-import { UserSchema } from '../utils';
+import { UserSchemaPublic, UserSchema } from '../utils/zod/userSchemes';
+
 
 async function getUserProfile(userId: number) {
 
@@ -11,11 +12,10 @@ async function getUserProfile(userId: number) {
 
   const user = await UserRepo.findById(userId);
   if (!user) throw new APIError('User not found', 404);
-
+  
   const userProfile = await UserProfileRepo.getProfile(userId);
   if (!userProfile) throw new APIError('User profile not found', 404);
 
-  
   return userProfile;
 }
 

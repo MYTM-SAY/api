@@ -9,6 +9,7 @@ import { UserProfileService } from '../services/userProfileService';
 
 export const getProfile = asyncHandler(
   async (req: Request, res: Response) => {
+    
     const profile = await UserProfileService.getUserProfile(+req.params.id);
     res
       .status(200)
@@ -17,6 +18,7 @@ export const getProfile = asyncHandler(
       );
   }
 );
+
 export const createProfile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const {

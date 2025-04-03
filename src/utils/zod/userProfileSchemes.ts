@@ -12,3 +12,4 @@ export const UserProfileSchema = z.object({
   profilePictureURL: z.string().url('Invalid profile picture URL').optional(),
 }).strict();
 
+

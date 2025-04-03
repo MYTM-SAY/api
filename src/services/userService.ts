@@ -6,19 +6,21 @@ import { z } from 'zod'
 import { UserSchema } from '../utils/zod/userSchemes'
 import { UserProfileSchema } from '../utils/zod/userProfileSchemes'
 import { validate } from 'uuid'
+import { UserSchemaPublic } from '../utils/zod/userSchemes'
 
 
 async function getUserById(
-   userId: number | null,
+   id: number | null,
 
 ) {
-   if(!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
+   if(!id || isNaN(id)) throw new APIError('Invalid User ID', 400)
 
-   if(userId) {
-      const user = await UserRepo.findById(userId)
+   if(id) {
+      const user = await UserRepo.findById(id)
       if(!user) throw new APIError('User not found', 404)
+      const safeUser = await UserSchemaPublic.parse(user);
 
-      return user
+      return safeUser
    }
 }
 
@@ -68,3 +70,11 @@ async function updateLastLogin(
 
 
 
+export const UserService = {
+   getUserById,
+   getUserByUsername,
+   createUser,
+   updateUser,
+   updateLastLogin,
+   // add more functions as needed
+}

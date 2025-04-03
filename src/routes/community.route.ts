@@ -79,8 +79,11 @@ app.get('/', isAuthenticated, getCommunities)
  * /communities:
  *   post:
  *     summary: Create a new community
+ * 
  *     description: Creates a new community with the provided details.
+ * 
  *     tags: [Communities]
+ * 
  *     requestBody:
  *       required: true
  *       content:
@@ -105,20 +108,22 @@ app.get('/', isAuthenticated, getCommunities)
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/logo.jpg"
+ * 
  *     responses:
  *       201:
  *         description: Community created successfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Community"
- *       400:
- *         description: Bad request.
- *       404:
- *         description: User not found.
- *       500:
- *         description: Server error.
+  *               $ref: "#/components/schemas/Community"
+  *       400:
+  *         description: Bad request.
+  *       404:
+  *         description: User not found.
+  *       500:
+  *         description: Server error.
  */
+
 app.post('/', isAuthenticated, createCommunity)
 /**
  * @swagger

@@ -114,6 +114,9 @@ router.post('/', isAuthenticated, createProfile);
  *           schema:
  *             type: object
  *             properties:
+ *               userId:
+ *                type : integer
+ *                example: 2 
  *               bio:
  *                 type: string
  *                 example: "Updated bio information."

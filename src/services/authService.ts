@@ -27,7 +27,7 @@ const register = async (
   const hashedPassword = await bcrypt.hash(user.password, 10)
 
   user.hashedPassword = hashedPassword
-  user.dob = user.dob ? new Date(user.dob) : undefined
+  user.dob = new Date(user.dob) 
   const createdUser = await UserRepo.createUser(user)
 
   return {
