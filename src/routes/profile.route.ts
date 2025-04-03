@@ -4,6 +4,7 @@ import { isAuthenticated } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
+// pulbic routes
 /**
  * @swagger
  * /profiles/{id}:
@@ -31,6 +32,8 @@ const router = express.Router();
  *         description: "Server error."
  */
 router.get('/:id',  getProfile);
+
+// Authenticated routes
 
 /**
  * @swagger

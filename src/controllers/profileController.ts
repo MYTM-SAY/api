@@ -7,6 +7,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { ResponseHelper } from '../utils/responseHelper';
 import { UserProfileService } from '../services/userProfileService';
 
+// get profile, publicly available
 export const getProfile = asyncHandler(
   async (req: Request, res: Response) => {
     
@@ -19,6 +20,7 @@ export const getProfile = asyncHandler(
   }
 );
 
+// create profile
 export const createProfile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const {
@@ -62,7 +64,7 @@ export const createProfile = asyncHandler(
   }
 );
 
-
+// update profile
 export const updateProfile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const {

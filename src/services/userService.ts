@@ -9,23 +9,22 @@ import { validate } from 'uuid'
 import { UserSchemaPublic } from '../utils/zod/userSchemes'
 
 
-async function getUserById(
-   id: number | null,
+// get by id
+async function getUserById( id: number | null ) {
 
-) {
    if(!id || isNaN(id)) throw new APIError('Invalid User ID', 400)
 
-   if(id) {
-      const user = await UserRepo.findById(id)
-      if(!user) throw new APIError('User not found', 404)
-      const safeUser = await UserSchemaPublic.parse(user);
+   const user = await UserRepo.findById(id)
+   if(!user) throw new APIError('User not found', 404)
+   const safeUser = await UserSchemaPublic.parse(user);
 
-      return safeUser
-   }
+   return safeUser
+   
 }
 
-
+// get by username
 async function getUserByUsername(username: string) {
+
    // Check that the username does not contain any spaces
    if (/\s/.test(username)) {
      throw new APIError('Username cannot contain spaces', 400);
@@ -39,7 +38,7 @@ async function getUserByUsername(username: string) {
    return user;
  }
  
-
+//create user
 async function createUser(
    data: Omit<z.infer<typeof UserSchema>, 'id'>,
 ) {
@@ -47,7 +46,7 @@ async function createUser(
    return UserRepo.createUser(validatedData)
 }
 
-// user can update the fullname and the dob only
+// update user, fullname and dob only
 async function updateUser(
    userId: number,
    data: Omit<z.infer<typeof UserSchema>, 'id'>,
