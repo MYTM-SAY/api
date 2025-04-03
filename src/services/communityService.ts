@@ -4,6 +4,7 @@ import { MemberRolesRepo } from '../repos/memberRoles.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
+import { ForumRepo } from '../repos/forum.repo'
 
 async function getAllCommunities() {
   return CommunityRepo.findAll()
@@ -51,7 +52,23 @@ async function createCommunity(
   userId: number,
 ) {
   const validatedData = await CommunitySchema.parseAsync(data)
-  return CommunityRepo.create(validatedData, userId)
+  const createCommunity = await CommunityRepo.create(validatedData, userId)
+  const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
+
+  if (!defaultForum) throw new APIError('Default Forum not found', 404)
+  return createCommunity
+}
+
+async function createDefaultForumForCommuinity(communityId: number) {
+  const forum = await ForumRepo.create(
+    {
+      title: 'Default Forum',
+      description: 'Default Forum Description',
+    },
+    communityId,
+  )
+
+  return forum
 }
 
 async function updateCommunity(

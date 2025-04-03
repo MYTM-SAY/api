@@ -36,19 +36,21 @@ async function deletePost(postId: number) {
   await PostRepo.delete(postId)
 }
 
-async function upVotePost(postId: number, forumId: number, userId: number) {
-  if (!postId || !forumId || !userId)
-    throw new APIError('Some parameter is missing', 400)
-
-  const result = PostRepo.upVotePost(postId, forumId, userId)
+async function upVotePost(postId: number, userId: number) {
+  if (!postId || !userId)
+    throw new APIError('Missing postId or userId', 404);
+  const post = await PostRepo.findById(postId);
+  if(!post) throw new APIError("Post not found", 404);
+  const result = PostRepo.upVotePost(postId, userId)
   return result
 }
 
-async function downVotePost(postId: number, forumId: number, userId: number) {
-  if (!postId || !forumId || !userId)
-    throw new APIError('Some parameter is missing', 400)
-
-  const result = PostRepo.downVotePost(postId, forumId, userId)
+async function downVotePost(postId: number, userId: number) {
+  if (!postId || !userId)
+    throw new APIError('Missing postId or userId', 404);
+  const post = await PostRepo.findById(postId);
+  if(!post) throw new APIError("Post not found", 404);
+  const result = PostRepo.downVotePost(postId, userId)
   return result
 }
 

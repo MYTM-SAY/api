@@ -1,8 +1,7 @@
-import { Prisma } from '@prisma/client'
-import { prisma } from '../db/PrismaClient'
 import { z } from 'zod'
-import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
+import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
+import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
@@ -39,135 +38,37 @@ export const PostRepo = {
     return result
   },
 
-  async upVotePost(
-    postId: number,
-    forumId: number,
-    userId: number,
-  ) {
+  async upVotePost(postId: number, userId: number) {
     let result
 
-    const post = await prisma.post.findFirst({
-      where: {
-        id: postId,
-        forumId,
-      },
-    })
-    if (!post) throw new APIError('Post not found', 404)
-
-    const existingVote = await prisma.postVote.findUnique({
+    result = await prisma.postVote.upsert({
       where: {
         userId_postId: {
           userId,
           postId,
         },
       },
+      update: { count: { increment: 1 } },
+      create: { userId, postId, count: 1 },
     })
 
-    if (existingVote) {
-      result = await prisma.postVote.update({
-        where: {
-          userId_postId: {
-            userId,
-            postId,
-          },
-        },
-        data: {
-          count: {
-            increment: 1,
-          },
-        },
-      })
-      await prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          voteCounter: result.count,
-        },
-      })
-    } else {
-      result = await prisma.postVote.create({
-        data: {
-          userId,
-          postId,
-          count: 1,
-        },
-      })
-      await prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          voteCounter: result.count,
-        },
-      })
-    }
     return result
   },
 
-  async downVotePost(
-    postId: number,
-    forumId: number,
-    userId: number,
-  ) {
+  async downVotePost(postId: number, userId: number) {
     let result
 
-    const post = await prisma.post.findFirst({
-      where: {
-        id: postId,
-        forumId,
-      },
-    })
-    if (!post) throw new APIError('Post not found', 404)
-
-    const existingVote = await prisma.postVote.findUnique({
+    result = await prisma.postVote.upsert({
       where: {
         userId_postId: {
           userId,
           postId,
         },
       },
+      update: { count: { decrement: 1 } },
+      create: { userId, postId, count: -1 },
     })
 
-    if (existingVote) {
-      result = await prisma.postVote.update({
-        where: {
-          userId_postId: {
-            userId,
-            postId,
-          },
-        },
-        data: {
-          count: {
-            decrement: 1,
-          },
-        },
-      })
-      await prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          voteCounter: result.count,
-        },
-      })
-    } else {
-      result = await prisma.postVote.create({
-        data: {
-          userId,
-          postId,
-          count: -1,
-        },
-      })
-      await prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          voteCounter: result.count,
-        },
-      })
-    }
     return result
   },
 }
