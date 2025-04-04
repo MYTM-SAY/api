@@ -3,6 +3,8 @@ import { prisma } from '../db/PrismaClient'
 import { MemberRolesRepo } from '../repos/memberRoles.repo'
 import { JwtService } from '../services/jwtService'
 import { TokenPayload } from '../interfaces/tokenPayload'
+import { Role } from '@prisma/client'
+import { ResponseHelper } from '../utils/responseHelper'
 
 export interface AuthenticatedRequest extends Request {
   claims?: TokenPayload
@@ -82,25 +84,54 @@ export const isAuthenticated = [authenticationJwtToken]
 //   }
 // }
 
-export const isOwner = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const userRole = await prisma.communityMembers.findFirst({
-      where: {
-        userId: req.claims?.id,
-        Role: 'OWNER',
-      },
-    })
+export const hasRoles = (requiredRoles: Role[]) => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { communityId } = req.body || req.params
 
-    if (!userRole) {
-      return res.status(403).json({ message: 'Access denied' })
+      if (!communityId) {
+        return res
+          .status(400)
+          .json(ResponseHelper.error('Missing community ID', 400))
+      }
+
+      if (requiredRoles.includes(Role.OWNER)) {
+        const community = await prisma.community.findFirst({
+          where: {
+            id: +communityId,
+            ownerId: req.claims?.id,
+          },
+        })
+
+        if (!community)
+          return res
+            .status(403)
+            .json(ResponseHelper.error('Access denied', 403))
+        else return next()
+      }
+
+      const userRole = await prisma.communityMembers.findFirst({
+        where: {
+          userId: req.claims?.id,
+          communityId: +communityId,
+        },
+      })
+
+      if (!userRole)
+        return res.status(403).json(ResponseHelper.error('Access denied', 403))
+
+      if (!requiredRoles.includes(userRole.Role))
+        return res.status(403).json(ResponseHelper.error('Access denied', 403))
+
+      next()
+    } catch (error) {
+      res
+        .status(500)
+        .json(ResponseHelper.error('Internal server error', 500, error))
     }
-
-    next()
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' })
   }
 }

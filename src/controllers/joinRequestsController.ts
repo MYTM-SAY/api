@@ -2,7 +2,10 @@ import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
 import { Response } from 'express'
-import { joinRequestSchema } from '../utils/zod/joinRequestSchema '
+import {
+  joinRequestSchema,
+  updateJoinRequestStatusSchema,
+} from '../utils/zod/joinRequestSchema '
 import { JoinRequestService } from '../services/joinRequestsService'
 import APIError from '../errors/APIError'
 
@@ -51,6 +54,25 @@ export const getAllJoinRequests = asyncHandler(
         ResponseHelper.success(
           'Join requests fetched successfully',
           joinRequests,
+        ),
+      )
+  },
+)
+
+export const updateJoinRequestStatus = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const validatedData = updateJoinRequestStatusSchema.parse(req.body)
+    const updatedRequest = await JoinRequestService.updateJoinRequestStatus(
+      validatedData,
+      req.claims!.id,
+    )
+
+    return res
+      .status(200)
+      .json(
+        ResponseHelper.success(
+          `Join request status updated to ${validatedData.status}`,
+          updatedRequest,
         ),
       )
   },

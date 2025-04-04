@@ -50,4 +50,31 @@ export const JoinRequestRepo = {
       where: { id },
     })
   },
+
+  async findByCommunityAndUser(communityId: number, userId: number) {
+    return await prisma.joinRequest.findFirst({
+      where: {
+        communityId,
+        userId,
+      },
+    })
+  },
+
+  async updateStatus(
+    communityId: number,
+    userId: number,
+    status: JoinRequestStatus,
+  ) {
+    return await prisma.joinRequest.update({
+      where: {
+        userId_communityId: {
+          communityId: communityId,
+          userId: userId,
+        },
+      },
+      data: {
+        status: status,
+      },
+    })
+  },
 }

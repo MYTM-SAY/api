@@ -307,7 +307,6 @@ enum MaterialType {
 }
 
 enum Role {
-  ADMIN
   OWNER
   MODERATOR
   MEMBER
