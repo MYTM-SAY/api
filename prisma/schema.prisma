@@ -21,15 +21,15 @@ model User {
   CommentVote       CommentVote[]
   OwnedCommunities  Community[]         @relation("CommunityOwner")
   InstructorProfile InstructorProfile[]
-  MemberRoles       MemberRoles[]
+  MemberRoles       CommunityMembers[]
   Post              Post[]
   PostVote          PostVote[]
   QuizScore         QuizScore[]
   UserProfile       UserProfile?
   Communities       Community[]         @relation("CommunityMembers")
-
-  Progress         Progress[]
-  CompletedLessons CompletedLessons[]
+  JoinRequests      JoinRequest[]
+  Progress          Progress[]
+  CompletedLessons  CompletedLessons[]
 }
 
 model UserProfile {
@@ -75,16 +75,31 @@ model Community {
   coverImgURL      String?
   logoImgURL       String?
   ownerId          Int
+  isPublic         Boolean            @default(true)
   Classrooms       Classroom[]
   Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
   Forums           Forum[]
-  MemberRoles      MemberRoles[]
+  CommunityMembers CommunityMembers[]
   Members          User[]             @relation("CommunityMembers")
   Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
+  JoinRequests     JoinRequest[] // Removed incorrect `map` argument
 }
 
-model MemberRoles {
+model JoinRequest {
+  id          Int               @id @default(autoincrement())
+  userId      Int
+  communityId Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  status      JoinRequestStatus @default(PENDING)
+  User        User              @relation(fields: [userId], references: [id])
+  Community   Community         @relation(fields: [communityId], references: [id])
+
+  @@unique([userId, communityId])
+}
+
+model CommunityMembers {
   communityId Int
   userId      Int
   createdAt   DateTime  @default(now())
@@ -94,6 +109,7 @@ model MemberRoles {
   User        User      @relation(fields: [userId], references: [id])
 
   @@id([communityId, userId])
+  @@map("CommunityMembers")
 }
 
 model Material {
@@ -295,4 +311,10 @@ enum Role {
   OWNER
   MODERATOR
   MEMBER
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

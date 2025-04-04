@@ -88,7 +88,7 @@ export const isOwner = async (
   next: NextFunction,
 ) => {
   try {
-    const userRole = await prisma.memberRoles.findFirst({
+    const userRole = await prisma.communityMembers.findFirst({
       where: {
         userId: req.claims?.id,
         Role: 'OWNER',

@@ -12,6 +12,10 @@ import {
   demoteFromModerator,
 } from '../controllers/memberRoles'
 import { isAuthenticated } from '../middlewares/authMiddleware'
+import {
+  createJoinRequstCommunity,
+  getAllJoinRequests,
+} from '../controllers/joinRequestsController'
 
 const app = express.Router()
 
@@ -218,5 +222,52 @@ app.get('/:id', getCommunity)
  *         description: Server error.
  */
 app.put('/:id', isAuthenticated, updateCommunity)
-
+/**
+ * @swagger
+ * /communities/{id}/join-requests:
+ *   post:
+ *     summary: Create a join request for a community
+ *     tags: [Communities]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the community the user wants to join
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       201:
+ *         description: Join request created successfully
+ *       400:
+ *         description: Invalid data or request
+ *       404:
+ *         description: Community not found
+ */
+app.post('/:id/join-requests', isAuthenticated, createJoinRequstCommunity)
+/**
+ * @swagger
+ * /communities/{id}/join-requests:
+ *   get:
+ *     summary: Get all pending join requests for a specific community
+ *     tags: [Communities]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the community to get join requests for
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Successfully fetched join requests
+ *       400:
+ *         description: Invalid community ID
+ *       404:
+ *         description: Community not found
+ *       500:
+ *         description: Internal server error
+ */
+app.get('/:id/join-requests', isAuthenticated, getAllJoinRequests)
 export default app
