@@ -1,6 +1,5 @@
 import { ClassroomRepo } from '../repos/classroom.repo'
 import { ClassroomSchema } from '../utils'
-import { ZodError } from 'zod'
 import APIError from '../errors/APIError'
 import { CommunityRepo } from '../repos/community.repo'
 

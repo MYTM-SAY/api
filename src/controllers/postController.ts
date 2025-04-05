@@ -53,7 +53,6 @@ export const upVotePost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const result = await PostService.upVotePost(
       +req.params.postId,
-      +req.params.forumId,
       +req.params.userId,
     )
     res
@@ -66,7 +65,6 @@ export const downVotePost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const result = await PostService.downVotePost(
       +req.params.postId,
-      +req.params.forumId,
       +req.params.userId,
     )
     res

@@ -1,9 +1,11 @@
 {
 	"compilerOptions": {
+		"types": ["node"],
+		"lib": ["es2020", "dom"],
 		"outDir": "dist",
 		"sourceMap": true,
 		"target": "esnext",
-		"module": "commonjs",
+		"module": "CommonJS",
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"noImplicitAny": true,

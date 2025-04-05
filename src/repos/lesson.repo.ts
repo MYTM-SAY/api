@@ -1,10 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
-import {
-  CreateLessonSchema,
-  UpdateLessonSchema,
-} from '../utils/zod/lessonSchema'
-import { MaterialSchema } from '../utils/zod/materialSchemes'
+import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
+import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
 
 export const LessonRepo = {
   async findBySectionId(id: number) {
@@ -27,14 +24,13 @@ export const LessonRepo = {
   },
 
   async createWithMaterial(
-    lessonData: z.infer<typeof CreateLessonSchema>,
-    materialData: z.infer<typeof MaterialSchema>,
+    data: z.infer<typeof CreateLessonWithMaterialSchema>,
   ) {
     return prisma.$transaction(async (tx) => {
-      const material = await tx.material.create({ data: materialData })
+      const material = await tx.material.create({ data: data.material })
       const lesson = await tx.lesson.create({
         data: {
-          ...lessonData,
+          ...data.lesson,
           materialId: material.id,
         },
         include: { Material: true },

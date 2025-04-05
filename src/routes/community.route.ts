@@ -11,7 +11,13 @@ import {
   promoteToModerator,
   demoteFromModerator,
 } from '../controllers/memberRoles'
-import { isAuthenticated } from '../middlewares/authMiddleware'
+import { hasRoles, isAuthenticated } from '../middlewares/authMiddleware'
+import {
+  createJoinRequstCommunity,
+  getAllJoinRequests,
+  updateJoinRequestStatus,
+} from '../controllers/joinRequestsController'
+import { Role } from '@prisma/client'
 
 const app = express.Router()
 
@@ -218,5 +224,90 @@ app.get('/:id', getCommunity)
  *         description: Server error.
  */
 app.put('/:id', isAuthenticated, updateCommunity)
+/**
+ * @swagger
+ * /communities/{id}/join-requests:
+ *   post:
+ *     summary: Create a join request for a community
+ *     tags: [Communities]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the community the user wants to join
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       201:
+ *         description: Join request created successfully
+ *       400:
+ *         description: Invalid data or request
+ *       404:
+ *         description: Community not found
+ */
+app.post('/:id/join-requests', isAuthenticated, createJoinRequstCommunity)
+/**
+ * @swagger
+ * /communities/{id}/join-requests:
+ *   get:
+ *     summary: Get all pending join requests for a specific community
+ *     tags: [Communities]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the community to get join requests for
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Successfully fetched join requests
+ *       400:
+ *         description: Invalid community ID
+ *       404:
+ *         description: Community not found
+ *       500:
+ *         description: Internal server error
+ */
+app.get('/:id/join-requests', isAuthenticated, getAllJoinRequests)
+/**
+ * @swagger
+ * /communities/join-requests/status:
+ *   patch:
+ *     summary: Update the status of a join request for a community
+ *     tags: [Communities]
+ *     requestBody:
+ *       description: Status to update the join request to (APPROVED or REJECTED)
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [APPROVED, REJECTED]
+ *                 example: APPROVED
+ *               communityId:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Successfully updated join request status
+ *       400:
+ *         description: Invalid data or request
+ *       404:
+ *         description: Join request not found
+ *       500:
+ *         description: Internal server error
+ */
+app.patch(
+  '/join-requests/status',
+  isAuthenticated,
+  hasRoles([Role.OWNER]),
+  updateJoinRequestStatus,
+)
 
 export default app
