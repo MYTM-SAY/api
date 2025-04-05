@@ -86,14 +86,20 @@ async function updateCommunity(
 }
 
 async function deleteCommunity(communityId: number, userId: number) {
-  console.log(communityId, userId)
+  
   const community = await CommunityRepo.findById(communityId)
-
   if (!community) throw new APIError('Community not found', 404)
 
   await CommunityRepo.delete(communityId)
 }
 
+async function getJoinedCommunities(userId: number) {
+  if (!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
+  const joinedCommunities = await CommunityRepo.joinedCommunities(userId)
+  if (!joinedCommunities) throw new APIError('No communities found', 404)
+  
+  return joinedCommunities
+}
 export const CommunityService = {
   getAllCommunities,
   discoverCommunities,
@@ -101,4 +107,5 @@ export const CommunityService = {
   createCommunity,
   updateCommunity,
   deleteCommunity,
+  getJoinedCommunities
 }

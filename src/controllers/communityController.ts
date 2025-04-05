@@ -52,9 +52,29 @@ export const getCommunity = asyncHandler(
       )
   },
 )
+// get joined communities by user id
+export const getJoinedCommunities = asyncHandler(
+  async (req: Request, res: Response) => {
 
+    console.log('user id', req.params.userId);
+    const joinedCommunities = await CommunityService.getJoinedCommunities(
+      +req.params.userId
+    )
+
+
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success(
+          'Joined communities retrieved successfully',
+          joinedCommunities,
+        ),
+      )
+  },
+)
+// get number of joined communities by user id
 export const createCommunity = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: AuthenticatedRequest, res: Response) => { 
     const newCommunity = await CommunityService.createCommunity(
       req.body,
       req.claims!.id,

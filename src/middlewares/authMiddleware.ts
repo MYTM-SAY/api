@@ -3,10 +3,13 @@ import { prisma } from '../db/PrismaClient'
 import { MemberRolesRepo } from '../repos/memberRoles.repo'
 import { JwtService } from '../services/jwtService'
 import { TokenPayload } from '../interfaces/tokenPayload'
+import { UserService } from '../services/userService'
+// each time update last login
 import { Role } from '@prisma/client'
 import { ResponseHelper } from '../utils/responseHelper'
 import { JoinRequestRepo } from '../repos/JoinRequestRepo '
 import { CommunityRepo } from '../repos/community.repo'
+
 
 export interface AuthenticatedRequest extends Request {
   claims?: TokenPayload
@@ -22,9 +25,12 @@ const authenticationJwtToken = async (
   let token
   if (tokenFromHeader) token = tokenFromHeader
   else if (tokenFromcookies) token = tokenFromcookies
+
   const payload = JwtService.verifyAccessToken(token)
   if (!payload) return res.status(401).json({ message: 'Unauthorized' })
   req.claims = payload
+  await UserService.updateLastLogin(payload.id);
+
   next()
 }
 

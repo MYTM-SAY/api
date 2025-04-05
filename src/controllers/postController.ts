@@ -72,3 +72,14 @@ export const downVotePost = asyncHandler(
       .json(ResponseHelper.success('Post downvoted successfully', result))
   },
 )
+
+
+export const getAllPostContribByUser = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const posts = await PostService.getAllPostContribByUser(+req.params.userId)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Posts fetched successfully', posts))
+  },
+)
+
