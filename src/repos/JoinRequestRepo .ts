@@ -1,4 +1,4 @@
-import { JoinRequestStatus, Prisma } from '@prisma/client'
+import { JoinRequestStatus, Prisma, Role } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 import { JoinRequestType } from '../utils/zod/joinRequestSchema '
 

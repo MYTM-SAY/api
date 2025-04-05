@@ -5,6 +5,8 @@ import { JwtService } from '../services/jwtService'
 import { TokenPayload } from '../interfaces/tokenPayload'
 import { Role } from '@prisma/client'
 import { ResponseHelper } from '../utils/responseHelper'
+import { JoinRequestRepo } from '../repos/JoinRequestRepo '
+import { CommunityRepo } from '../repos/community.repo'
 
 export interface AuthenticatedRequest extends Request {
   claims?: TokenPayload
@@ -100,31 +102,24 @@ export const hasRoles = (requiredRoles: Role[]) => {
       }
 
       if (requiredRoles.includes(Role.OWNER)) {
-        const community = await prisma.community.findFirst({
-          where: {
-            id: +communityId,
-            ownerId: req.claims?.id,
-          },
-        })
+        const community = await CommunityRepo.findById(+communityId)
 
-        if (!community)
+        if (!community || community.ownerId !== req.claims!.id)
           return res
             .status(403)
             .json(ResponseHelper.error('Access denied', 403))
         else return next()
       }
 
-      const userRole = await prisma.communityMembers.findFirst({
-        where: {
-          userId: req.claims?.id,
-          communityId: +communityId,
-        },
-      })
+      const userRole = await MemberRolesRepo.getUserRoleInCommunity(
+        +communityId,
+        req.claims!.id,
+      )
 
       if (!userRole)
         return res.status(403).json(ResponseHelper.error('Access denied', 403))
 
-      if (!requiredRoles.includes(userRole.Role))
+      if (!requiredRoles.includes(userRole))
         return res.status(403).json(ResponseHelper.error('Access denied', 403))
 
       next()
