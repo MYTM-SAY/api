@@ -1,7 +1,7 @@
 import express from 'express'
-import { getMe, getUser } from '../controllers/userController'
+import { getMe, getUser, getUserContributions } from '../controllers/userController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
-
+import { getJoinedCommunities } from '../controllers/communityController'
 const router = express.Router()
 
 /**
@@ -95,5 +95,75 @@ router.get('/:userId', getUser)
  *           format: date-time
  *           nullable: true
  *           example: "2023-01-03T00:00:00Z"
+ * 
+ * 
  */
+
+//   number of contributions
+
+/**
+ * @swagger
+ * /users/{userId}/contributions:
+ *   get:
+ *     summary: Get contrubtions  by user ID
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the user to get
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserPublic'
+ *       400:
+ *         description: Invalid user ID format
+ *       401:
+ *         description: Unauthorized, authentication required
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:userId/contributions', getUserContributions)
+
+/**
+ * @swagger
+ * /users/{userId}/communities:
+ *   get:
+ *     summary: Get contrubtions  by user ID
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the user to get
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserPublic'
+ *       400:
+ *         description: Invalid user ID format
+ *       401:
+ *         description: Unauthorized, authentication required
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:userId/communities', getJoinedCommunities)
 export default router

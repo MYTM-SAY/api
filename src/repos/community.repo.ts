@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { z } from 'zod'
+import { join } from 'path'
 
 export const CommunityRepo = {
   async findAll() {
@@ -90,4 +91,57 @@ export const CommunityRepo = {
       },
     })
   },
+
+
+  // number of joined communties
+  async numberOfJoinedCommunties(
+    id: number
+  ){
+    const result = await prisma.user.findUnique({
+
+      where : { id }, 
+
+      select : {
+
+        _count : {
+
+          select:{
+
+            Communities: true
+
+          }
+        
+        }
+      },
+    
+   }
+   );
+   
+
+
+  },
+  async joinedCommunities(id: number) {
+  // get all joined communities (id, name) by user id
+  const communitiesForUser = await prisma.user.findMany({
+
+    where: { id },
+    select: {
+
+      Communities: {
+        select: {
+          id: true,
+          name: true,
+        },
+
+      },
+    },
+    
+  });
+    
+
+    return communitiesForUser;
+  },
+
+  
+
 }

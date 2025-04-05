@@ -71,4 +71,34 @@ export const PostRepo = {
 
     return result
   },
+
+  // get all the posts wether they are upvoted or downvoted or posted or commented or commentvoteup or commentVoteDown  by the user
+  async getAllContribByUserId(userId: number) {
+
+    const result = await prisma.post.findMany({
+
+      where: {  OR : [
+        {authorId: userId},
+        { PostVotes: { some: { userId } } },
+        { Comments: { some: { authorId: userId } } },
+        { Comments: { some: { CommentVotes: {some :{ userId }} } } },
+
+      ] },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
+        PostVotes: {
+          where: { userId },
+          select: { count: true },
+        },}
+
+    });
+
+    return result;
+  },
+
 }

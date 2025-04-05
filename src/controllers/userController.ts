@@ -22,3 +22,14 @@ export const getUser = asyncHandler(
     res.status(200).json(ResponseHelper.success('User retrieved successfully', user))
   }
 )
+
+// number of contributions for the user
+export const getUserContributions = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = +req.params.userId
+    const contributions = await UserService.getUserContributions(userId)
+    res.status(200).json(ResponseHelper.success('User contributions retrieved successfully', contributions))
+  }
+
+
+)

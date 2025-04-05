@@ -8,7 +8,6 @@ import { UserProfileSchema } from '../utils/zod/userProfileSchemes'
 import { validate } from 'uuid'
 import { UserSchemaPublic } from '../utils/zod/userSchemes'
 
-
 // get by id
 async function getUserById( id: number | null ) {
 
@@ -67,6 +66,23 @@ async function updateLastLogin(
    return UserRepo.updateLastLogin(userId)
 }
 
+// get user contributions
+async function getUserContributions(
+   userId: number
+) {
+   // validate userId
+   if(!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
+
+   const user = await UserRepo.findById(userId)
+   if(!user) throw new APIError('User not found', 404)
+
+   const contributions = await UserRepo.getContributionsByUserId(userId)
+   if(!contributions) throw new APIError('Contributions not found', 404)
+   // validate contributions
+
+   return contributions
+}
+
 
 
 export const UserService = {
@@ -75,5 +91,6 @@ export const UserService = {
    createUser,
    updateUser,
    updateLastLogin,
+   getUserContributions,
    // add more functions as needed
 }
