@@ -69,7 +69,7 @@ async getContributionsByUserId(id: number) {
     select: {
     _count: {
       select: {
-        Communities: true,
+        MemberRoles: true,
         Post: true,         
         Comment: true,       
         PostVote: true,      

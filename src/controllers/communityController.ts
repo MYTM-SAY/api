@@ -56,7 +56,7 @@ export const getCommunity = asyncHandler(
 export const getJoinedCommunities = asyncHandler(
   async (req: Request, res: Response) => {
 
-    console.log('user id', req.params.id);
+    console.log('user id', req.params.userId);
     const joinedCommunities = await CommunityService.getJoinedCommunities(
       +req.params.userId
     )

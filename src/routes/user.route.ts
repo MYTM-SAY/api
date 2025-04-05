@@ -2,6 +2,9 @@ import express from 'express'
 import { getMe, getUser, getUserContributions } from '../controllers/userController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 import { getJoinedCommunities } from '../controllers/communityController'
+// from posts
+import { getAllPostContribByUser } from '../controllers/postController'
+import { get } from 'http'
 const router = express.Router()
 
 /**
@@ -103,7 +106,7 @@ router.get('/:userId', getUser)
 
 /**
  * @swagger
- * /users/{userId}/contributions:
+ * /users/{userId}/numOfContributions:
  *   get:
  *     summary: Get contrubtions  by user ID
  *     tags: [User]
@@ -132,7 +135,7 @@ router.get('/:userId', getUser)
  *       500:
  *         description: Server error
  */
-router.get('/:userId/contributions', getUserContributions)
+router.get('/:userId/numOfContributions', getUserContributions)
 
 /**
  * @swagger
@@ -166,4 +169,38 @@ router.get('/:userId/contributions', getUserContributions)
  *         description: Server error
  */
 router.get('/:userId/communities', getJoinedCommunities)
+
+/**
+ * @swagger
+ * /users/{userId}/contributions:
+ *   get:
+ *     summary: Get contrubtions  by user ID
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the user to get
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserPublic'
+ *       400:
+ *         description: Invalid user ID format
+ *       401:
+ *         description: Unauthorized, authentication required
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:userId/contributions', getAllPostContribByUser)
+
 export default router

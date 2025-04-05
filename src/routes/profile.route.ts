@@ -49,12 +49,9 @@ router.get('/:id',  getProfile);
  *           schema:
  *             type: object
  *             required:
- *               - userId
+ *              
  *               - bio
  *             properties:
- *               userId:
- *                 type: integer
- *                 example: 1
  *               bio:
  *                 type: string
  *                 example: "I am a software developer."
@@ -98,18 +95,11 @@ router.post('/', isAuthenticated, createProfile);
 
 /**
  * @swagger
- * /profiles/{id}:
+ * /profiles/:
  *   put:
  *     summary: Update a user profile
  *     description: "Updates the profile details for the authenticated user."
  *     tags: [Profiles]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: "The ID of the user whose profile is to be updated."
  *     requestBody:
  *       required: true
  *       content:
@@ -117,9 +107,6 @@ router.post('/', isAuthenticated, createProfile);
  *           schema:
  *             type: object
  *             properties:
- *               userId:
- *                type : integer
- *                example: 2 
  *               bio:
  *                 type: string
  *                 example: "Updated bio information."
@@ -159,6 +146,6 @@ router.post('/', isAuthenticated, createProfile);
  *       500:
  *         description: "Server error."
  */
-router.put('/:id', isAuthenticated, updateProfile);
+router.put('/', isAuthenticated, updateProfile);
 
 export default router;

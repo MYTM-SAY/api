@@ -94,11 +94,10 @@ async function deleteCommunity(communityId: number, userId: number) {
 }
 
 async function getJoinedCommunities(userId: number) {
-
+  if (!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
   const joinedCommunities = await CommunityRepo.joinedCommunities(userId)
   if (!joinedCommunities) throw new APIError('No communities found', 404)
-  if (!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
-
+  
   return joinedCommunities
 }
 export const CommunityService = {

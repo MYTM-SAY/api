@@ -24,7 +24,7 @@ export const getProfile = asyncHandler(
 export const createProfile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const {
-      userId,
+ 
       bio,
       twitter,
       facebook,
@@ -33,15 +33,8 @@ export const createProfile = asyncHandler(
       youtube,
       profilePictureURL,
     } = req.body;
-
-    if (userId !== req.claims?.id) {
-      return res
-        .status(403)
-        .json(
-          ResponseHelper.error('Forbidden: You can only create your own profile')
-        );
-    }
-
+    
+    const userId = Number(req.claims?.id);
 
 
     // Call the service with the profile data and the userId separately.
@@ -68,7 +61,7 @@ export const createProfile = asyncHandler(
 export const updateProfile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const {
-      userId,
+   
       bio,
       twitter,
       facebook,
@@ -78,14 +71,11 @@ export const updateProfile = asyncHandler(
       profilePictureURL,
     } = req.body;
 
-    if (userId !== req.claims?.id) {
-      return res
-        .status(403)
-        .json(
-          ResponseHelper.error('Forbidden: You can only update your profile')
-        );
-    }
+    const userId = Number(req.claims?.id);
 
+
+     
+  
     const profile = await UserProfileService.updateUserProfile(
       
       {bio,

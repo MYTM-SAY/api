@@ -4,6 +4,7 @@ import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { z } from 'zod'
 import { join } from 'path'
 
+
 export const CommunityRepo = {
   async findAll() {
     const results = await prisma.community.findMany()
@@ -107,7 +108,7 @@ export const CommunityRepo = {
 
           select:{
 
-            Communities: true
+            MemberRoles : true,
 
           }
         
@@ -122,15 +123,17 @@ export const CommunityRepo = {
   },
   async joinedCommunities(id: number) {
   // get all joined communities (id, name) by user id
-  const communitiesForUser = await prisma.user.findMany({
+  const communitiesForUser = await prisma.communityMembers.findMany({
 
-    where: { id },
+    where: { userId : id },
     select: {
-
-      Communities: {
+      Role: true,
+     
+      Community: {
         select: {
           id: true,
           name: true,
+          
         },
 
       },
