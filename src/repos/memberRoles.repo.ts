@@ -1,9 +1,16 @@
 // import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 
 export const MemberRolesRepo = {
+  async addUserToCommunity(data: Prisma.CommunityMembersUncheckedCreateInput) {
+    const communities = await prisma.communityMembers.create({
+      data,
+    })
+    return communities
+  },
   async assignModRole(userId: number, communityId: number) {
-    const communities = await prisma.memberRoles.update({
+    const communities = await prisma.communityMembers.update({
       where: { communityId_userId: { communityId, userId } },
       data: { Role: 'MODERATOR' },
     })
@@ -11,7 +18,7 @@ export const MemberRolesRepo = {
   },
 
   async removeModRole(userId: number, communityId: number) {
-    const communities = await prisma.memberRoles.update({
+    const communities = await prisma.communityMembers.update({
       where: { communityId_userId: { communityId, userId } },
       data: { Role: 'MEMBER' },
     })
@@ -19,7 +26,7 @@ export const MemberRolesRepo = {
   },
 
   async getUserRoleInCommunity(userId: number, communityId: number) {
-    const member = await prisma.memberRoles.findUnique({
+    const member = await prisma.communityMembers.findUnique({
       where: { communityId_userId: { communityId, userId } },
       select: { Role: true },
     })

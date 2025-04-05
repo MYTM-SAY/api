@@ -46,7 +46,6 @@ export const schemas = {
               id: { type: 'integer' },
               name: { type: 'string' },
               description: { type: 'string', nullable: true },
-              isCompleted: { type: 'boolean' },
               classroomId: { type: 'integer' },
               createdAt: { type: 'string', format: 'date-time' },
               updatedAt: { type: 'string', format: 'date-time' },
@@ -107,9 +106,6 @@ export const schemas = {
         type: 'string',
         format: 'date-time',
       },
-      isCompleted: {
-        type: 'boolean',
-      },
     },
   },
   SectionWithClassroom: {
@@ -135,9 +131,6 @@ export const schemas = {
       updatedAt: {
         type: 'string',
         format: 'date-time',
-      },
-      isCompleted: {
-        type: 'boolean',
       },
       Classroom: {
         type: 'object',
@@ -186,9 +179,6 @@ export const schemas = {
       classroomId: {
         type: 'integer',
       },
-      isCompleted: {
-        type: 'boolean',
-      },
     },
   },
   UpdateSectionInput: {
@@ -200,9 +190,6 @@ export const schemas = {
       description: {
         type: 'string',
         nullable: true,
-      },
-      isCompleted: {
-        type: 'boolean',
       },
     },
   },

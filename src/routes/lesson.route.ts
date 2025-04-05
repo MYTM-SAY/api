@@ -51,20 +51,19 @@ router.use(isAuthenticated)
  *               message: "Lessons retrieved successfully"
  *               data:
  *                 - id: 1
- *                   name: "Introduction to Prisma"
- *                   notes: "This lesson covers the basics of Prisma ORM."
- *                   materialId: 5
+ *                   name: "Intro to Algebra"
+ *                   notes: "Basic concepts"
+ *                   materialId: 6
  *                   sectionId: 1
- *                   createdAt: "2023-10-01T10:00:00Z"
- *                   updatedAt: "2023-10-01T10:00:00Z"
- *                   Section:
- *                     id: 1
- *                     name: "Prisma Basics"
- *                     description: "An introduction to Prisma ORM."
- *                     isCompleted: false
- *                     classroomId: 1
- *                     createdAt: "2023-10-01T10:00:00Z"
- *                     updatedAt: "2023-10-01T10:00:00Z"
+ *                   createdAt: "2025-04-03T12:24:27.161Z"
+ *                   updatedAt: "2025-04-03T12:24:27.161Z"
+ *                 - id: 2
+ *                   name: "Intro to Algebra 2"
+ *                   notes: "Basic concepts"
+ *                   materialId: 7
+ *                   sectionId: 1
+ *                   createdAt: "2025-04-03T12:39:14.561Z"
+ *                   updatedAt: "2025-04-03T12:39:14.561Z"
  *       400:
  *         description: Invalid section ID
  *       500:
@@ -118,7 +117,6 @@ router.get('/sections/:sectionId', getLessonsBySectionId)
  *                   id: 1
  *                   name: "Mathematics Fundamentals"
  *                   description: "A comprehensive guide to foundational math topics."
- *                   isCompleted: true
  *                   classroomId: 1
  *                   createdAt: "2023-10-01T10:00:00Z"
  *                   updatedAt: "2023-10-01T10:00:00Z"

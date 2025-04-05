@@ -4,11 +4,8 @@ import { LessonService } from '../services/lessonService'
 import { ResponseHelper } from '../utils/responseHelper'
 import { asyncHandler } from '../utils/asyncHandler'
 import APIError from '../errors/APIError'
-import {
-  CreateLessonSchema,
-  UpdateLessonSchema,
-} from '../utils/zod/lessonSchemes'
-import { CreateMaterialSchema } from '../utils/zod/materialSchemes'
+import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
+import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
 
 export const getLessonsBySectionId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -40,13 +37,10 @@ export const getLessonById = asyncHandler(
 
 export const createLessonWithNewMaterial = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const validatedLessonData = CreateLessonSchema.parse(req.body.lesson)
-    const validatedMaterialData = CreateMaterialSchema.parse(req.body.material)
+    const validatedLessonData = CreateLessonWithMaterialSchema.parse(req.body)
 
-    const newLesson = await LessonService.createLessonWithNewMaterial(
-      validatedLessonData,
-      validatedMaterialData,
-    )
+    const newLesson =
+      await LessonService.createLessonWithNewMaterial(validatedLessonData)
 
     return res
       .status(201)

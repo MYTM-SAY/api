@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
-// Enum for Material Types
 const MaterialTypeEnum = z.enum(['VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE'], {})
 
-// Common Fields
 export const CreateMaterialSchema = z
   .object({
     materialType: MaterialTypeEnum,
