@@ -15,7 +15,7 @@ dotenv.config()
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || `http://localhost:${port}`,
+    origin: '*',
     credentials: true,
   }),
 )
