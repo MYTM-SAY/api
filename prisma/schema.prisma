@@ -21,7 +21,7 @@ model User {
   CommentVote       CommentVote[]
   OwnedCommunities  Community[]         @relation("CommunityOwner")
   InstructorProfile InstructorProfile[]
-  MemberRoles       CommunityMembers[]
+  CommunityMembers  CommunityMembers[]
   Post              Post[]
   PostVote          PostVote[]
   QuizScore         QuizScore[]
@@ -30,6 +30,7 @@ model User {
   JoinRequests      JoinRequest[]
   Progress          Progress[]
   CompletedLessons  CompletedLessons[]
+  UserContributions UserContributions[]
 }
 
 model UserProfile {
@@ -289,6 +290,17 @@ model QuizScore {
   Quiz      Quiz     @relation(fields: [quizId], references: [id])
   User      User     @relation(fields: [userId], references: [id])
 }
+
+model UserContributions {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  count     Int      @default(0)
+  User      User     @relation(fields: [userId], references: [id])
+  dateOnly  DateTime @db.Date
+
+  @@unique([userId, dateOnly]) 
+}
+
 
 model File {
   id        Int      @id @default(autoincrement())
