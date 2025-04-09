@@ -100,7 +100,7 @@ export const CommunityRepo = {
       select: {
         _count: {
           select: {
-            MemberRoles: true,
+            CommunityMembers: true,
           },
         },
       },
