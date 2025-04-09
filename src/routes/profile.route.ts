@@ -189,6 +189,6 @@ router.put('/', isAuthenticated, updateProfile);
  *       500:
  *         description: Internal server error.
  */
-router.get('/contributions/:username', getContributions);
+router.get('/contributions/:username', isAuthenticated, getContributions);
 
 export default router;
