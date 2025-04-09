@@ -21,7 +21,7 @@ model User {
   CommentVote       CommentVote[]
   OwnedCommunities  Community[]         @relation("CommunityOwner")
   InstructorProfile InstructorProfile[]
-  MemberRoles       CommunityMembers[]
+  CommunityMembers  CommunityMembers[]
   Post              Post[]
   PostVote          PostVote[]
   QuizScore         QuizScore[]

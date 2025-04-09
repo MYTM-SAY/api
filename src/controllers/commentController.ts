@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
 import { CommentSchema } from '../utils/zod/commentSchemes'
+import { CommunityRepo } from '../repos/community.repo'
 
 export const findAllComments = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -65,13 +66,14 @@ export const getCommentsByUserIdAndCommunityId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.claims!.id
     const communityId = Number(req.params.id)
+
     const comments = await CommentService.getCommentsByUserIdAndCommunityId(
       userId,
       communityId,
     )
-    res
+    return res
       .status(200)
-      .json(ResponseHelper.success('Comments fetched successfully', comments))
+      .json(ResponseHelper.success('Comments fetched successfully', true))
   },
 )
 

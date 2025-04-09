@@ -4,7 +4,6 @@ import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { z } from 'zod'
 import { join } from 'path'
 
-
 export const CommunityRepo = {
   async findAll() {
     const results = await prisma.community.findMany()
@@ -25,7 +24,7 @@ export const CommunityRepo = {
     const result = await prisma.community.findUnique({
       where: { id },
       include: {
-        Classrooms: true,
+        Forums: true,
       },
     })
     return result
@@ -93,58 +92,36 @@ export const CommunityRepo = {
     })
   },
 
-
   // number of joined communties
-  async numberOfJoinedCommunties(
-    id: number
-  ){
+  async numberOfJoinedCommunties(id: number) {
     const result = await prisma.user.findUnique({
+      where: { id },
 
-      where : { id }, 
-
-      select : {
-
-        _count : {
-
-          select:{
-
-            MemberRoles : true,
-
-          }
-        
-        }
+      select: {
+        _count: {
+          select: {
+            MemberRoles: true,
+          },
+        },
       },
-    
-   }
-   );
-   
-
-
+    })
   },
   async joinedCommunities(id: number) {
-  // get all joined communities (id, name) by user id
-  const communitiesForUser = await prisma.communityMembers.findMany({
+    // get all joined communities (id, name) by user id
+    const communitiesForUser = await prisma.communityMembers.findMany({
+      where: { userId: id },
+      select: {
+        Role: true,
 
-    where: { userId : id },
-    select: {
-      Role: true,
-     
-      Community: {
-        select: {
-          id: true,
-          name: true,
-          
+        Community: {
+          select: {
+            id: true,
+            name: true,
+          },
         },
-
       },
-    },
-    
-  });
-    
+    })
 
-    return communitiesForUser;
+    return communitiesForUser
   },
-
-  
-
 }

@@ -12,7 +12,6 @@ const app = express()
 const port = process.env.PORT || 5500
 const swaggerSpecs = swaggerJsdoc(swaggerOptions)
 dotenv.config()
-
 app.use(
   cors({
     origin: '*',
