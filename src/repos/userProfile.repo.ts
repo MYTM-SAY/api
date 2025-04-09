@@ -3,6 +3,7 @@ import APIError from '../errors/APIError';
 import { UserRepo } from './user.repo';
 import { UserProfileSchema } from '../utils/zod/userProfileSchemes';
 import { z } from 'zod';
+import { getUserContributions } from '../controllers/userController';
 
 export const UserProfileRepo = {
   async findByUserId(userId: number,) {
@@ -56,4 +57,14 @@ export const UserProfileRepo = {
     });
     return result;
   },
+  
+async getUserContributions(userName: string) {
+  const result = await prisma.user.findUnique({
+    where: { username: userName },
+    select: {
+      UserContributions: true,
+    },
+  });  
+  return result;
+}
 };

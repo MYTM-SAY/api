@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProfile, createProfile, updateProfile } from '../controllers/profileController';
+import { createProfile, getContributions, getProfile, updateProfile } from '../controllers/profileController';
 import { isAuthenticated } from '../middlewares/authMiddleware';
 
 const router = express.Router();
@@ -147,5 +147,48 @@ router.post('/', isAuthenticated, createProfile);
  *         description: "Server error."
  */
 router.put('/', isAuthenticated, updateProfile);
+
+
+/**
+ * @swagger
+ * /profiles/contributions/{username}:
+ *   get:
+ *     summary: Get user contributions
+ *     description: Retrieves the contribution data (e.g., daily streaks or total contributions) for the specified user.
+ *     tags: [Profiles]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The username of the user.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved contributions.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 12
+ *                 userId:
+ *                   type: integer
+ *                   example: 5
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-04-08T12:34:56.000Z"
+ *                 count:
+ *                   type: integer
+ *                   example: 34
+ *       404:
+ *         description: Contributions not found for this user.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/contributions/:username', isAuthenticated, getContributions);
 
 export default router;

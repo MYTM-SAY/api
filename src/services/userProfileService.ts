@@ -54,9 +54,19 @@ async function createUserProfile(
    return await UserProfileRepo.updateProfile(validatedData, userId);
  }
  
+ async function getUserContributions(
+  userName: string,
+ ){
+  if(!userName) throw new APIError('username is required', 400);
+  const result = await UserProfileRepo.getUserContributions(userName);
+  if(!result) throw new APIError('User not found', 404);
+  return result;
+ }
+
 
 export const UserProfileService = {
   getUserProfile,
   createUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  getUserContributions
 };
