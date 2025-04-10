@@ -7,10 +7,53 @@ const router = express.Router();
 // pulbic routes
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     UserProfile:
+ *       type: object
+ *       properties:
+ *         bio:
+ *           type: string
+ *           example: "I am a software developer."
+ *         twitter:
+ *           type: string
+ *           example: "https://twitter.com/example"
+ *         facebook:
+ *           type: string
+ *           example: "https://facebook.com/example"
+ *         instagram:
+ *           type: string
+ *           example: "https://instagram.com/example"
+ *         linkedin:
+ *           type: string
+ *           example: "https://linkedin.com/in/example"
+ *         youtube:
+ *           type: string
+ *           example: "https://youtube.com/example"
+ *         profilePictureURL:
+ *           type: string
+ *           example: "https://example.com/profile.jpg"
+ *         tags:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["c++", "ComputerVision", "ProblemSolving"]
+ *     Response:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: "Profile retrieved successfully"
+ *         data:
+ *           $ref: '#/components/schemas/UserProfile'
+ *
  * /profiles/{id}:
  *   get:
  *     summary: Get a user profile
- *     description: "Retrieves the profile details for the specified user ID."
+ *     description: Retrieves the profile details for the specified user ID.
  *     tags: [Profiles]
  *     parameters:
  *       - in: path
@@ -18,20 +61,21 @@ const router = express.Router();
  *         required: true
  *         schema:
  *           type: integer
- *         description: "The ID of the user."
+ *         description: The ID of the user.
  *     responses:
  *       200:
- *         description: "Successfully retrieved profile."
+ *         description: Successfully retrieved profile.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/UserProfile'
+ *               $ref: '#/components/schemas/Response'
  *       404:
- *         description: "Profile not found."
+ *         description: Profile not found.
  *       500:
- *         description: "Server error."
+ *         description: Server error.
  */
-router.get('/:id',  getProfile);
+router.get('/:id', getProfile);
+
 
 // Authenticated routes
 

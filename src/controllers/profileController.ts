@@ -10,9 +10,15 @@ import { UserProfileService } from '../services/userProfileService'
 // get profile, publicly available
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const profile = await UserProfileService.getUserProfile(+req.params.id)
+  // add a dummy array of strings to the profile object to test the frontend
+  const dummyArray = ['c++', 'ComputerVision', 'ProblemSolving']
+  const profileWithTags = {
+    ...profile,
+    tags: dummyArray,
+  };
   res
     .status(200)
-    .json(ResponseHelper.success('Profile retrieved successfully', profile))
+    .json(ResponseHelper.success('Profile retrieved successfully', profileWithTags))
 })
 
 // create profile
