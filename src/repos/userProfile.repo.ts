@@ -58,9 +58,9 @@ export const UserProfileRepo = {
     return result;
   },
   
-async getUserContributions(userName: string) {
+async getUserContributions(id: number) {
   const result = await prisma.user.findUnique({
-    where: { username: userName },
+    where: { id },
     select: {
       UserContributions: true,
     },

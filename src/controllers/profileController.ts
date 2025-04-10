@@ -87,7 +87,7 @@ export const updateProfile = asyncHandler(
 export const getContributions = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const contributions = await UserProfileService.getUserContributions(
-      req.params.username,
+      +req.params.id,
     )
     res
     .status(200)

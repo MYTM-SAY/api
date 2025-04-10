@@ -33,3 +33,10 @@ export const getUserContributions = asyncHandler(
 
 
 )
+export const getUserIdByUsername = asyncHandler(
+  async (req: Request, res: Response) => {
+    const username = req.body.username
+    const user_id = await UserService.getUserByUsername(username)
+    res.status(200).json(ResponseHelper.success('User retrieved successfully', user_id))
+  }
+)

@@ -24,6 +24,11 @@ export const UserRepo = {
   async findByUsername(username: string) {
     const result = await prisma.user.findUnique({
       where: { username },
+      select: {
+        id: true,
+        username: true,
+      },
+
     });
     return result;
   },
@@ -69,7 +74,7 @@ async getContributionsByUserId(id: number) {
     select: {
     _count: {
       select: {
-        MemberRoles: true,
+        CommunityMembers: true,
         Post: true,         
         Comment: true,       
         PostVote: true,      

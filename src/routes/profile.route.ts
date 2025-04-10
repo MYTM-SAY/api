@@ -158,11 +158,11 @@ router.put('/', isAuthenticated, updateProfile);
  *     tags: [Profiles]
  *     parameters:
  *       - in: path
- *         name: username
+ *         name: id
  *         required: true
  *         schema:
- *           type: string
- *         description: The username of the user.
+ *           type: number
+ *         description: The Id of the user.
  *     responses:
  *       200:
  *         description: Successfully retrieved contributions.
@@ -189,6 +189,6 @@ router.put('/', isAuthenticated, updateProfile);
  *       500:
  *         description: Internal server error.
  */
-router.get('/contributions/:username', isAuthenticated, getContributions);
+router.get('/contributions/:id', getContributions);
 
 export default router;

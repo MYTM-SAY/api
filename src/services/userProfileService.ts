@@ -55,11 +55,14 @@ async function createUserProfile(
  }
  
  async function getUserContributions(
-  userName: string,
+  id: number,
  ){
-  if(!userName) throw new APIError('username is required', 400);
-  const result = await UserProfileRepo.getUserContributions(userName);
-  if(!result) throw new APIError('User not found', 404);
+  if (!id || isNaN(id)) throw new APIError('Invalid User ID', 400);
+  const user = await UserRepo.findById(id);
+  if (!user) throw new APIError('User not found', 404);
+
+  const result = await UserProfileRepo.getUserContributions(id);
+  if(!result) throw new APIError('User Profile not found', 404);
   return result;
  }
 
