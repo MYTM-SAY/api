@@ -48,9 +48,4 @@ export const getUserIdByUsername = asyncHandler(
   },
 )
 
-export const toggleStatus = asyncHandler(
-  async (req: Request, res: Response) => {
-    const user = await UserService.toggleStatus(+req.params.id)
-    res.status(200).json(ResponseHelper.success('User status inverted', user))
-  },
-)
+ 

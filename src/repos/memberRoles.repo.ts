@@ -6,7 +6,8 @@ export const MemberRolesRepo = {
   async addUserToCommunity(data: Prisma.CommunityMembersUncheckedCreateInput) {
     const communities = await prisma.communityMembers.create({
       data,
-    })
+    });
+    
     return communities
   },
   async assignModRole(userId: number, communityId: number) {

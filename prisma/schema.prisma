@@ -14,7 +14,6 @@ model User {
   email             String              @unique
   dob               DateTime
   lastLogin         DateTime?
-  isOnline          Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   hashedPassword    String

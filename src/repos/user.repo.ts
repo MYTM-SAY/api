@@ -83,18 +83,5 @@ export const UserRepo = {
       },
     })
     return result?._count
-  },
-  async toggleStatus(id: number) {
-    const { isOnline } =
-      (await prisma.user.findUnique({
-        where: { id },
-        select: { isOnline: true },
-      })) ?? {}
-    const user = await prisma.user.update({
-      where: { id },
-      data: { isOnline: !isOnline },
-      select: { id: true, isOnline: true },
-    })
-    return user
-  },
-}
+  }
+  }

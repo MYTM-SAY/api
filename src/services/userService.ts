@@ -68,15 +68,6 @@ async function getUserContributions(userId: number) {
   return contributions
 }
 
-async function toggleStatus(userId: number) {
-  if (!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
-
-  const user = await UserRepo.findById(userId)
-  if (!user) throw new APIError('User not found', 404)
-
-  const updatedUser = await UserRepo.toggleStatus(userId)
-  return updatedUser
-}
 
 export const UserService = {
   getUserById,
@@ -85,5 +76,4 @@ export const UserService = {
   updateUser,
   updateLastLogin,
   getUserContributions,
-  toggleStatus,
 }
