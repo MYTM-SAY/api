@@ -12,8 +12,58 @@ export const PostRepo = {
   async findById(id: number) {
     const result = await prisma.post.findUnique({
       where: { id },
-    })
-    return result
+      include: {
+    
+        _count: {
+          select: {
+            Comments: true,
+          },
+
+        },
+        Author: {
+          select: {
+            id: true,
+            username: true,
+            fullname: true,
+         
+            UserProfile: {
+              select: {profilePictureURL: true},
+          },
+
+        },
+      },
+    }})
+
+    const { _count,Author ,...postData } = result as {
+      _count: { Comments: number };
+      Author: {
+        id: number;
+        username: string;
+        fullname: string;
+
+        UserProfile: {
+          profilePictureURL: string;
+        };
+      };
+      [key: string]: any;
+    };
+    const {UserProfile, ...rest_stuff} = Author
+
+    const Authorfiltered = {
+      ...rest_stuff,
+      profilePictureURL: Author.UserProfile.profilePictureURL,
+    }
+    
+  
+    const result2 = {
+      ...postData, Authorfiltered,
+      commentsCount: _count.Comments,
+    };
+
+
+    return result2
+
+   
   },
 
   async create(post: z.infer<typeof PostSchema>, authorId: number) {

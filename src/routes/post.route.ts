@@ -94,10 +94,76 @@ router.post('/forums/:forumId', isAuthenticated, createPost)
  *     responses:
  *       200:
  *         description: Successfully retrieved post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                     title:
+ *                       type: string
+ *                     content:
+ *                       type: string
+ *                     voteCounter:
+ *                       type: number
+ *                     attachments:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     forumId:
+ *                       type: number
+ *                     authorId:
+ *                       type: number
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                     Authorfiltered:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: number
+ *                         username:
+ *                           type: string
+ *                         fullname:
+ *                           type: string
+ *                         profilePictureURL:
+ *                           type: string
+ *                     commentsCount:
+ *                       type: number
+ *             example:
+ *               success: true
+ *               message: "Post fetched successfully"
+ *               data:
+ *                 id: 1
+ *                 title: "string"
+ *                 content: "string"
+ *                 voteCounter: 0
+ *                 attachments: []
+ *                 forumId: 1
+ *                 authorId: 1
+ *                 createdAt: "2025-04-11T06:41:58.470Z"
+ *                 updatedAt: "2025-04-11T06:41:58.470Z"
+ *                 Authorfiltered:
+ *                   id: 1
+ *                   username: "johndoe"
+ *                   fullname: "John Doe"
+ *                   profilePictureURL: "https://example.com/profile.jpg"
+ *                 commentsCount: 0
  *       404:
  *         description: Post not found
  */
-router.get('/:id', isAuthenticated, getPost)
+router.get('/:id', isAuthenticated, getPost);
 
 /**
  * @swagger
