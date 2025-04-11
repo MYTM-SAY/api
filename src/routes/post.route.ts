@@ -138,6 +138,7 @@ router.get('/forums/:id', isAuthenticated, getPostsByForumId)
  *                 items:
  *                   type: string
  *                   format: url
+ *                   example: "https://example.com/file1"
  *     responses:
  *       201:
  *         description: Post created successfully
@@ -339,7 +340,7 @@ router.delete('/:id', isAuthenticated, deletePost)
  *       500:
  *         description: Server error
  */
-router.put('/upvote/:postId/:userId', upVotePost);
+router.put('/upvote/:postId/:userId', upVotePost)
 
 /**
  * @swagger
@@ -389,6 +390,6 @@ router.put('/upvote/:postId/:userId', upVotePost);
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:postId/:userId', downVotePost);
+router.put('/downvote/:postId/:userId', downVotePost)
 
 export default router

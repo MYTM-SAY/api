@@ -1,6 +1,5 @@
 import { CommunityRepo } from '../repos/community.repo'
 import { UserProfileRepo } from '../repos/userProfile.repo'
-import { MemberRolesRepo } from '../repos/memberRoles.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
@@ -47,18 +46,6 @@ async function getCommunityById(id: number) {
   return community
 }
 
-async function createCommunity(
-  data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
-  userId: number,
-) {
-  const validatedData = await CommunitySchema.parseAsync(data)
-  const createCommunity = await CommunityRepo.create(validatedData, userId)
-  const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
-
-  if (!defaultForum) throw new APIError('Default Forum not found', 404)
-  return createCommunity
-}
-
 async function createDefaultForumForCommuinity(communityId: number) {
   const forum = await ForumRepo.create(
     {
@@ -69,6 +56,18 @@ async function createDefaultForumForCommuinity(communityId: number) {
   )
 
   return forum
+}
+
+async function createCommunity(
+  data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
+  userId: number,
+) {
+  const validatedData = await CommunitySchema.parseAsync(data)
+  const createCommunity = await CommunityRepo.create(validatedData, userId)
+  const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
+
+  if (!defaultForum) throw new APIError('Default Forum not found', 404)
+  return createCommunity
 }
 
 async function updateCommunity(

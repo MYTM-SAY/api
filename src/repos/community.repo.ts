@@ -24,7 +24,12 @@ export const CommunityRepo = {
     const result = await prisma.community.findUnique({
       where: { id },
       include: {
-        Forums: true,
+        Classrooms: true,
+        Forums: {
+          select: {
+            Posts: true,
+          },
+        },
       },
     })
     return result

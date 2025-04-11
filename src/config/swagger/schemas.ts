@@ -193,4 +193,88 @@ export const schemas = {
       },
     },
   },
+  Post: {
+    type: 'object',
+    properties: {
+      id: { type: 'integer', example: 1 },
+      title: { type: 'string', example: 'Tech Trends 2025' },
+      content: {
+        type: 'string',
+        example: 'A deep dive into the latest technology trends for the year.',
+      },
+      voteCounter: { type: 'integer', example: 5 },
+      attachments: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+        example: ['https://techcommunity.com/files/trends-2025.pdf'],
+      },
+      forumId: { type: 'integer', example: 1 },
+      authorId: { type: 'integer', example: 1 },
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        example: '2025-04-11T06:41:58.470Z',
+      },
+      updatedAt: {
+        type: 'string',
+        format: 'date-time',
+        example: '2025-04-11T06:41:58.470Z',
+      },
+    },
+    required: [
+      'id',
+      'title',
+      'content',
+      'voteCounter',
+      'forumId',
+      'authorId',
+      'createdAt',
+      'updatedAt',
+    ],
+  },
+  Community: {
+    type: 'object',
+    properties: {
+      id: { type: 'integer', example: 1 },
+      name: { type: 'string', example: 'Tech Community' },
+      description: { type: 'string', example: 'A place for tech enthusiasts.' },
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        example: '2025-04-11T06:25:08.279Z',
+      },
+      updatedAt: {
+        type: 'string',
+        format: 'date-time',
+        example: '2025-04-11T06:25:08.279Z',
+      },
+      coverImgURL: { type: 'string', example: 'https://example.com/cover.jpg' },
+      logoImgURL: { type: 'string', example: 'https://example.com/logo.jpg' },
+      ownerId: { type: 'integer', example: 1 },
+      Classrooms: {
+        type: 'array',
+        items: { type: 'object' },
+        example: [],
+      },
+      Forums: {
+        type: 'object',
+        properties: {
+          Posts: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/Post' },
+          },
+        },
+      },
+    },
+    required: [
+      'id',
+      'name',
+      'description',
+      'createdAt',
+      'updatedAt',
+      'ownerId',
+    ],
+  },
 }
