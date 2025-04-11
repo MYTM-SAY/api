@@ -71,6 +71,7 @@ model Community {
   id               Int                @id @default(autoincrement())
   name             String
   description      String?
+  bio              String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   coverImgURL      String?
@@ -292,15 +293,14 @@ model QuizScore {
 }
 
 model UserContributions {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  count     Int      @default(0)
-  User      User     @relation(fields: [userId], references: [id])
-  dateOnly  DateTime @db.Date
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  count    Int      @default(0)
+  User     User     @relation(fields: [userId], references: [id])
+  dateOnly DateTime @db.Date
 
-  @@unique([userId, dateOnly]) 
+  @@unique([userId, dateOnly])
 }
-
 
 model File {
   id        Int      @id @default(autoincrement())
