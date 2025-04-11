@@ -5,8 +5,56 @@ import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
-    const results = await prisma.post.findMany({ where: { forumId } })
-    return results
+    // Fetch posts with additional details for each post
+    const results = await prisma.post.findMany({
+      where: { forumId },
+      include: {
+        _count: {
+          select: { Comments: true },
+        },
+        Author: {
+          select: {
+            id: true,
+            username: true,
+            fullname: true,
+            UserProfile: {
+              select: { profilePictureURL: true },
+            },
+          },
+        },
+      },
+    });
+  
+    const transformedResults = results.map(result => {
+
+      const { _count, Author, ...postData } = result as {
+        _count: { Comments: number };
+        Author: {
+          id: number;
+          username: string;
+          fullname: string;
+          UserProfile: {
+            profilePictureURL: string;
+          };
+        };
+        [key: string]: any;
+      };
+  
+      const { UserProfile, ...authorProps } = Author;
+  
+      const Authorfiltered = {
+        ...authorProps,
+        profilePictureURL: UserProfile.profilePictureURL,
+      };
+  
+      return {
+        ...postData,
+        Authorfiltered,
+        commentsCount: _count.Comments,
+      };
+    });
+  
+    return transformedResults;
   },
 
   async findById(id: number) {
@@ -47,10 +95,10 @@ export const PostRepo = {
       };
       [key: string]: any;
     };
-    const {UserProfile, ...rest_stuff} = Author
+    const {UserProfile, ...RestProfileData} = Author
 
     const Authorfiltered = {
-      ...rest_stuff,
+      ...RestProfileData,
       profilePictureURL: Author.UserProfile.profilePictureURL,
     }
     
@@ -122,33 +170,71 @@ export const PostRepo = {
     return result
   },
 
-  // get all the posts wether they are upvoted or downvoted or posted or commented or commentvoteup or commentVoteDown  by the user
   async getAllContribByUserId(userId: number) {
-
-    const result = await prisma.post.findMany({
-
-      where: {  OR : [
-        {authorId: userId},
-        { PostVotes: { some: { userId } } },
-        { Comments: { some: { authorId: userId } } },
-        { Comments: { some: { CommentVotes: {some :{ userId }} } } },
-
-      ] },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        createdAt: true,
-        updatedAt: true,
-        authorId: true,
+    const results = await prisma.post.findMany({
+      where: {
+        OR: [
+          { authorId: userId },
+          { PostVotes: { some: { userId } } },
+          { Comments: { some: { authorId: userId } } },
+          { Comments: { some: { CommentVotes: { some: { userId } } } } },
+        ],
+      },
+      include: {
+        _count: {
+          select: { Comments: true },
+        },
+        Author: {
+          select: {
+            id: true,
+            username: true,
+            fullname: true,
+            email: true,
+            UserProfile: {
+              select: { profilePictureURL: true },
+            },
+          },
+        },
         PostVotes: {
           where: { userId },
           select: { count: true },
-        },}
-
+        },
+      },
     });
-
-    return result;
-  },
+  
+    const transformedResults = results.map(result => {
+      // Destructure the post result to get _count, Author, and PostVotes
+      const { _count, Author, PostVotes, ...postData } = result as {
+        _count: { Comments: number };
+        Author: {
+          id: number;
+          username: string;
+          fullname: string;
+          email: string;
+          UserProfile: { profilePictureURL: string };
+        };
+        PostVotes: { count: number }[];
+        [key: string]: any;
+      };
+  
+      const { UserProfile, ...authorRest } = Author;
+  
+      const Authorfiltered = {
+        ...authorRest,
+        profilePictureURL: UserProfile?.profilePictureURL,
+      };
+  
+      const votesCount = PostVotes.length > 0 ? PostVotes[0].count : 0;
+  
+      return {
+        ...postData,
+        Authorfiltered,
+        commentsCount: _count.Comments,
+        votesCount,
+      };
+    });
+  
+    return transformedResults;
+  }
 
 }

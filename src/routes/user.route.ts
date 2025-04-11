@@ -263,14 +263,132 @@ router.get('/:userId/communities', getJoinedCommunities)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ContributionsListResponse'
- *       400:
- *         description: Invalid user ID format
- *       404:
- *         description: User not found
- *       500:
- *         description: Server error
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       title:
+ *                         type: string
+ *                       content:
+ *                         type: string
+ *                       voteCounter:
+ *                         type: integer
+ *                       attachments:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       forumId:
+ *                         type: integer
+ *                       authorId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       Authorfiltered:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           username:
+ *                             type: string
+ *                           fullname:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                           profilePictureURL:
+ *                             type: string
+ *                       commentsCount:
+ *                         type: integer
+ *                       votesCount:
+ *                         type: integer
+ *             example:
+ *               success: true
+ *               message: "Posts fetched successfully"
+ *               data:
+ *                 - id: 1
+ *                   title: "string"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments: []
+ *                   forumId: 1
+ *                   authorId: 1
+ *                   createdAt: "2025-04-11T06:41:58.470Z"
+ *                   updatedAt: "2025-04-11T06:41:58.470Z"
+ *                   Authorfiltered:
+ *                     id: 1
+ *                     username: "johndoe"
+ *                     fullname: "John Doe"
+ *                     email: "john@example.com"
+ *                     profilePictureURL: "https://example.com/profile.jpg"
+ *                   commentsCount: 0
+ *                   votesCount: 0
+ *                 - id: 2
+ *                   title: "string2"
+ *                   content: "string2"
+ *                   voteCounter: 0
+ *                   attachments: []
+ *                   forumId: 1
+ *                   authorId: 1
+ *                   createdAt: "2025-04-11T06:49:29.716Z"
+ *                   updatedAt: "2025-04-11T06:49:29.716Z"
+ *                   Authorfiltered:
+ *                     id: 1
+ *                     username: "johndoe"
+ *                     fullname: "John Doe"
+ *                     email: "john@example.com"
+ *                     profilePictureURL: "https://example.com/profile.jpg"
+ *                   commentsCount: 0
+ *                   votesCount: 0
+ *                 - id: 3
+ *                   title: "string"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments:
+ *                     - "https://example.com/file1"
+ *                   forumId: 1
+ *                   authorId: 1
+ *                   createdAt: "2025-04-11T06:55:32.833Z"
+ *                   updatedAt: "2025-04-11T06:55:32.833Z"
+ *                   Authorfiltered:
+ *                     id: 1
+ *                     username: "johndoe"
+ *                     fullname: "John Doe"
+ *                     email: "john@example.com"
+ *                     profilePictureURL: "https://example.com/profile.jpg"
+ *                   commentsCount: 0
+ *                   votesCount: 0
+ *                 - id: 4
+ *                   title: "string"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments:
+ *                     - "https://example.com/file1"
+ *                   forumId: 1
+ *                   authorId: 1
+ *                   createdAt: "2025-04-11T06:57:55.875Z"
+ *                   updatedAt: "2025-04-11T06:57:55.875Z"
+ *                   Authorfiltered:
+ *                     id: 1
+ *                     username: "johndoe"
+ *                     fullname: "John Doe"
+ *                     email: "john@example.com"
+ *                     profilePictureURL: "https://example.com/profile.jpg"
+ *                   commentsCount: 0
+ *                   votesCount: 0
  */
+
 router.get('/:userId/contributions', getAllPostContribByUser)
 
 /**
