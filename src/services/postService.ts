@@ -16,8 +16,11 @@ async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
 }
 
 async function getPostById(postId: number) {
+
   const post = await PostRepo.findById(postId)
+
   if (!post) throw new APIError('Post not found', 404)
+    
   return post
 }
 
