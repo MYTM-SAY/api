@@ -80,7 +80,7 @@ model Community {
   Forums           Forum[]
   MemberRoles      MemberRoles[]
   Members          User[]             @relation("CommunityMembers")
-  Tags         Tag[]              @relation("CommunityToTag")
+  Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
 }
 
