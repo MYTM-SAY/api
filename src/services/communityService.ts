@@ -76,7 +76,7 @@ async function updateCommunity(
   userId: number,
   data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
 ) {
-  const validatedData = await CommunitySchema.parseAsync(data)
+  const validatedData = await CommunitySchema.partial().parse(data)
 
   if (!validatedData) throw new APIError('Invalid data', 400)
   const community = await CommunityRepo.findById(communityId)
