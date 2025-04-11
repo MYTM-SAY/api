@@ -14,6 +14,7 @@ model User {
   email             String              @unique
   dob               DateTime
   lastLogin         DateTime?
+  isOnline          Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   hashedPassword    String
@@ -68,24 +69,27 @@ model Tag {
 }
 
 model Community {
-  id               Int                @id @default(autoincrement())
-  name             String
-  description      String?
-  bio              String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  coverImgURL      String?
-  logoImgURL       String?
-  ownerId          Int
-  isPublic         Boolean            @default(true)
-  Classrooms       Classroom[]
-  Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
-  Forums           Forum[]
-  CommunityMembers CommunityMembers[]
-  Members          User[]             @relation("CommunityMembers")
-  Tags             Tag[]              @relation("CommunityToTag")
-  CompletedLessons CompletedLessons[]
-  JoinRequests     JoinRequest[] // Removed incorrect `map` argument
+  id                 Int                @id @default(autoincrement())
+  name               String
+  description        String?
+  bio                String?
+  membersCount       Int                @default(0)
+  onlineMembersCount Int                @default(0)
+  adminsCount        Int                @default(0)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  coverImgURL        String?
+  logoImgURL         String?
+  ownerId            Int
+  isPublic           Boolean            @default(true)
+  Classrooms         Classroom[]
+  Owner              User               @relation("CommunityOwner", fields: [ownerId], references: [id])
+  Forums             Forum[]
+  CommunityMembers   CommunityMembers[]
+  Members            User[]             @relation("CommunityMembers")
+  Tags               Tag[]              @relation("CommunityToTag")
+  CompletedLessons   CompletedLessons[]
+  JoinRequests       JoinRequest[] // Removed incorrect `map` argument
 }
 
 model JoinRequest {
