@@ -24,6 +24,11 @@ export const CommunityRepo = {
       where: { id },
       include: {
         Classrooms: true,
+        Forums: {
+          select: {
+            Posts: true,
+          },
+        },
       },
     })
     return result

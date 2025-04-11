@@ -147,8 +147,8 @@ app.delete('/:id', isAuthenticated, deleteCommunity)
  * @swagger
  * /communities/{id}:
  *   get:
- *     summary: Get a single community
- *     description: Fetches details of a specific community by its ID.
+ *     summary: Retrieve a community by ID
+ *     description: Returns details of a specific community, including its forum and posts, based on the provided community ID.
  *     tags: [Communities]
  *     parameters:
  *       - in: path
@@ -156,18 +156,42 @@ app.delete('/:id', isAuthenticated, deleteCommunity)
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the community to retrieve.
+ *         description: The ID of the community to retrieve
  *     responses:
  *       200:
- *         description: Successfully retrieved community.
+ *         description: Community retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Community"
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Community'
  *       404:
- *         description: Community not found.
- *       500:
- *         description: Server error.
+ *         description: Community not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: 'null'
+ *               required:
+ *                 - success
+ *                 - message
+ *                 - data
+ *             example:
+ *               success: false
+ *               message: Community not found
+ *               data: null
  */
 app.get('/:id', getCommunity)
 /**
