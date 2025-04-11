@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from '../db/PrismaClient';
+import { Prisma } from '@prisma/client'
+import { prisma } from '../db/PrismaClient'
 
 export const UserRepo = {
   // find the user
@@ -8,16 +8,16 @@ export const UserRepo = {
   async findById(id: number) {
     const result = await prisma.user.findUnique({
       where: { id },
-    });
-    return result;
+    })
+    return result
   },
 
   // find user by email
   async findByEmail(email: string) {
     const result = await prisma.user.findUnique({
       where: { email },
-    });
-    return result;
+    })
+    return result
   },
 
   // find user by username
@@ -28,9 +28,8 @@ export const UserRepo = {
         id: true,
         username: true,
       },
-
-    });
-    return result;
+    })
+    return result
   },
 
   // create User for the Authentication
@@ -43,7 +42,7 @@ export const UserRepo = {
         dob: userData.dob,
         hashedPassword: userData.hashedPassword,
       },
-    });
+    })
   },
 
   // update
@@ -53,8 +52,8 @@ export const UserRepo = {
     const result = await prisma.user.update({
       where: { id },
       data: { fullname, dob },
-    });
-    return result;
+    })
+    return result
   },
 
   // update last login by id
@@ -62,27 +61,40 @@ export const UserRepo = {
     const result = await prisma.user.update({
       where: { id },
       data: { lastLogin: new Date() },
-    });
-    return result;
+    })
+    return result
   },
 
-// Get the number of contributions (posts, comments, postVotes, commentVotes) by user id
-async getContributionsByUserId(id: number) {
-  const result = await prisma.user.findUnique({
-    where: { id },
-    
-    select: {
-    _count: {
-      select: {
-        CommunityMembers: true,
-        Post: true,         
-        Comment: true,       
-        PostVote: true,      
-        CommentVote: true,  
-      },
-    },}
-  });
-  return result?._count;
-}
+  // Get the number of contributions (posts, comments, postVotes, commentVotes) by user id
+  async getContributionsByUserId(id: number) {
+    const result = await prisma.user.findUnique({
+      where: { id },
 
-};
+      select: {
+        _count: {
+          select: {
+            CommunityMembers: true,
+            Post: true,
+            Comment: true,
+            PostVote: true,
+            CommentVote: true,
+          },
+        },
+      },
+    })
+    return result?._count
+  },
+  async toggleStatus(id: number) {
+    const { isOnline } =
+      (await prisma.user.findUnique({
+        where: { id },
+        select: { isOnline: true },
+      })) ?? {}
+    const user = await prisma.user.update({
+      where: { id },
+      data: { isOnline: !isOnline },
+      select: { id: true, isOnline: true },
+    })
+    return user
+  },
+}

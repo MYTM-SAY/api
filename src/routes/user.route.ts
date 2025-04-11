@@ -1,10 +1,9 @@
 import express from 'express'
-import { getMe, getUser, getUserContributions,getUserIdByUsername } from '../controllers/userController'
-import { isAuthenticated } from '../middlewares/authMiddleware'
 import { getJoinedCommunities } from '../controllers/communityController'
+import { getMe, getUser, getUserContributions, getUserIdByUsername, toggleStatus } from '../controllers/userController'
+import { isAuthenticated } from '../middlewares/authMiddleware'
 // from posts
 import { getAllPostContribByUser } from '../controllers/postController'
-import { get } from 'http'
 const router = express.Router()
 /**
  * @swagger
@@ -431,5 +430,50 @@ router.get('/:userId/contributions', getAllPostContribByUser)
  *         description: Server error
  */
 router.post('/getUserIdByUsername', getUserIdByUsername);
+
+/**
+ * @swagger
+ * /users/toggle-status/{id}:
+ *   put:
+ *     summary: Toggle user's online status
+ *     description: Inverts the `isOnline` boolean status of a user.
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user whose status will be toggled.
+ *     responses:
+ *       200:
+ *         description: User status inverted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User status inverted
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     isOnline:
+ *                       type: boolean
+ *                       example: false
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Server error.
+ */
+
+router.put('/toggle-status/:id', toggleStatus);
 
 export default router
