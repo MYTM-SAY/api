@@ -6,6 +6,7 @@ import {
   deleteCommunity,
   updateCommunity,
   getCommunity,
+  getAllUsersInACommunity
 } from '../controllers/communityController'
 import {
   promoteToModerator,
@@ -318,5 +319,44 @@ app.patch(
   hasRoles([Role.OWNER]),
   updateJoinRequestStatus,
 )
+
+
+/**
+ * @swagger
+ * /communities/{communityId}/users-count:
+ *   get:
+ *     summary: Get number of users in a specific community
+ *     description: Returns the total count of users who are members of the given community.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to count users for.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user count.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Community members fetched successfully
+ *                 data:
+ *                   type: integer
+ *                   example: 42
+ *       404:
+ *         description: Community not found.
+ *       500:
+ *         description: Server error.
+ */
+app.get('/:communityId/users-count', getAllUsersInACommunity);
 
 export default app

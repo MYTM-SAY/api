@@ -111,3 +111,17 @@ export const deleteCommunity = asyncHandler(
     res.status(204).end()
   },
 )
+
+export const getAllUsersInACommunity = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const usersCount = await CommunityService.getAllUsersInACommunity(+req.params.communityId)
+    res
+    .status(200)
+    .json(
+      ResponseHelper.success(
+        'Community members fetched successfully',
+        usersCount,
+      ),
+    )
+  },
+)

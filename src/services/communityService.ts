@@ -100,6 +100,14 @@ async function getJoinedCommunities(userId: number) {
   
   return joinedCommunities
 }
+
+async function getAllUsersInACommunity(id:number){
+  const community = await CommunityRepo.findById(id);
+  if (!community) throw new APIError('Community not found', 404);
+
+  const usersCount = await CommunityRepo.getAllUsersInACommunity(id);
+  return usersCount;
+}
 export const CommunityService = {
   getAllCommunities,
   discoverCommunities,
@@ -107,5 +115,6 @@ export const CommunityService = {
   createCommunity,
   updateCommunity,
   deleteCommunity,
-  getJoinedCommunities
+  getJoinedCommunities,
+  getAllUsersInACommunity
 }

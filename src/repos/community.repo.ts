@@ -124,4 +124,19 @@ export const CommunityRepo = {
 
     return communitiesForUser
   },
+
+  async getAllUsersInACommunity(id: number){
+    const usersCount = await prisma.communityMembers.count({
+      where:{
+        communityId:id
+      },
+    });
+    await prisma.community.update({
+      where:{id},
+      data: {
+        membersCount: usersCount,
+      },
+    })
+    return usersCount;
+  }
 }
