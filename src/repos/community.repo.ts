@@ -122,6 +122,7 @@ export const CommunityRepo = {
           select: {
             id: true,
             name: true,
+            logoImgURL: true,
           },
         },
       },
