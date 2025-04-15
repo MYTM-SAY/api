@@ -14,7 +14,7 @@ import {
   updateJoinRequestStatus,
 } from '../controllers/joinRequestsController'
 import { Role } from '@prisma/client'
-import { getUsersInCommunity } from '../controllers/communityMemberController'
+import { getUsersInCommunity, removeUserInCommunity } from '../controllers/communityMemberController'
 
 const app = express.Router()
 
@@ -372,5 +372,52 @@ app.patch(
  *         description: Internal server error
  */
 app.get('/:id/users', isAuthenticated, getUsersInCommunity)
+/**
+ * @swagger
+ * /communities/{communityId}/users/{userId}:
+ *   delete:
+ *     summary: Remove a user from a community
+ *     tags: [Communities]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the community
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user to remove from the community
+ *     responses:
+ *       200:
+ *         description: User successfully removed from the community
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User removed from community successfully
+ *       400:
+ *         description: Invalid input or user not in community
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Community or user not found
+ *       500:
+ *         description: Internal server error
+ */
+
+app.delete('/:communityId/users/:userId', isAuthenticated, removeUserInCommunity)
+
 
 export default app

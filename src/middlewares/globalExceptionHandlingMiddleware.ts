@@ -7,8 +7,8 @@ const globalExceptionHandlerMiddleware = (
   error: any,
   req: Request,
   res: Response,
+  next: NextFunction
 ) => {
-
 
   if (error instanceof APIError) {
     return res

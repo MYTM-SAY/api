@@ -66,7 +66,7 @@ async function createCommunity(
 ) {
   const validatedData = await CommunitySchema.parseAsync(data)
   const createCommunity = await CommunityRepo.create(validatedData, userId)
-  const addOwnerAsMember = await CommunityMembersRepo.addUserToCommunity({
+  await CommunityMembersRepo.addUserToCommunity({
     communityId: createCommunity.id, userId: userId, Role: Role.OWNER
   })
   const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
@@ -104,6 +104,7 @@ async function getJoinedCommunities(userId: number) {
 
   return joinedCommunities
 }
+
 
 export const CommunityService = {
   getAllCommunities,

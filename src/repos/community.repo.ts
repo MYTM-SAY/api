@@ -45,7 +45,7 @@ export const CommunityRepo = {
 
   async delete(id: number) {
     const result = await prisma.community.delete({
-      where: { id },
+      where: { id: id },
     })
     return result
   },

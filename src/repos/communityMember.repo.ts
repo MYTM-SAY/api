@@ -17,13 +17,13 @@ export const CommunityMembersRepo = {
     return communities
   },
 
-  async removeModRole(userId: number, communityId: number) {
-    const communities = await prisma.communityMembers.update({
+  async delete(userId: number, communityId: number) {
+    const member = await prisma.communityMembers.delete({
       where: { communityId_userId: { communityId, userId } },
-      data: { Role: 'MEMBER' },
     })
-    return communities
+    return member
   },
+
 
   async getUserRoleInCommunity(userId: number, communityId: number) {
     const member = await prisma.communityMembers.findUnique({
