@@ -2,7 +2,7 @@
 import { Prisma, Role } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 
-export const MemberRolesRepo = {
+export const CommunityMembersRepo = {
   async addUserToCommunity(data: Prisma.CommunityMembersUncheckedCreateInput) {
     const communities = await prisma.communityMembers.create({
       data,
@@ -33,21 +33,36 @@ export const MemberRolesRepo = {
     return member?.Role || null
   },
 
-  async hasAnyCommunityRole(userId: number, communityId: number) {
-    return !!(await this.getUserRoleInCommunity(userId, communityId))
-  },
+  async getUsersInCommunity(communityId: number) {
+    const members = await prisma.communityMembers.findMany({
+      where: {
+        communityId: communityId,
+      },
+      select: {
+        User: {
+          select: {
+            id: true,
+            fullname: true,
+            email: true,
+            UserProfile: {
+              select: {
+                profilePictureURL: true
+              }
+            },
+            CommunityMembers:
+            {
+              where: { communityId },
+              select: {
+                Role: true
+              }
+            }
 
-  async hasCommunityRoleOrHigher(userId: number, communityId: number) {
-    return (await this.getUserRoleInCommunity(userId, communityId)) === 'MEMBER'
-  },
+          },
+        },
+      },
+    });
+    return members;
+  }
 
-  async isCommunityOwner(userId: number, communityId: number) {
-    return (await this.getUserRoleInCommunity(userId, communityId)) === 'OWNER'
-  },
 
-  async isCommunityMod(userId: number, communityId: number) {
-    return (
-      (await this.getUserRoleInCommunity(userId, communityId)) === 'MODERATOR'
-    )
-  },
 }

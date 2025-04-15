@@ -1,12 +1,14 @@
 import { UserRepo } from '../repos/user.repo'
 import { UserProfileRepo } from '../repos/userProfile.repo'
-import { MemberRolesRepo } from '../repos/memberRoles.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { UserSchema } from '../utils/zod/userSchemes'
 import { UserProfileSchema } from '../utils/zod/userProfileSchemes'
 import { validate } from 'uuid'
 import { UserSchemaPublic } from '../utils/zod/userSchemes'
+import { CommunityService } from './communityService'
+import { CommunityRepo } from '../repos/community.repo'
 
 // get by id
 async function getUserById( id: number | null ) {
@@ -82,6 +84,7 @@ async function getUserContributions(
 
    return contributions
 }
+
 
 
 

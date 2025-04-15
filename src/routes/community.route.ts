@@ -7,10 +7,6 @@ import {
   updateCommunity,
   getCommunity,
 } from '../controllers/communityController'
-import {
-  promoteToModerator,
-  demoteFromModerator,
-} from '../controllers/memberRoles'
 import { hasRoles, isAuthenticated } from '../middlewares/authMiddleware'
 import {
   createJoinRequstCommunity,
@@ -18,6 +14,7 @@ import {
   updateJoinRequestStatus,
 } from '../controllers/joinRequestsController'
 import { Role } from '@prisma/client'
+import { getUsersInCommunity } from '../controllers/communityMemberController'
 
 const app = express.Router()
 
@@ -64,8 +61,6 @@ const app = express.Router()
  */
 
 app.get('/discover', discoverCommunities) // need revision
-app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) // done
-app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
 /**
  * @swagger
  * /communities:
@@ -338,5 +333,44 @@ app.patch(
   hasRoles([Role.OWNER]),
   updateJoinRequestStatus,
 )
+/**
+ * @swagger
+ * /communities/{id}/users:
+ *   get:
+ *     summary: Get users in a specific community
+ *     tags: [Communities]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the community
+ *     responses:
+ *       200:
+ *         description: List of users in the community
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Community not found
+ *       500:
+ *         description: Internal server error
+ */
+app.get('/:id/users', isAuthenticated, getUsersInCommunity)
 
 export default app

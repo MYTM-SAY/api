@@ -1,5 +1,5 @@
 import { Response, NextFunction, Request } from 'express'
-import { MemberRolesRepo } from '../repos/memberRoles.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { JwtService } from '../services/jwtService'
 import { TokenPayload } from '../interfaces/tokenPayload'
 import { UserService } from '../services/userService'
@@ -58,7 +58,7 @@ export const hasRoles = (requiredRoles: Role[]) => {
         else return next()
       }
 
-      const userRole = await MemberRolesRepo.getUserRoleInCommunity(
+      const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
         +communityId,
         req.claims!.id,
       )
@@ -98,7 +98,7 @@ export const isJoined = (parameterName: string) => {
 
     if (!community || community.ownerId === req.claims!.id) return next()
 
-    const userRole = await MemberRolesRepo.getUserRoleInCommunity(
+    const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
       +communityId,
       req.claims!.id,
     )

@@ -66,23 +66,23 @@ export const UserRepo = {
     return result;
   },
 
-// Get the number of contributions (posts, comments, postVotes, commentVotes) by user id
-async getContributionsByUserId(id: number) {
-  const result = await prisma.user.findUnique({
-    where: { id },
-    
-    select: {
-    _count: {
-      select: {
-        CommunityMembers: true,
-        Post: true,         
-        Comment: true,       
-        PostVote: true,      
-        CommentVote: true,  
-      },
-    },}
-  });
-  return result?._count;
-}
+  // Get the number of contributions (posts, comments, postVotes, commentVotes) by user id
+  async getContributionsByUserId(id: number) {
+    const result = await prisma.user.findUnique({
+      where: { id },
 
+      select: {
+        _count: {
+          select: {
+            CommunityMembers: true,
+            Post: true,
+            Comment: true,
+            PostVote: true,
+            CommentVote: true,
+          },
+        },
+      }
+    });
+    return result?._count;
+  }
 };
