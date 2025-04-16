@@ -87,7 +87,12 @@ router.get('/:id', isAuthenticated, getClassroom)
  *       201:
  *         description: Classroom created successfully
  */
-router.post('/', hasRoles([Role.MODERATOR, Role.OWNER]), createClassroom)
+router.post(
+  '/',
+  isAuthenticated,
+  hasRoles([Role.MODERATOR, Role.OWNER]),
+  createClassroom,
+)
 /**
  * @swagger
  * /classrooms/{id}:
