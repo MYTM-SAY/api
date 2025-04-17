@@ -49,9 +49,23 @@ router.get(
  *         required: true
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: section
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Whether to include the section relation
+ *       - in: query
+ *         name: lesson
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Whether to include the lesson relation
  *     responses:
  *       200:
  *         description: Returns the requested classroom
+ *       400:
+ *         description: Invalid query parameters
  *       404:
  *         description: Classroom not found
  */

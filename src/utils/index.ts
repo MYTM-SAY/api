@@ -148,6 +148,22 @@ export const ClassroomSchema = z
   })
   .strict()
 
+export const querySchema = z.object({
+  section: z
+    .string()
+    .refine((val) => val === 'true' || val === 'false', {
+      message: 'section must be "true" or "false"',
+    })
+    .transform((val) => val === 'true'), // Convert to boolean
+  lesson: z
+    .string()
+    .refine((val) => val === 'true' || val === 'false', {
+      message: 'lesson must be "true" or "false"',
+    })
+    .transform((val) => val === 'true'), // Convert to boolean
+})
+
+export type QuerySchema = z.infer<typeof querySchema>
 export const QuestionSchema = z
   .object({
     id: z.number().int().positive().optional(),

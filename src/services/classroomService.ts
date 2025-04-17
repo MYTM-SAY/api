@@ -1,14 +1,15 @@
 import { ClassroomRepo } from '../repos/classroom.repo'
-import { ClassroomSchema } from '../utils'
+import { ClassroomSchema, QuerySchema } from '../utils'
 import APIError from '../errors/APIError'
 import { CommunityRepo } from '../repos/community.repo'
+import { boolean } from 'zod'
 
 const getClassroomsByCommunityId = async (communityId: number) => {
   return ClassroomRepo.findByCommunityId(communityId)
 }
 
-const getClassroomById = async (id: number) => {
-  const classroom = await ClassroomRepo.findbyId(id)
+const getClassroomById = async (id: number, includes: QuerySchema) => {
+  const classroom = await ClassroomRepo.findbyId(id, includes)
   if (!classroom) throw new APIError('Classroom not found', 404)
   return classroom
 }

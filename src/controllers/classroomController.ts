@@ -5,6 +5,8 @@ import { ResponseHelper } from '../utils/responseHelper'
 import { asyncHandler } from '../utils/asyncHandler'
 import { CommunityRepo } from '../repos/community.repo'
 import APIError from '../errors/APIError'
+import { ParsedQs } from 'qs'
+import { querySchema } from '../utils'
 
 export const getClassrooms = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -24,7 +26,11 @@ export const getClassrooms = asyncHandler(
 
 export const getClassroom = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const classroom = await ClassroomService.getClassroomById(+req.params.id)
+    const includes = await querySchema.parseAsync(req.query)
+    const classroom = await ClassroomService.getClassroomById(
+      +req.params.id,
+      includes,
+    )
     res
       .status(200)
       .json(
@@ -69,3 +75,8 @@ export const updateClassroom = asyncHandler(
       )
   },
 )
+function parseBool(
+  section: string | ParsedQs | (string | ParsedQs)[] | undefined,
+) {
+  throw new Error('Function not implemented.')
+}

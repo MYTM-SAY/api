@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
-import { ClassroomSchema } from '../utils'
+import { ClassroomSchema, QuerySchema } from '../utils'
 
 export const ClassroomRepo = {
   async findAll() {
@@ -13,11 +13,19 @@ export const ClassroomRepo = {
     return classrooms
   },
 
-  async findbyId(id: number) {
+  async findbyId(id: number, includes?: QuerySchema) {
+    console.log('includes', includes)
     const classroom = await prisma.classroom.findUnique({
       where: { id },
       include: {
         Community: true,
+        Sections: includes?.section
+          ? {
+              include: {
+                Lessons: includes?.lesson ? true : false,
+              },
+            }
+          : false,
       },
     })
     return classroom
