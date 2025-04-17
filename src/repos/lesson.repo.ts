@@ -17,7 +17,7 @@ export const LessonRepo = {
     const lesson = await prisma.lesson.findUnique({
       where: { id },
       include: {
-        Section: true,
+        Material: true,
       },
     })
     return lesson
