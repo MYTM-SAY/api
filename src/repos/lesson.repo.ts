@@ -9,6 +9,9 @@ export const LessonRepo = {
       where: {
         sectionId: id,
       },
+      include: {
+        Material: true,
+      },
     })
     return lessons
   },
