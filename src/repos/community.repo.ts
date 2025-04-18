@@ -131,12 +131,6 @@ export const CommunityRepo = {
         communityId:id
       },
     });
-    await prisma.community.update({
-      where:{id},
-      data: {
-        membersCount: usersCount,
-      },
-    })
     return usersCount;
   },
 
@@ -153,12 +147,6 @@ export const CommunityRepo = {
         }
       },
     });
-    await prisma.community.update({
-      where:{id},
-      data: {
-        onlineMembersCount: usersCount,
-      },
-    })
     return usersCount;
   }
 }

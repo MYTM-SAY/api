@@ -43,8 +43,9 @@ async function getCommunityById(id: number) {
 
   const community = await CommunityRepo.findById(id)
   if (!community) throw new APIError('Community not found', 404)
-
-  return community
+  const membersCount = await CommunityRepo.getAllUsersInACommunity(id);
+  const onlineMembers = await CommunityRepo.getAllOnlineUsersInACommunity(id);
+  return {membersCount,onlineMembers, ...community};
 }
 
 async function createCommunity(

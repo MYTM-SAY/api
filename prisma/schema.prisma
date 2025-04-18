@@ -72,8 +72,6 @@ model Community {
   name               String
   description        String?
   bio                String?
-  membersCount       Int                @default(0)
-  onlineMembersCount Int                @default(0)
   adminsCount        Int                @default(0)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt

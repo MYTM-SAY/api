@@ -28,13 +28,6 @@ async function createJoinRequest(data: JoinRequestType) {
       data.communityId,
     )
     if (isMember) throw new APIError('Already a member of this community', 400)
-    const CommunityMembers = await MemberRolesRepo.addUserToCommunity({
-      userId: data.userId,
-      communityId: data.communityId,
-      Role: Role.MEMBER,
-    })
-    await CommunityRepo.getAllUsersInACommunity(data.communityId);
-
     return null
   }
   const isSentRequest = await JoinRequestRepo.findById(data.userId)
