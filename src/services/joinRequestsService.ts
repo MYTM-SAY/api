@@ -5,7 +5,7 @@ import {
   JoinRequestType,
   UpdateJoinRequestType,
 } from '../utils/zod/joinRequestSchema '
-import { MemberRolesRepo } from '../repos/memberRoles.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { JoinRequestStatus, Role } from '@prisma/client'
 
 async function getAllPendingJoinRequests(communityId: number) {
@@ -23,12 +23,12 @@ async function createJoinRequest(data: JoinRequestType) {
   if (!community) throw new APIError('Community not found', 404)
 
   if (community.isPublic) {
-    const isMember = await MemberRolesRepo.getUserRoleInCommunity(
+    const isMember = await CommunityMembersRepo.getUserRoleInCommunity(
       data.userId,
       data.communityId,
     )
     if (isMember) throw new APIError('Already a member of this community', 400)
-    const CommunityMembers = await MemberRolesRepo.addUserToCommunity({
+    const CommunityMembers = await CommunityMembersRepo.addUserToCommunity({
       userId: data.userId,
       communityId: data.communityId,
       Role: Role.MEMBER,

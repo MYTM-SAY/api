@@ -6,7 +6,12 @@ import {
   deleteClassroom,
   updateClassroom,
 } from '../controllers/classroomController'
-import { isAuthenticated } from '../middlewares/authMiddleware'
+import {
+  hasRoles,
+  isAuthenticated,
+  isJoined,
+} from '../middlewares/authMiddleware'
+import { Role } from '@prisma/client'
 
 const router = express.Router()
 /**
@@ -26,7 +31,12 @@ const router = express.Router()
  *       200:
  *         description: List of all classrooms in the specified community
  */
-router.get('/communities/:id', getClassroomsByCommunityId)
+router.get(
+  '/communities/:id',
+  isAuthenticated,
+  isJoined('id'),
+  getClassroomsByCommunityId,
+)
 /**
  * @swagger
  * /classrooms/{id}:
@@ -39,13 +49,27 @@ router.get('/communities/:id', getClassroomsByCommunityId)
  *         required: true
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: section
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Whether to include the section relation
+ *       - in: query
+ *         name: lesson
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: Whether to include the lesson relation
  *     responses:
  *       200:
  *         description: Returns the requested classroom
+ *       400:
+ *         description: Invalid query parameters
  *       404:
  *         description: Classroom not found
  */
-router.get('/:id', getClassroom)
+router.get('/:id', isAuthenticated, getClassroom)
 /**
  * @swagger
  * /classrooms:
@@ -77,8 +101,12 @@ router.get('/:id', getClassroom)
  *       201:
  *         description: Classroom created successfully
  */
-
-router.post('/', createClassroom)
+router.post(
+  '/',
+  isAuthenticated,
+  hasRoles([Role.MODERATOR, Role.OWNER]),
+  createClassroom,
+)
 /**
  * @swagger
  * /classrooms/{id}:
