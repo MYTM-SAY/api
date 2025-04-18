@@ -138,5 +138,27 @@ export const CommunityRepo = {
       },
     })
     return usersCount;
+  },
+
+  async getAllOnlineUsersInACommunity(id: number){
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+
+    const usersCount = await prisma.communityMembers.count({
+      where: {
+        communityId: id,
+        User:{
+          lastLogin: {
+            gte: threeMinutesAgo,
+          },
+        }
+      },
+    });
+    await prisma.community.update({
+      where:{id},
+      data: {
+        onlineMembersCount: usersCount,
+      },
+    })
+    return usersCount;
   }
 }

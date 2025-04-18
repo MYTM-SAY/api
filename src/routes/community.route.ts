@@ -6,7 +6,8 @@ import {
   deleteCommunity,
   updateCommunity,
   getCommunity,
-  getAllUsersInACommunity
+  getAllUsersInACommunity,
+  getAllOnlineUsersInACommunity
 } from '../controllers/communityController'
 import {
   promoteToModerator,
@@ -358,5 +359,45 @@ app.patch(
  *         description: Server error.
  */
 app.get('/:communityId/users-count', getAllUsersInACommunity);
+
+/**
+ * @swagger
+ * /communities/{communityId}/online-users-count:
+ *   get:
+ *     summary: Get the count of users online in a specific community
+ *     description: Returns the count of users who have logged in within the last 3 minutes in the given community.
+ *     tags:
+ *       - Communities
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to check online users for.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the count of online users in the community.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Community online members fetched successfully
+ *                 data:
+ *                   type: integer
+ *                   example: 5  # This is an example of the number of online users
+ *       404:
+ *         description: Community not found.
+ *       500:
+ *         description: Internal server error.
+ */
+app.get('/:communityId/online-users-count', getAllOnlineUsersInACommunity);
+
 
 export default app

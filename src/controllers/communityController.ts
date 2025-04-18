@@ -125,3 +125,17 @@ export const getAllUsersInACommunity = asyncHandler(
     )
   },
 )
+
+export const getAllOnlineUsersInACommunity = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const usersCount = await CommunityService.getAllOnlineUsersInACommunity(+req.params.communityId)
+    res
+    .status(200)
+    .json(
+      ResponseHelper.success(
+        'Community online members fetched successfully',
+        usersCount,
+      ),
+    )
+  },
+)
