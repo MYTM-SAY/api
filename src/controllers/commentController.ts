@@ -36,7 +36,7 @@ export const createComment = asyncHandler(
       ...validatedData,
       authorId: req.claims!.id,
     });
-    upsertUserContribution(+req.params.userId);
+    await upsertUserContribution(req.claims!.id);
     res
       .status(201)
       .json(ResponseHelper.success('Comment created successfully', comment))
@@ -85,7 +85,7 @@ export const upVoteComment = asyncHandler(
       +req.params.commentId,
       +req.params.userId,
     );
-    upsertUserContribution(+req.params.userId);
+    await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Comment upvoted successfully', result))
@@ -98,7 +98,7 @@ export const downVoteComment = asyncHandler(
       +req.params.commentId,
       +req.params.userId,
     );
-    upsertUserContribution(+req.params.userId);
+    await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Comment downvoted successfully', result))
