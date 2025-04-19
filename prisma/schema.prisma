@@ -59,13 +59,12 @@ model InstructorProfile {
 model Tag {
   id              Int           @id @default(autoincrement())
   name            String        @unique
-  isCommunityOnly Boolean
-  communityId     Int?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   Communities     Community[]   @relation("CommunityToTag")
   UserProfiles    UserProfile[] @relation("TagToUserProfile")
 }
+
 
 model Community {
   id               Int                @id @default(autoincrement())

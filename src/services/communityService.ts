@@ -83,12 +83,13 @@ async function updateCommunity(
   userId: number,
   data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
 ) {
-  const validatedData = await CommunitySchema.partial().parse(data)
-  if (!validatedData) throw new APIError('Invalid data', 400)
-  const community = await CommunityRepo.findById(communityId)
+  const validatedData = await CommunitySchema.partial().parse(data);
+  if (!validatedData) throw new APIError('Invalid data', 400);
 
-  if (!community) throw new APIError('Community not found', 404)
-  return CommunityRepo.update(communityId, data)
+  const community = await CommunityRepo.findById(communityId);
+  if (!community) throw new APIError('Community not found', 404);
+
+  return CommunityRepo.update(communityId, validatedData);
 }
 
 async function deleteCommunity(communityId: number, userId: number) {
