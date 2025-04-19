@@ -23,7 +23,7 @@ export const createPost = asyncHandler(
       forumId: +req.params.forumId,
     })
 
-    upsertUserContribution(+req.params.userId);
+    await upsertUserContribution(+req.claims!.id);
 
     const post = await PostService.createPost(validatedData, req.claims!.id)
     res
@@ -58,7 +58,7 @@ export const upVotePost = asyncHandler(
       +req.params.postId,
       +req.params.userId,
     );
-        upsertUserContribution(+req.params.userId);
+       await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Post upvoted successfully', result))
@@ -71,7 +71,7 @@ export const downVotePost = asyncHandler(
       +req.params.postId,
       +req.params.userId,
     );
-        upsertUserContribution(+req.params.userId);
+    await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Post downvoted successfully', result))
