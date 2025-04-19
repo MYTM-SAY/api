@@ -68,25 +68,24 @@ model Tag {
 }
 
 model Community {
-  id                 Int                @id @default(autoincrement())
-  name               String
-  description        String?
-  bio                String?
-  adminsCount        Int                @default(0)
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  coverImgURL        String?
-  logoImgURL         String?
-  ownerId            Int
-  isPublic           Boolean            @default(true)
-  Classrooms         Classroom[]
-  Owner              User               @relation("CommunityOwner", fields: [ownerId], references: [id])
-  Forums             Forum[]
-  CommunityMembers   CommunityMembers[]
-  Members            User[]             @relation("CommunityMembers")
-  Tags               Tag[]              @relation("CommunityToTag")
-  CompletedLessons   CompletedLessons[]
-  JoinRequests       JoinRequest[] // Removed incorrect `map` argument
+  id               Int                @id @default(autoincrement())
+  name             String
+  description      String?
+  bio              String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  coverImgURL      String?
+  logoImgURL       String?
+  ownerId          Int
+  isPublic         Boolean            @default(true)
+  Classrooms       Classroom[]
+  Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
+  Forums           Forum[]
+  CommunityMembers CommunityMembers[]
+  Members          User[]             @relation("CommunityMembers")
+  Tags             Tag[]              @relation("CommunityToTag")
+  CompletedLessons CompletedLessons[]
+  JoinRequests     JoinRequest[] // Removed incorrect `map` argument
 }
 
 model JoinRequest {
@@ -115,6 +114,7 @@ model CommunityMembers {
   @@map("CommunityMembers")
 }
 
+// TODO: Make material have 1 to 1 relation with lesson and onCascde delete
 model Material {
   id           Int          @id @default(autoincrement())
   materialType MaterialType
@@ -213,7 +213,7 @@ model Section {
   updatedAt   DateTime   @updatedAt
   Lessons     Lesson[]
   Questions   Question[]
-  Classroom   Classroom  @relation(fields: [classroomId], references: [id])
+  Classroom   Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
@@ -225,7 +225,7 @@ model Lesson {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   Material   Material @relation(fields: [materialId], references: [id])
-  Section    Section  @relation(fields: [sectionId], references: [id])
+  Section    Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
   CompletedLessons CompletedLessons[]
 }

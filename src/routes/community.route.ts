@@ -9,10 +9,6 @@ import {
   getAllUsersInACommunity,
   getAllOnlineUsersInACommunity
 } from '../controllers/communityController'
-import {
-  promoteToModerator,
-  demoteFromModerator,
-} from '../controllers/memberRoles'
 import { hasRoles, isAuthenticated } from '../middlewares/authMiddleware'
 import {
   createJoinRequstCommunity,
@@ -20,6 +16,7 @@ import {
   updateJoinRequestStatus,
 } from '../controllers/joinRequestsController'
 import { Role } from '@prisma/client'
+import { getUsersInCommunity, removeUserInCommunity } from '../controllers/communityMemberController'
 
 const app = express.Router()
 
@@ -66,8 +63,6 @@ const app = express.Router()
  */
 
 app.get('/discover', discoverCommunities) // need revision
-app.post('/:id/remove-moderator/:userId', isAuthenticated, demoteFromModerator) // done
-app.post('/:id/assign-moderator/:userId', isAuthenticated, promoteToModerator) // done
 /**
  * @swagger
  * /communities:
@@ -160,8 +155,8 @@ app.delete('/:id', isAuthenticated, deleteCommunity)
  * @swagger
  * /communities/{id}:
  *   get:
- *     summary: Get a single community
- *     description: Fetches details of a specific community by its ID.
+ *     summary: Retrieve a community by ID
+ *     description: Returns details of a specific community, including its forum and posts, based on the provided community ID.
  *     tags: [Communities]
  *     parameters:
  *       - in: path
@@ -169,18 +164,42 @@ app.delete('/:id', isAuthenticated, deleteCommunity)
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the community to retrieve.
+ *         description: The ID of the community to retrieve
  *     responses:
  *       200:
- *         description: Successfully retrieved community.
+ *         description: Community retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Community"
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Community'
  *       404:
- *         description: Community not found.
- *       500:
- *         description: Server error.
+ *         description: Community not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: 'null'
+ *               required:
+ *                 - success
+ *                 - message
+ *                 - data
+ *             example:
+ *               success: false
+ *               message: Community not found
+ *               data: null
  */
 app.get('/:id', getCommunity)
 /**
@@ -320,6 +339,92 @@ app.patch(
   hasRoles([Role.OWNER]),
   updateJoinRequestStatus,
 )
+/**
+ * @swagger
+ * /communities/{id}/users:
+ *   get:
+ *     summary: Get users in a specific community
+ *     tags: [Communities]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the community
+ *     responses:
+ *       200:
+ *         description: List of users in the community
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Community not found
+ *       500:
+ *         description: Internal server error
+ */
+app.get('/:id/users', isAuthenticated, getUsersInCommunity)
+/**
+ * @swagger
+ * /communities/{communityId}/users/{userId}:
+ *   delete:
+ *     summary: Remove a user from a community
+ *     tags: [Communities]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the community
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user to remove from the community
+ *     responses:
+ *       200:
+ *         description: User successfully removed from the community
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User removed from community successfully
+ *       400:
+ *         description: Invalid input or user not in community
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Community or user not found
+ *       500:
+ *         description: Internal server error
+ */
+
+app.delete('/:communityId/users/:userId', isAuthenticated, removeUserInCommunity)
+
 
 
 /**

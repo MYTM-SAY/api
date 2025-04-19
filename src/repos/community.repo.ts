@@ -24,7 +24,12 @@ export const CommunityRepo = {
     const result = await prisma.community.findUnique({
       where: { id },
       include: {
-        Forums: true,
+        Classrooms: true,
+        Forums: {
+          select: {
+            Posts: true,
+          },
+        },
       },
     })
     return result
@@ -40,7 +45,7 @@ export const CommunityRepo = {
 
   async delete(id: number) {
     const result = await prisma.community.delete({
-      where: { id },
+      where: { id: id },
     })
     return result
   },
@@ -117,6 +122,7 @@ export const CommunityRepo = {
           select: {
             id: true,
             name: true,
+            logoImgURL: true,
           },
         },
       },

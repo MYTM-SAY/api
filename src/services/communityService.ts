@@ -1,10 +1,11 @@
 import { CommunityRepo } from '../repos/community.repo'
 import { UserProfileRepo } from '../repos/userProfile.repo'
-import { MemberRolesRepo } from '../repos/memberRoles.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { ForumRepo } from '../repos/forum.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
+import { Role } from '@prisma/client'
 
 async function getAllCommunities() {
   return CommunityRepo.findAll()
@@ -72,11 +73,27 @@ async function createDefaultForumForCommuinity(communityId: number) {
   return forum
 }
 
+async function createCommunity(
+  data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
+  userId: number,
+) {
+  const validatedData = await CommunitySchema.parseAsync(data)
+  const createCommunity = await CommunityRepo.create(validatedData, userId)
+  await CommunityMembersRepo.addUserToCommunity({
+    communityId: createCommunity.id, userId: userId, Role: Role.OWNER
+  })
+  const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
+
+  if (!defaultForum) throw new APIError('Default Forum not found', 404)
+  return createCommunity
+}
+
 async function updateCommunity(
   communityId: number,
   userId: number,
   data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
 ) {
+  const validatedData = await CommunitySchema.partial().parse(data)
   const validatedData = await CommunitySchema.partial().parse(data)
 
   if (!validatedData) throw new APIError('Invalid data', 400)
@@ -87,7 +104,7 @@ async function updateCommunity(
 }
 
 async function deleteCommunity(communityId: number, userId: number) {
-  
+
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
@@ -98,7 +115,7 @@ async function getJoinedCommunities(userId: number) {
   if (!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
   const joinedCommunities = await CommunityRepo.joinedCommunities(userId)
   if (!joinedCommunities) throw new APIError('No communities found', 404)
-  
+
   return joinedCommunities
 }
 
