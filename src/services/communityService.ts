@@ -49,17 +49,7 @@ async function getCommunityById(id: number) {
   return {membersCount,onlineMembers, ...community};
 }
 
-async function createCommunity(
-  data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
-  userId: number,
-) {
-  const validatedData = await CommunitySchema.parseAsync(data)
-  const createCommunity = await CommunityRepo.create(validatedData, userId)
-  const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
 
-  if (!defaultForum) throw new APIError('Default Forum not found', 404)
-  return createCommunity
-}
 
 async function createDefaultForumForCommuinity(communityId: number) {
   const forum = await ForumRepo.create(
@@ -94,8 +84,6 @@ async function updateCommunity(
   data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
 ) {
   const validatedData = await CommunitySchema.partial().parse(data)
-  const validatedData = await CommunitySchema.partial().parse(data)
-
   if (!validatedData) throw new APIError('Invalid data', 400)
   const community = await CommunityRepo.findById(communityId)
 
