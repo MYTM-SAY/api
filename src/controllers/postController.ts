@@ -4,6 +4,8 @@ import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { ResponseHelper } from '../utils/responseHelper'
 import { asyncHandler } from '../utils/asyncHandler'
 import { PostSchema } from '../utils/zod/postSchemes'
+import { upsertUserContribution } from '../services/contributionService'
+
 
 export const getPostsByForumId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -21,7 +23,7 @@ export const createPost = asyncHandler(
       forumId: +req.params.forumId,
     })
 
-    console.log(validatedData)
+    await upsertUserContribution(+req.claims!.id);
 
     const post = await PostService.createPost(validatedData, req.claims!.id)
     res
@@ -31,6 +33,7 @@ export const createPost = asyncHandler(
 )
 
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
+  
   const post = await PostService.getPostById(+req.params.id)
   res
     .status(200)
@@ -54,7 +57,8 @@ export const upVotePost = asyncHandler(
     const result = await PostService.upVotePost(
       +req.params.postId,
       +req.params.userId,
-    )
+    );
+       await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Post upvoted successfully', result))
@@ -66,9 +70,21 @@ export const downVotePost = asyncHandler(
     const result = await PostService.downVotePost(
       +req.params.postId,
       +req.params.userId,
-    )
+    );
+    await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Post downvoted successfully', result))
   },
 )
+
+
+export const getAllPostContribByUser = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const posts = await PostService.getAllPostContribByUser(+req.params.userId)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Posts fetched successfully', posts))
+  },
+)
+

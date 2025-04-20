@@ -3,6 +3,7 @@ import APIError from '../errors/APIError'
 import { ForumRepo } from '../repos/forum.repo'
 import { PostRepo } from '../repos/post.repo'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
+import { UserRepo } from '../repos/user.repo'
 
 async function getPostsByForumId(forumId: number) {
   return await PostRepo.findPostsByForumId(forumId)
@@ -15,8 +16,11 @@ async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
 }
 
 async function getPostById(postId: number) {
+
   const post = await PostRepo.findById(postId)
+
   if (!post) throw new APIError('Post not found', 404)
+    
   return post
 }
 
@@ -54,6 +58,16 @@ async function downVotePost(postId: number, userId: number) {
   return result
 }
 
+async function getAllPostContribByUser(userId: number) {
+  if (!userId) throw new APIError('Missing userId', 404)
+  const user = await UserRepo.findById(userId)
+  if (!user) throw new APIError('User not found', 404)
+  const posts = await PostRepo.getAllContribByUserId(userId)
+  if (!posts) throw new APIError('Posts not found', 404)
+ 
+  return posts
+}
+
 export const PostService = {
   getPostsByForumId,
   createPost,
@@ -62,4 +76,5 @@ export const PostService = {
   deletePost,
   upVotePost,
   downVotePost,
+  getAllPostContribByUser,
 }

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
 import { CommentSchema } from '../utils/zod/commentSchemes'
+import { count } from 'console';
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -143,8 +144,8 @@ export const CommentRepo = {
   },
 
   async upVoteComment(commentId: number, userId: number) {
-    let result
-
+    let result;
+  
     result = await prisma.commentVote.upsert({
       where: {
         userId_commentId: { userId, commentId },
@@ -157,11 +158,10 @@ export const CommentRepo = {
         commentId,
         count: 1,
       },
-    })
-
-    return result
+    });
+  
+    return result;
   },
-
   async downVoteComment(commentId: number, userId: number) {
     let result
 

@@ -21,13 +21,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
 export const refreshToken = asyncHandler(
   async (req: Request, res: Response) => {
-    const refreshtoken = req.cookies.refreshToken || req.body.refreshtoken
-    const result = await AuthService.refreshToken(refreshtoken)
-    res.cookie('accessToken', result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 15, // 15 minutes
-    })
+    const refreshToken = req.body.refreshToken
+    const result = await AuthService.refreshToken(refreshToken)
     return res
       .status(200)
       .json(ResponseHelper.success('Token refreshed successfully', result))

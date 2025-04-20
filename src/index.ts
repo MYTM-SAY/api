@@ -15,7 +15,7 @@ const swaggerSpecs = swaggerJsdoc(swaggerOptions)
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || `http://localhost:${port}`,
+    origin: '*',
     credentials: true,
   }),
 )

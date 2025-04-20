@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { z } from 'zod'
+import { join } from 'path'
 
 export const CommunityRepo = {
   async findAll() {
@@ -48,7 +49,7 @@ export const CommunityRepo = {
 
   async delete(id: number) {
     const result = await prisma.community.delete({
-      where: { id },
+      where: { id: id },
     })
     return result
   },
@@ -105,4 +106,63 @@ export const CommunityRepo = {
       },
     })
   },
+
+  // number of joined communties
+  async numberOfJoinedCommunties(id: number) {
+    const result = await prisma.user.findUnique({
+      where: { id },
+
+      select: {
+        _count: {
+          select: {
+            CommunityMembers: true,
+          },
+        },
+      },
+    })
+  },
+  async joinedCommunities(id: number) {
+    // get all joined communities (id, name) by user id
+    const communitiesForUser = await prisma.communityMembers.findMany({
+      where: { userId: id },
+      select: {
+        Role: true,
+
+        Community: {
+          select: {
+            id: true,
+            name: true,
+            logoImgURL: true,
+          },
+        },
+      },
+    })
+
+    return communitiesForUser
+  },
+
+  async getAllUsersInACommunity(id: number){
+    const usersCount = await prisma.communityMembers.count({
+      where:{
+        communityId:id
+      },
+    });
+    return usersCount;
+  },
+
+  async getAllOnlineUsersInACommunity(id: number){
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+
+    const usersCount = await prisma.communityMembers.count({
+      where: {
+        communityId: id,
+        User:{
+          lastLogin: {
+            gte: threeMinutesAgo,
+          },
+        }
+      },
+    });
+    return usersCount;
+  }
 }

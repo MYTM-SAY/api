@@ -9,6 +9,9 @@ export const LessonRepo = {
       where: {
         sectionId: id,
       },
+      include: {
+        Material: true,
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -20,7 +23,7 @@ export const LessonRepo = {
     const lesson = await prisma.lesson.findUnique({
       where: { id },
       include: {
-        Section: true,
+        Material: true,
       },
     })
     return lesson

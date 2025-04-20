@@ -4,6 +4,8 @@ import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { ForumRepo } from '../repos/forum.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
+import { Role } from '@prisma/client'
 
 async function getAllCommunities() {
   return CommunityRepo.findAll()
@@ -42,9 +44,12 @@ async function getCommunityById(id: number) {
 
   const community = await CommunityRepo.findById(id)
   if (!community) throw new APIError('Community not found', 404)
-
-  return community
+  const membersCount = await CommunityRepo.getAllUsersInACommunity(id);
+  const onlineMembers = await CommunityRepo.getAllOnlineUsersInACommunity(id);
+  return {membersCount,onlineMembers, ...community};
 }
+
+
 
 async function createDefaultForumForCommuinity(communityId: number) {
   const forum = await ForumRepo.create(
@@ -64,6 +69,9 @@ async function createCommunity(
 ) {
   const validatedData = await CommunitySchema.parseAsync(data)
   const createCommunity = await CommunityRepo.create(validatedData, userId)
+  await CommunityMembersRepo.addUserToCommunity({
+    communityId: createCommunity.id, userId: userId, Role: Role.OWNER
+  })
   const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
 
   if (!defaultForum) throw new APIError('Default Forum not found', 404)
@@ -75,8 +83,7 @@ async function updateCommunity(
   userId: number,
   data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
 ) {
-  const validatedData = await CommunitySchema.parseAsync(data)
-
+  const validatedData = await CommunitySchema.partial().parse(data)
   if (!validatedData) throw new APIError('Invalid data', 400)
   const community = await CommunityRepo.findById(communityId)
 
@@ -85,14 +92,36 @@ async function updateCommunity(
 }
 
 async function deleteCommunity(communityId: number, userId: number) {
-  console.log(communityId, userId)
-  const community = await CommunityRepo.findById(communityId)
 
+  const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
   await CommunityRepo.delete(communityId)
 }
 
+async function getJoinedCommunities(userId: number) {
+  if (!userId || isNaN(userId)) throw new APIError('Invalid User ID', 400)
+  const joinedCommunities = await CommunityRepo.joinedCommunities(userId)
+  if (!joinedCommunities) throw new APIError('No communities found', 404)
+
+  return joinedCommunities
+}
+
+async function getAllUsersInACommunity(id:number){
+  const community = await CommunityRepo.findById(id);
+  if (!community) throw new APIError('Community not found', 404);
+
+  const usersCount = await CommunityRepo.getAllUsersInACommunity(id);
+  return usersCount;
+}
+
+async function getAllOnlineUsersInACommunity(id:number){
+  const community = await CommunityRepo.findById(id);
+  if (!community) throw new APIError('Community not found', 404);
+
+  const usersCount = await CommunityRepo.getAllOnlineUsersInACommunity(id);
+  return usersCount;
+}
 export const CommunityService = {
   getAllCommunities,
   discoverCommunities,
@@ -100,4 +129,7 @@ export const CommunityService = {
   createCommunity,
   updateCommunity,
   deleteCommunity,
+  getJoinedCommunities,
+  getAllUsersInACommunity,
+  getAllOnlineUsersInACommunity
 }

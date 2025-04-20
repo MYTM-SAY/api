@@ -4,6 +4,8 @@ import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
 import { CommentSchema } from '../utils/zod/commentSchemes'
+import { upsertUserContribution } from '../services/contributionService'
+
 
 export const findAllComments = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -33,7 +35,8 @@ export const createComment = asyncHandler(
     const comment = await CommentService.createComment({
       ...validatedData,
       authorId: req.claims!.id,
-    })
+    });
+    await upsertUserContribution(req.claims!.id);
     res
       .status(201)
       .json(ResponseHelper.success('Comment created successfully', comment))
@@ -65,13 +68,14 @@ export const getCommentsByUserIdAndCommunityId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.claims!.id
     const communityId = Number(req.params.id)
+
     const comments = await CommentService.getCommentsByUserIdAndCommunityId(
       userId,
       communityId,
     )
-    res
+    return res
       .status(200)
-      .json(ResponseHelper.success('Comments fetched successfully', comments))
+      .json(ResponseHelper.success('Comments fetched successfully', true))
   },
 )
 
@@ -80,7 +84,8 @@ export const upVoteComment = asyncHandler(
     const result = await CommentService.upVoteComment(
       +req.params.commentId,
       +req.params.userId,
-    )
+    );
+    await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Comment upvoted successfully', result))
@@ -92,7 +97,8 @@ export const downVoteComment = asyncHandler(
     const result = await CommentService.downVoteComment(
       +req.params.commentId,
       +req.params.userId,
-    )
+    );
+    await upsertUserContribution(+req.claims!.id);
     res
       .status(200)
       .json(ResponseHelper.success('Comment downvoted successfully', result))

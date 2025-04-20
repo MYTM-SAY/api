@@ -46,7 +46,7 @@ async function getCommentsByUserIdAndCommunityId(
 ) {
   if (!userId || !communityId)
     throw new APIError('Missing userId or communityId', 400)
-
+  console.log('userId', userId, 'communityId', communityId)
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 

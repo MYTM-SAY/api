@@ -9,10 +9,10 @@ datasource db {
 
 model User {
   id                Int                 @id @default(autoincrement())
-  fullname          String?
+  fullname          String
   username          String              @unique
   email             String              @unique
-  dob               DateTime?
+  dob               DateTime
   lastLogin         DateTime?
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -21,15 +21,16 @@ model User {
   CommentVote       CommentVote[]
   OwnedCommunities  Community[]         @relation("CommunityOwner")
   InstructorProfile InstructorProfile[]
-  MemberRoles       MemberRoles[]
+  CommunityMembers  CommunityMembers[]
   Post              Post[]
   PostVote          PostVote[]
   QuizScore         QuizScore[]
   UserProfile       UserProfile?
   Communities       Community[]         @relation("CommunityMembers")
-
-  Progress         Progress[]
-  CompletedLessons CompletedLessons[]
+  JoinRequests      JoinRequest[]
+  Progress          Progress[]
+  CompletedLessons  CompletedLessons[]
+  UserContributions UserContributions[]
 }
 
 model UserProfile {
@@ -70,21 +71,37 @@ model Community {
   id               Int                @id @default(autoincrement())
   name             String
   description      String?
+  bio              String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   coverImgURL      String?
   logoImgURL       String?
   ownerId          Int
+  isPublic         Boolean            @default(true)
   Classrooms       Classroom[]
   Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
   Forums           Forum[]
-  MemberRoles      MemberRoles[]
+  CommunityMembers CommunityMembers[]
   Members          User[]             @relation("CommunityMembers")
-  Tags         Tag[]              @relation("CommunityToTag")
+  Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
+  JoinRequests     JoinRequest[] // Removed incorrect `map` argument
 }
 
-model MemberRoles {
+model JoinRequest {
+  id          Int               @id @default(autoincrement())
+  userId      Int
+  communityId Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  status      JoinRequestStatus @default(PENDING)
+  User        User              @relation(fields: [userId], references: [id])
+  Community   Community         @relation(fields: [communityId], references: [id])
+
+  @@unique([userId, communityId])
+}
+
+model CommunityMembers {
   communityId Int
   userId      Int
   createdAt   DateTime  @default(now())
@@ -94,8 +111,10 @@ model MemberRoles {
   User        User      @relation(fields: [userId], references: [id])
 
   @@id([communityId, userId])
+  @@map("CommunityMembers")
 }
 
+// TODO: Make material have 1 to 1 relation with lesson and onCascde delete
 model Material {
   id           Int          @id @default(autoincrement())
   materialType MaterialType
@@ -194,7 +213,7 @@ model Section {
   updatedAt   DateTime   @updatedAt
   Lessons     Lesson[]
   Questions   Question[]
-  Classroom   Classroom  @relation(fields: [classroomId], references: [id])
+  Classroom   Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
@@ -206,7 +225,7 @@ model Lesson {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   Material   Material @relation(fields: [materialId], references: [id])
-  Section    Section  @relation(fields: [sectionId], references: [id])
+  Section    Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
   CompletedLessons CompletedLessons[]
 }
@@ -274,6 +293,16 @@ model QuizScore {
   User      User     @relation(fields: [userId], references: [id])
 }
 
+model UserContributions {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  count    Int      @default(0)
+  User     User     @relation(fields: [userId], references: [id])
+  dateOnly DateTime @db.Date
+
+  @@unique([userId, dateOnly])
+}
+
 model File {
   id        Int      @id @default(autoincrement())
   name      String
@@ -291,8 +320,13 @@ enum MaterialType {
 }
 
 enum Role {
-  ADMIN
   OWNER
   MODERATOR
   MEMBER
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
