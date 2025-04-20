@@ -112,6 +112,11 @@ app.get('/', isAuthenticated, getCommunities)
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/logo.jpg"
+ *               Tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["javascript", "backend", "cloud"]
  *     responses:
  *       201:
  *         description: Community created successfully.
@@ -125,8 +130,8 @@ app.get('/', isAuthenticated, getCommunities)
  *         description: User not found.
  *       500:
  *         description: Server error.
+ */
 
-*/
 app.post('/', isAuthenticated, createCommunity)
 /**
  * @swagger
@@ -241,6 +246,11 @@ app.get('/:id', getCommunity)
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/updated-logo.jpg"
+ *               Tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["javascript", "backend", "cloud"]
  *     responses:
  *       200:
  *         description: Community updated successfully.
