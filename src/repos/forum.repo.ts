@@ -12,7 +12,11 @@ export const ForumRepo = {
     return result
   },
   async findAll() {
-    const results = await prisma.forum.findMany({})
+    const results = await prisma.forum.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
     return results
   },
 

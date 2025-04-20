@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
-import APIError from '../errors/APIError'
 import { ClassroomSchema } from '../utils'
 
 export const ClassroomRepo = {
@@ -8,6 +7,9 @@ export const ClassroomRepo = {
     const classrooms = await prisma.classroom.findMany({
       include: {
         Community: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     })
     return classrooms
@@ -26,6 +28,9 @@ export const ClassroomRepo = {
   async findByCommunityId(communityId: number) {
     const classrooms = await prisma.classroom.findMany({
       where: { communityId },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return classrooms
   },

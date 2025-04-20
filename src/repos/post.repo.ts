@@ -1,11 +1,15 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
-import APIError from '../errors/APIError'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
-    const results = await prisma.post.findMany({ where: { forumId } })
+    const results = await prisma.post.findMany({
+      where: { forumId },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
     return results
   },
 

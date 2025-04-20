@@ -11,6 +11,9 @@ export const SectionRepo = {
       where: {
         classroomId: id,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return sections
   },

@@ -9,6 +9,9 @@ export const LessonRepo = {
       where: {
         sectionId: id,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return lessons
   },
