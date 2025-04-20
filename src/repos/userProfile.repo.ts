@@ -1,9 +1,6 @@
-import { prisma } from '../db/PrismaClient';
-import APIError from '../errors/APIError';
-import { UserRepo } from './user.repo';
-import { UserProfileSchema } from '../utils/zod/userProfileSchemes';
 import { z } from 'zod';
-import { getUserContributions } from '../controllers/userController';
+import { prisma } from '../db/PrismaClient';
+import { UserProfileSchema } from '../utils/zod/userProfileSchemes';
 
 export const UserProfileRepo = {
   async findByUserId(userId: number,) {
@@ -25,38 +22,58 @@ export const UserProfileRepo = {
         linkedin: true,
         youtube: true,
         profilePictureURL: true,
+        Tags:true,
       },
     });
     return result;
   },
 
+  async connectOrCreateTags(tagNames: string[]) {
+    return tagNames.map((name) => ({
+      where: { name },
+      create: { name },
+    }));
+  },
+  
   async createProfile(
     profile: z.infer<typeof UserProfileSchema>,
     userId: number,
   ) {
- 
-    const result = await prisma.userProfile.create({
+    const { tags, ...profileData } = profile;
+  
+    return await prisma.userProfile.create({
       data: {
         userId,
-        ...profile,
+        ...profileData,
+        Tags: tags ? {
+          connectOrCreate: await this.connectOrCreateTags(tags),
+        } : undefined,
       },
+      include: { Tags: true },
     });
-    return result;
   },
-
+  
   async updateProfile(
     profile: z.infer<typeof UserProfileSchema>,
     userId: number,
   ) {
-    
-    const result = await prisma.userProfile.update({
+    const { tags, ...profileData } = profile;
+  
+    return await prisma.userProfile.update({
       where: { userId },
       data: {
-        ...profile,
+        ...profileData,
+        ...(tags ? {
+          Tags: {
+            set: [],
+            connectOrCreate: await this.connectOrCreateTags(tags),
+          },
+        } : {}),
       },
+      include: { Tags: true },
     });
-    return result;
   },
+  
   
 async getUserContributions(id: number) {
   const result = await prisma.user.findUnique({
