@@ -5,56 +5,55 @@ export const schemas = {
       id: { type: 'integer' },
       name: { type: 'string' },
       notes: { type: 'string', nullable: true },
-      materialId: { type: 'integer' },
       sectionId: { type: 'integer' },
       createdAt: { type: 'string', format: 'date-time' },
       updatedAt: { type: 'string', format: 'date-time' },
+      materials: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/Material' },
+      },
+    },
+    example: {
+      id: 1,
+      name: 'Intro to Algebra',
+      notes: 'Basic concepts',
+      sectionId: 1,
+      createdAt: '2025-04-03T12:24:27.161Z',
+      updatedAt: '2025-04-03T12:24:27.161Z',
+      materials: [
+        {
+          id: 1,
+          materialType: 'VIDEO',
+          fileUrl: 'https://example.com/video.mp4',
+          createdAt: '2025-04-22T12:22:14.918Z',
+          updatedAt: '2025-04-22T12:22:14.918Z',
+          lessonId: 1,
+        },
+      ],
     },
   },
-  LessonWithMaterial: {
-    allOf: [
-      { $ref: '#/components/schemas/Lesson' },
-      {
-        type: 'object',
-        properties: {
-          Material: {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              materialType: {
-                type: 'string',
-                enum: ['VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE'],
-              },
-              fileUrl: { type: 'string', format: 'uri' },
-              createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' },
-            },
-          },
-        },
+
+  Material: {
+    type: 'object',
+    properties: {
+      id: { type: 'integer' },
+      materialType: {
+        type: 'string',
+        enum: ['VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE'],
       },
-    ],
+      fileUrl: { type: 'string', format: 'uri' },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' },
+    },
+    example: {
+      id: 7,
+      materialType: 'VIDEO',
+      fileUrl: 'https://example.com/video.mp4',
+      createdAt: '2025-04-03T12:39:14.561Z',
+      updatedAt: '2025-04-03T12:39:14.561Z',
+    },
   },
-  LessonWithSection: {
-    allOf: [
-      { $ref: '#/components/schemas/Lesson' },
-      {
-        type: 'object',
-        properties: {
-          Section: {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              name: { type: 'string' },
-              description: { type: 'string', nullable: true },
-              classroomId: { type: 'integer' },
-              createdAt: { type: 'string', format: 'date-time' },
-              updatedAt: { type: 'string', format: 'date-time' },
-            },
-          },
-        },
-      },
-    ],
-  },
+
   CreateLessonInput: {
     type: 'object',
     properties: {
@@ -63,14 +62,25 @@ export const schemas = {
       sectionId: { type: 'integer' },
     },
     required: ['name', 'sectionId'],
+    example: {
+      name: 'Intro to Algebra',
+      notes: 'Basic concepts',
+      sectionId: 1,
+    },
   },
+
   UpdateLessonInput: {
     type: 'object',
     properties: {
       name: { type: 'string', minLength: 1, maxLength: 100 },
       notes: { type: 'string', maxLength: 5000, nullable: true },
     },
+    example: {
+      name: 'Updated Lesson Name',
+      notes: 'Updated notes for this lesson.',
+    },
   },
+
   CreateMaterialInput: {
     type: 'object',
     properties: {
@@ -81,6 +91,10 @@ export const schemas = {
       fileUrl: { type: 'string', format: 'uri' },
     },
     required: ['materialType', 'fileUrl'],
+    example: {
+      materialType: 'VIDEO',
+      fileUrl: 'https://example.com/video.mp4',
+    },
   },
   Section: {
     type: 'object',

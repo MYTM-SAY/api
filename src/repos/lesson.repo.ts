@@ -10,7 +10,7 @@ export const LessonRepo = {
         sectionId: id,
       },
       include: {
-        Material: true,
+        Materials: true,
       },
     })
     return lessons
@@ -20,7 +20,7 @@ export const LessonRepo = {
     const lesson = await prisma.lesson.findUnique({
       where: { id },
       include: {
-        Material: true,
+        Materials: true,
       },
     })
     return lesson
@@ -29,17 +29,16 @@ export const LessonRepo = {
   async createWithMaterial(
     data: z.infer<typeof CreateLessonWithMaterialSchema>,
   ) {
-    return prisma.$transaction(async (tx) => {
-      const material = await tx.material.create({ data: data.material })
-      const lesson = await tx.lesson.create({
-        data: {
-          ...data.lesson,
-          materialId: material.id,
+    const lesson = await prisma.lesson.create({
+      data: {
+        ...data.lesson,
+        Materials: {
+          create: data.materials,
         },
-        include: { Material: true },
-      })
-      return lesson
+      },
+      include: { Materials: true },
     })
+    return lesson
   },
 
   async delete(id: number) {
@@ -55,6 +54,7 @@ export const LessonRepo = {
     const updatedlesson = await prisma.lesson.update({
       where: { id },
       data,
+      include: { Materials: true },
     })
     return updatedlesson
   },
