@@ -93,7 +93,6 @@ router.get('/:id', getProfile);
  *           schema:
  *             type: object
  *             required:
- *              
  *               - bio
  *             properties:
  *               bio:
@@ -123,6 +122,12 @@ router.get('/:id', getProfile);
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/profile.jpg"
+ *               tags:
+ *                 type: array
+ *                 description: List of tag names to associate with the profile
+ *                 items:
+ *                   type: string
+ *                   example: "javascript"
  *     responses:
  *       201:
  *         description: "Profile created successfully."
@@ -139,7 +144,7 @@ router.post('/', isAuthenticated, createProfile);
 
 /**
  * @swagger
- * /profiles/:
+ * /profiles:
  *   put:
  *     summary: Update a user profile
  *     description: "Updates the profile details for the authenticated user."
@@ -178,6 +183,12 @@ router.post('/', isAuthenticated, createProfile);
  *                 type: string
  *                 format: url
  *                 example: "https://example.com/newprofile.jpg"
+ *               tags:
+ *                 type: array
+ *                 description: Updated list of tag names to associate with the profile
+ *                 items:
+ *                   type: string
+ *                   example: "typescript"
  *     responses:
  *       200:
  *         description: "Profile updated successfully."
@@ -191,7 +202,6 @@ router.post('/', isAuthenticated, createProfile);
  *         description: "Server error."
  */
 router.put('/', isAuthenticated, updateProfile);
-
 
 /**
  * @swagger

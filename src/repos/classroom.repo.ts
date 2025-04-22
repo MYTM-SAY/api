@@ -9,6 +9,9 @@ export const ClassroomRepo = {
       include: {
         Community: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return classrooms
   },
@@ -34,6 +37,9 @@ export const ClassroomRepo = {
   async findByCommunityId(communityId: number) {
     const classrooms = await prisma.classroom.findMany({
       where: { communityId },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return classrooms
   },

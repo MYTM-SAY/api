@@ -12,6 +12,9 @@ export const LessonRepo = {
       include: {
         Materials: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return lessons
   },

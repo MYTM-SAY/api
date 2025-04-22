@@ -11,14 +11,10 @@ import { UserProfileService } from '../services/userProfileService'
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const profile = await UserProfileService.getUserProfile(+req.params.id)
   // add a dummy array of strings to the profile object to test the frontend
-  const dummyArray = ['c++', 'ComputerVision', 'ProblemSolving']
-  const profileWithTags = {
-    ...profile,
-    tags: dummyArray,
-  };
+
   res
     .status(200)
-    .json(ResponseHelper.success('Profile retrieved successfully', profileWithTags))
+    .json(ResponseHelper.success('Profile retrieved successfully', profile))
 })
 
 // create profile
@@ -32,6 +28,7 @@ export const createProfile = asyncHandler(
       linkedin,
       youtube,
       profilePictureURL,
+      tags,
     } = req.body
 
     const userId = Number(req.claims?.id)
@@ -46,6 +43,7 @@ export const createProfile = asyncHandler(
         linkedin,
         youtube,
         profilePictureURL,
+        tags
       },
       userId,
     )
@@ -67,6 +65,7 @@ export const updateProfile = asyncHandler(
       linkedin,
       youtube,
       profilePictureURL,
+      tags,
     } = req.body
 
     const userId = Number(req.claims?.id)
@@ -80,6 +79,7 @@ export const updateProfile = asyncHandler(
         linkedin,
         youtube,
         profilePictureURL,
+        tags,
       },
       userId,
     )

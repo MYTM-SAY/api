@@ -26,6 +26,9 @@ export const CommentRepo = {
         },
         Children: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return results
   },
@@ -121,6 +124,9 @@ export const CommentRepo = {
         content: true,
         postId: true,
         createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     })
 

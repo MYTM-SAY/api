@@ -6,19 +6,37 @@ import { join } from 'path'
 
 export const CommunityRepo = {
   async findAll() {
-    const results = await prisma.community.findMany()
+    const results = await prisma.community.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
     return results
   },
 
   async create(community: z.infer<typeof CommunitySchema>, userId: number) {
+    const { Tags, ...rest } = community;
+  
     const result = await prisma.community.create({
       data: {
-        ...community,
+        ...rest,
         ownerId: userId,
+        ...(Tags && {
+          Tags: {
+            connectOrCreate: Tags.map(tag => ({
+              where: { name: tag },
+              create: { name: tag },
+            })),
+          },
+        }),
       },
-    })
-    return result
-  },
+      include: {
+        Tags: true,
+      },
+    });
+  
+    return result;
+  },  
 
   async findById(id: number) {
     const result = await prisma.community.findUnique({
@@ -30,18 +48,36 @@ export const CommunityRepo = {
             Posts: true,
           },
         },
+        Tags:true,
       },
     })
     return result
   },
 
-  async update(id: number, post: Prisma.CommunityUpdateInput) {
+  async update(id: number, post: Partial<z.infer<typeof CommunitySchema>>) {
+    const { Tags, ...rest } = post;
+  
+    const updateData: Prisma.CommunityUpdateInput = {
+      ...rest,
+      ...(Tags && {
+        Tags: {
+          set: [],
+          connectOrCreate: Tags.map(tag => ({
+            where: { name: tag },
+            create: { name: tag },
+          })),
+        },
+      }),
+    };
+  
     const result = await prisma.community.update({
       where: { id },
-      data: post,
-    })
-    return result
-  },
+      data: updateData,
+      include: { Tags: true },
+    });
+  
+    return result;
+  },  
 
   async delete(id: number) {
     const result = await prisma.community.delete({
@@ -61,6 +97,9 @@ export const CommunityRepo = {
         },
       },
       include: { Tags: true, Owner: true },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return recommendedCommunities
   },
@@ -93,6 +132,9 @@ export const CommunityRepo = {
       include: {
         Tags: true,
         Owner: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     })
   },

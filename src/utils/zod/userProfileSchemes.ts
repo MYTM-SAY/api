@@ -10,6 +10,7 @@ export const UserProfileSchema = z.object({
   linkedin: socialMediaUrl,
   youtube: socialMediaUrl,
   profilePictureURL: z.string().url('Invalid profile picture URL').optional(),
+  tags: z.array(z.string().min(1)).optional(), // tag names instead of IDs
 }).strict();
 
 
