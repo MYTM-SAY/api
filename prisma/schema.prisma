@@ -120,8 +120,8 @@ model Material {
   fileUrl      String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  lessonId     Int?
-  Lesson       Lesson?      @relation("LessonMaterials", fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId     Int
+  Lesson       Lesson       @relation("LessonMaterials", fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model Forum {
@@ -224,7 +224,7 @@ model Lesson {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   Section   Section    @relation(fields: [sectionId], references: [id])
-  Materials Material[] @relation("LessonMaterials") 
+  Materials Material[] @relation("LessonMaterials")
 
   CompletedLessons CompletedLessons[]
 }
