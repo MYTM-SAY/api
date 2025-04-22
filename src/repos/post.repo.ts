@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
-import APIError from '../errors/APIError'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 export const PostRepo = {
@@ -23,7 +22,10 @@ export const PostRepo = {
           },
         },
       },
-    });
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
   
     const transformedResults = results.map(result => {
 
@@ -55,6 +57,7 @@ export const PostRepo = {
     });
   
     return transformedResults;
+
   },
 
   async findById(id: number) {

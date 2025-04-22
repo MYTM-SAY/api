@@ -6,7 +6,11 @@ import { join } from 'path'
 
 export const CommunityRepo = {
   async findAll() {
-    const results = await prisma.community.findMany()
+    const results = await prisma.community.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
     return results
   },
 
@@ -93,6 +97,9 @@ export const CommunityRepo = {
         },
       },
       include: { Tags: true, Owner: true },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     return recommendedCommunities
   },
@@ -125,6 +132,9 @@ export const CommunityRepo = {
       include: {
         Tags: true,
         Owner: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     })
   },
