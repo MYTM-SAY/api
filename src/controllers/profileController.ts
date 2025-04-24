@@ -1,8 +1,5 @@
 import { Request, Response } from 'express'
 import { AuthenticatedRequest } from '../middlewares/authMiddleware'
-import { UserProfileRepo } from '../repos/userProfile.repo'
-import { UserRepo } from '../repos/user.repo'
-import APIError from '../errors/APIError'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
 import { UserProfileService } from '../services/userProfileService'
@@ -43,7 +40,7 @@ export const createProfile = asyncHandler(
         linkedin,
         youtube,
         profilePictureURL,
-        tags
+        tags,
       },
       userId,
     )
@@ -96,7 +93,11 @@ export const getContributions = asyncHandler(
       +req.params.id,
     )
     res
-    .status(200)
-    .json(ResponseHelper.success('Contributions fetched Successfully!', [contributions]));
+      .status(200)
+      .json(
+        ResponseHelper.success('Contributions fetched Successfully!', [
+          contributions,
+        ]),
+      )
   },
 )

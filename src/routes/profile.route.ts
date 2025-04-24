@@ -1,8 +1,13 @@
-import express from 'express';
-import { createProfile, getContributions, getProfile, updateProfile } from '../controllers/profileController';
-import { isAuthenticated } from '../middlewares/authMiddleware';
+import express from 'express'
+import {
+  createProfile,
+  getContributions,
+  getProfile,
+  updateProfile,
+} from '../controllers/profileController'
+import { isAuthenticated } from '../middlewares/authMiddleware'
 
-const router = express.Router();
+const router = express.Router()
 
 // pulbic routes
 /**
@@ -74,8 +79,7 @@ const router = express.Router();
  *       500:
  *         description: Server error.
  */
-router.get('/:id', getProfile);
-
+router.get('/:id', getProfile)
 
 // Authenticated routes
 
@@ -140,7 +144,7 @@ router.get('/:id', getProfile);
  *       500:
  *         description: "Server error."
  */
-router.post('/', isAuthenticated, createProfile);
+router.post('/', isAuthenticated, createProfile)
 
 /**
  * @swagger
@@ -201,7 +205,7 @@ router.post('/', isAuthenticated, createProfile);
  *       500:
  *         description: "Server error."
  */
-router.put('/', isAuthenticated, updateProfile);
+router.put('/', isAuthenticated, updateProfile)
 
 /**
  * @swagger
@@ -243,6 +247,6 @@ router.put('/', isAuthenticated, updateProfile);
  *       500:
  *         description: Internal server error.
  */
-router.get('/contributions/:id', getContributions);
+router.get('/contributions/:id', getContributions)
 
-export default router;
+export default router
