@@ -4,6 +4,41 @@ import APIError from '../errors/APIError'
 import { UserRepo } from '../repos/user.repo'
 import bcrypt from 'bcrypt'
 
+export const googleLogin = async (profile: any) => {
+  // extract email from Google profile
+  const email = profile.emails?.[0]?.value;
+
+  if (!email) {
+    throw new APIError('No email received from Google', 400);
+  }
+
+
+  
+  let user = await UserRepo.findByEmail(email);
+  //console.log('user', user)
+
+  // if can not find the user, create one with a random password
+  if (!user) {
+    // TODO : this a temporary solution, it's horrible to do this
+    const randomPassword = Math.random().toString(36).slice(-8); // generate a random password
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    user = await UserRepo.createUser({
+      email,
+      hashedPassword,
+      username: profile.displayName || email.split('@')[0], 
+      fullname: profile.displayName || email.split('@')[0],
+      dob: new Date(), 
+    });
+
+  }
+  return {
+    accessToken:  JwtService.generateAccessToken(user),
+    refreshToken: JwtService.generateRefreshToken(user),
+  };
+};
+
+
+
 const login = async (email: string, password: string) => {
   const user = await UserRepo.findByEmail(email)
   if (!user) throw new APIError('User not found', 404)
@@ -50,4 +85,4 @@ const logout = async (userId: string) => {
   console.log(`User ${userId} logged out`)
 }
 
-export const AuthService = { login, register, logout, refreshToken }
+export const AuthService = { login, register, logout, refreshToken, googleLogin }
