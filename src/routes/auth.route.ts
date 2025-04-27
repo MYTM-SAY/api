@@ -8,7 +8,7 @@ import {
 const router = express.Router()
 
 /**
- * @swaggerdis
+ * @swagger
  * /auth/register:
  *   post:
  *     summary: Register a new user
