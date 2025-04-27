@@ -7,7 +7,7 @@ import {
   updateCommunity,
   getCommunity,
   getAllUsersInACommunity,
-  getAllOnlineUsersInACommunity
+  getAllOnlineUsersInACommunity,
 } from '../controllers/communityController'
 import { hasRoles, isAuthenticated } from '../middlewares/authMiddleware'
 import {
@@ -16,7 +16,11 @@ import {
   updateJoinRequestStatus,
 } from '../controllers/joinRequestsController'
 import { Role } from '@prisma/client'
-import { getUsersInCommunity, removeUserInCommunity } from '../controllers/communityMemberController'
+import {
+  getUsersInCommunity,
+  removeUserInCommunity,
+  getUserRoleInCommunity,
+} from '../controllers/communityMemberController'
 
 const app = express.Router()
 
@@ -433,9 +437,11 @@ app.get('/:id/users', isAuthenticated, getUsersInCommunity)
  *         description: Internal server error
  */
 
-app.delete('/:communityId/users/:userId', isAuthenticated, removeUserInCommunity)
-
-
+app.delete(
+  '/:communityId/users/:userId',
+  isAuthenticated,
+  removeUserInCommunity,
+)
 
 /**
  * @swagger
@@ -473,7 +479,7 @@ app.delete('/:communityId/users/:userId', isAuthenticated, removeUserInCommunity
  *       500:
  *         description: Server error.
  */
-app.get('/:communityId/users-count', getAllUsersInACommunity);
+app.get('/:communityId/users-count', getAllUsersInACommunity)
 
 /**
  * @swagger
@@ -512,7 +518,50 @@ app.get('/:communityId/users-count', getAllUsersInACommunity);
  *       500:
  *         description: Internal server error.
  */
-app.get('/:communityId/online-users-count', getAllOnlineUsersInACommunity);
+app.get('/:communityId/online-users-count', getAllOnlineUsersInACommunity)
 
+/**
+ * @swagger
+ * /communities/{communityId}/user-role-in-a-community:
+ *   get:
+ *     summary: Get the role of the authenticated user in a community
+ *     description: Retrieves the role (e.g., OWNER, ADMIN, MEMBER) of the currently authenticated user within the specified community.
+ *     tags: [Communities]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to fetch the user's role for.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user role.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Member role retrieved successfully
+ *                 data:
+ *                   type: string
+ *                   enum: [OWNER, ADMIN, MEMBER]
+ *                   example: ADMIN
+ *       401:
+ *         description: Unauthorized - user not logged in or token missing/invalid.
+ *       404:
+ *         description: Community or user not found.
+ *       500:
+ *         description: Internal server error.
+ */
+
+app.get('/:communityId/user-role-in-a-community', isAuthenticated, getUserRoleInCommunity);
 
 export default app
