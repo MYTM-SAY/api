@@ -6,7 +6,6 @@ import {
 } from '../controllers/googleAuthController'  // new import
 
 const router = express.Router()
-
 /**
  * @swagger
  * /auth/register:
@@ -47,7 +46,6 @@ const router = express.Router()
  *         description: User registered successfully
  */
 router.post('/register', register)
-
 /**
  * @swagger
  * /auth/login:
@@ -77,14 +75,14 @@ router.post('/register', register)
  *         description: Login successful
  */
 router.post('/login', login)
-
 /**
  * @swagger
  * /auth/refresh-token:
  *   post:
  *     summary: Refresh the access token
  *     description: Generates a new access token using a valid refresh token.
- *     tags: [Auth]
+ *     tags:
+ *       - Auth
  *     requestBody:
  *       required: true
  *       content:
@@ -96,8 +94,23 @@ router.post('/login', login)
  *                 type: string
  *                 description: The refresh token obtained during login
  *     responses:
- *       200:
+ *       201:
  *         description: Successfully refreshed access token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: The new access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: The new refresh token
+ *       400:
+ *         description: Invalid or missing refresh token
+ *       500:
+ *         description: Internal server error
  */
 router.post('/refresh-token', refreshToken)
 
