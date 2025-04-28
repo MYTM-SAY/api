@@ -113,14 +113,14 @@ model CommunityMembers {
   @@map("CommunityMembers")
 }
 
-// TODO: Make material have 1 to 1 relation with lesson and onCascde delete
 model Material {
   id           Int          @id @default(autoincrement())
   materialType MaterialType
   fileUrl      String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  Lessons      Lesson[]
+  lessonId     Int
+  Lesson       Lesson       @relation("LessonMaterials", fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model Forum {
@@ -216,15 +216,14 @@ model Section {
 }
 
 model Lesson {
-  id         Int      @id @default(autoincrement())
-  name       String
-  notes      String?
-  materialId Int
-  sectionId  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  Material   Material @relation(fields: [materialId], references: [id])
-  Section    Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  id        Int        @id @default(autoincrement())
+  name      String
+  notes     String?
+  sectionId Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Section   Section    @relation(fields: [sectionId], references: [id])
+  Materials Material[] @relation("LessonMaterials")
 
   CompletedLessons CompletedLessons[]
 }

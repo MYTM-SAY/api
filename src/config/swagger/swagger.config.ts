@@ -11,6 +11,20 @@ const swaggerOptions: swaggerJsdoc.Options = {
       version: '1.0.0',
       description: 'API Documentation with Swagger in TypeScript',
     },
+    tags: [
+      { name: 'Auth', description: 'Authentication endpoints for user login, registration, etc.' },
+      { name: 'User', description: 'Endpoints for managing users' },
+      { name: 'Profiles', description: 'Endpoints for user profiles' },
+      { name: 'Communities', description: 'Endpoints for managing communities' },
+      { name: 'Leaderboard', description: 'Endpoints for tracking and displaying leaderboard data' },
+      { name: 'Classrooms', description: 'Endpoints for managing classrooms' },
+      { name: 'Sections', description: 'Endpoints for managing sections' },
+      { name: 'Lessons', description: 'Endpoints for managing lessons' },
+      { name: 'Posts', description: 'Endpoints for creating and managing posts' },
+      { name: 'Comments', description: 'Endpoints for handling comments on posts' },
+      { name: 'Upload', description: 'Endpoints for file uploads' },
+      { name: 'Progress', description: 'Endpoints for managing lesson status and progress tracking' },
+    ],
     servers: [
       {
         url: `http://localhost:${port}/api/v1`,

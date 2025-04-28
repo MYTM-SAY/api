@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MaterialSchema } from './materialSchemes'
 
 const BaseLessonSchema = z.object({
   name: z
@@ -20,7 +21,7 @@ export const CreateLessonSchema = BaseLessonSchema.extend({
 
 export const LessonSchema = CreateLessonSchema.extend({
   id: z.number().int().positive().optional(),
-  materialId: z.number().int().positive(),
+  materials: z.array(MaterialSchema).optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 }).strict()

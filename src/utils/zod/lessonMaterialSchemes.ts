@@ -1,8 +1,10 @@
-import { object } from 'zod'
+import { z } from 'zod'
 import { CreateLessonSchema } from './lessonSchemes'
 import { CreateMaterialSchema } from './materialSchemes'
 
-export const CreateLessonWithMaterialSchema = object({
-  lesson: CreateLessonSchema,
-  material: CreateMaterialSchema,
-}).strict()
+export const CreateLessonWithMaterialSchema = z
+  .object({
+    lesson: CreateLessonSchema,
+    materials: z.array(CreateMaterialSchema),
+  })
+  .strict()

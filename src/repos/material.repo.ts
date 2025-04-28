@@ -9,7 +9,7 @@ export const MaterialRepo = {
   async findAll() {
     const materials = await prisma.material.findMany({
       include: {
-        Lessons: true,
+        Lesson: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -22,7 +22,7 @@ export const MaterialRepo = {
     const material = await prisma.material.findUnique({
       where: { id },
       include: {
-        Lessons: true,
+        Lesson: true,
       },
     })
     return material

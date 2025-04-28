@@ -80,8 +80,8 @@ export const UserRepo = {
             CommentVote: true,
           },
         },
-      }
-    });
-    return result?._count;
-  }
-};
+      },
+    })
+    return result?._count
+  },
+}
