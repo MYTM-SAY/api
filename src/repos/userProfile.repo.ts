@@ -30,12 +30,12 @@ export const UserProfileRepo = {
 
   async connectOrCreateTags(
     tagNames: string[],
-    isCommunityOnly: boolean = false,
+  
   ) {
     if (!tagNames) return []
     return tagNames.map((name) => ({
       where: { name },
-      create: { name, isCommunityOnly },
+      create: { name,},
     }))
   },
 

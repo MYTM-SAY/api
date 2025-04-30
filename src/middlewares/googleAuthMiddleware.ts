@@ -6,7 +6,10 @@ dotenv.config();
 
 const clientID: string = process.env.GOOGLE_CLIENT_ID!;
 const clientSecret: string = process.env.GOOGLE_CLIENT_SECRET!;
-const callbackURL = process.env.GOOGLE_CALLBACK_URL ?? 'http://localhost:5000/api/v1/auth/google/callback'; // TODO: a PORT variable should be added
+
+// add a PORT variable to the .env file
+const port: string = process.env.PORT!; 
+const callbackURL = process.env.GOOGLE_CALLBACK_URL ?? `http://localhost:${port}/api/v1/auth/google/callback`; // TODO: a PORT variable should be added
 
 passport.use(
   new GoogleStrategy(
