@@ -3,6 +3,22 @@ import { Prisma, Role } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 
 export const CommunityMembersRepo = {
+
+  async findUser(id: number){
+    const user = await prisma.user.findUnique({
+      where:{id},
+    });
+    return user;
+  },
+
+  async findCommunity(id: number){
+    const community = await prisma.community.findUnique({
+      where:{id},
+    });
+    return community;
+  },
+
+
   async addUserToCommunity(data: Prisma.CommunityMembersUncheckedCreateInput) {
     const communities = await prisma.communityMembers.create({
       data,

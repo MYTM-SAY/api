@@ -5,6 +5,9 @@ import { asyncHandler } from '../utils/asyncHandler'
 import { Role } from '@prisma/client'
 import { ResponseHelper } from '../utils/responseHelper'
 import { CommunityAuthrizationService } from '../services/communityAuthrization'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
+import APIError from '../errors/APIError'
+import { CommunityMemberService } from '../services/communityMemberService'
 
 
 export const getUsersInCommunity = asyncHandler(
@@ -39,5 +42,21 @@ export const removeUserInCommunity = asyncHandler(
     await CommunityAuthrizationService.removeMember(userIdToRemove, communityId)
 
     return res.status(204).json()
+  },
+)
+
+
+export const getUserRoleInCommunity = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = +req.claims!.id;
+    const communityId = +req.params.communityId;
+
+
+    const memberRole = await CommunityMemberService.getUserRoleInCommunity(userId, communityId);
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success('member role retrieved successfully', memberRole),
+      )
   },
 )

@@ -56,6 +56,8 @@ async function removeMember(userId: number, communityId: number) {
     console.log(deleted)
     return deleted
 }
+
+
 export const CommunityAuthrizationService =
 {
     getAllUsersInCommunity,

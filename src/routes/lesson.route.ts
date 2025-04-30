@@ -1,4 +1,3 @@
-// src/routes/lesson.route.ts
 import express from 'express'
 import {
   getLessonsBySectionId,
@@ -46,24 +45,6 @@ router.use(isAuthenticated)
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Lesson'
- *             example:
- *               success: true
- *               message: "Lessons retrieved successfully"
- *               data:
- *                 - id: 1
- *                   name: "Intro to Algebra"
- *                   notes: "Basic concepts"
- *                   materialId: 6
- *                   sectionId: 1
- *                   createdAt: "2025-04-03T12:24:27.161Z"
- *                   updatedAt: "2025-04-03T12:24:27.161Z"
- *                 - id: 2
- *                   name: "Intro to Algebra 2"
- *                   notes: "Basic concepts"
- *                   materialId: 7
- *                   sectionId: 1
- *                   createdAt: "2025-04-03T12:39:14.561Z"
- *                   updatedAt: "2025-04-03T12:39:14.561Z"
  *       400:
  *         description: Invalid section ID
  *       500:
@@ -101,25 +82,7 @@ router.get('/sections/:sectionId', getLessonsBySectionId)
  *                   type: string
  *                   example: "Lesson retrieved successfully"
  *                 data:
- *                   $ref: '#/components/schemas/LessonWithSection'
- *             example:
- *               success: true
- *               message: "Lesson retrieved successfully"
- *               data:
- *                 id: 2
- *                 name: "Advanced Algebra"
- *                 notes: "Exploring advanced algebraic concepts."
- *                 materialId: 10
- *                 sectionId: 1
- *                 createdAt: "2023-10-01T10:00:00Z"
- *                 updatedAt: "2023-10-01T10:00:00Z"
- *                 Section:
- *                   id: 1
- *                   name: "Mathematics Fundamentals"
- *                   description: "A comprehensive guide to foundational math topics."
- *                   classroomId: 1
- *                   createdAt: "2023-10-01T10:00:00Z"
- *                   updatedAt: "2023-10-01T10:00:00Z"
+ *                   $ref: '#/components/schemas/Lesson'
  *       400:
  *         description: Invalid lesson ID
  *       404:
@@ -133,7 +96,7 @@ router.get('/:id', getLessonById)
  * @swagger
  * /lessons:
  *   post:
- *     summary: Create a new lesson with a new material in a single transaction
+ *     summary: Create a new lesson with new materials in a single operation
  *     tags: [Lessons]
  *     security:
  *       - bearerAuth: []
@@ -146,16 +109,10 @@ router.get('/:id', getLessonById)
  *             properties:
  *               lesson:
  *                 $ref: '#/components/schemas/CreateLessonInput'
- *               material:
- *                 $ref: '#/components/schemas/CreateMaterialInput'
- *           example:
- *             lesson:
- *               name: "Intro to Algebra"
- *               notes: "Basic concepts"
- *               sectionId: 1
- *             material:
- *               materialType: "VIDEO"
- *               fileUrl: "https://example.com/video.mp4"
+ *               materials:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/CreateMaterialInput'
  *     responses:
  *       201:
  *         description: Lesson created successfully
@@ -171,24 +128,7 @@ router.get('/:id', getLessonById)
  *                   type: string
  *                   example: "Lesson created successfully"
  *                 data:
- *                   $ref: '#/components/schemas/LessonWithMaterial'
- *             example:
- *               success: true
- *               message: "Lesson created successfully"
- *               data:
- *                 id: 131
- *                 name: "Intro to Algebra"
- *                 notes: "Basic concepts"
- *                 materialId: 121
- *                 sectionId: 1
- *                 createdAt: "2023-10-01T10:00:00Z"
- *                 updatedAt: "2023-10-01T10:00:00Z"
- *                 Material:
- *                   id: 121
- *                   materialType: "VIDEO"
- *                   fileUrl: "https://example.com/video.mp4"
- *                   createdAt: "2023-10-01T10:00:00Z"
- *                   updatedAt: "2023-10-01T10:00:00Z"
+ *                   $ref: '#/components/schemas/Lesson'
  *       400:
  *         description: Invalid input data
  *       500:
@@ -217,9 +157,6 @@ router.post('/', createLessonWithNewMaterial)
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/UpdateLessonInput'
- *           example:
- *             name: "Updated Lesson Name"
- *             notes: "Updated notes for this lesson."
  *     responses:
  *       200:
  *         description: Lesson updated successfully
@@ -236,17 +173,6 @@ router.post('/', createLessonWithNewMaterial)
  *                   example: "Lesson updated successfully"
  *                 data:
  *                   $ref: '#/components/schemas/Lesson'
- *             example:
- *               success: true
- *               message: "Lesson updated successfully"
- *               data:
- *                 id: 2
- *                 name: "Updated Lesson Name"
- *                 notes: "Updated notes for this lesson."
- *                 materialId: 10
- *                 sectionId: 1
- *                 createdAt: "2023-10-01T10:00:00Z"
- *                 updatedAt: "2023-10-02T12:00:00Z"
  *       400:
  *         description: Invalid lesson ID or input data
  *       404:
@@ -285,9 +211,9 @@ router.patch('/:id', updateLesson)
  *                 message:
  *                   type: string
  *                   example: "Lesson deleted successfully"
- *             example:
- *               success: true
- *               message: "Lesson deleted successfully"
+ *                 data:
+ *                   type: null
+ *                   example: null
  *       400:
  *         description: Invalid lesson ID
  *       404:
