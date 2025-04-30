@@ -44,7 +44,9 @@ async function updateUserProfile(profiledata: any, userId: number) {
 }
 
 async function getUserContributions(id: number) {
+
   if (!id || isNaN(id)) throw new APIError('Invalid User ID', 400)
+  
   const user = await UserRepo.findById(id)
   if (!user) throw new APIError('User not found', 404)
 

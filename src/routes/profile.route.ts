@@ -209,7 +209,7 @@ router.put('/', isAuthenticated, updateProfile)
 
 /**
  * @swagger
- * /profiles/contributions/{username}:
+ * /profiles/contributions/{id}:
  *   get:
  *     summary: Get user contributions
  *     description: Retrieves the contribution data (e.g., daily streaks or total contributions) for the specified user.

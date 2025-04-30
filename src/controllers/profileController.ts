@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
 import { UserProfileService } from '../services/userProfileService'
+import { number } from 'zod'
 
 // get profile, publicly available
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -17,6 +18,7 @@ export const getProfile = asyncHandler(async (req: Request, res: Response) => {
 // create profile
 export const createProfile = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
+    
     const {
       bio,
       twitter,
@@ -89,8 +91,9 @@ export const updateProfile = asyncHandler(
 
 export const getContributions = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
+    const userId = Number(+req.params.id)
     const contributions = await UserProfileService.getUserContributions(
-      +req.params.id,
+      userId,
     )
     res
       .status(200)
