@@ -12,6 +12,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 })
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
+  
   const { email, password } = req.body
   const result = await AuthService.login(email, password)
   return res

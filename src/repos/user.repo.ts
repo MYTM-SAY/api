@@ -16,15 +16,7 @@ export const UserRepo = {
   async findByEmail(email: string) {
     const result = await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        fullname: true,
-        dob: true,
-     
-        lastLogin: true,
-      },
+
     })
     return result
   },
