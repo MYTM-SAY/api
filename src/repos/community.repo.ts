@@ -15,15 +15,15 @@ export const CommunityRepo = {
   },
 
   async create(community: z.infer<typeof CommunitySchema>, userId: number) {
-    const { Tags, ...rest } = community;
-  
+    const { Tags, ...rest } = community
+
     const result = await prisma.community.create({
       data: {
         ...rest,
         ownerId: userId,
         ...(Tags && {
           Tags: {
-            connectOrCreate: Tags.map(tag => ({
+            connectOrCreate: Tags.map((tag) => ({
               where: { name: tag },
               create: { name: tag },
             })),
@@ -33,47 +33,47 @@ export const CommunityRepo = {
       include: {
         Tags: true,
       },
-    });
-  
-    return result;
-  },  
+    })
 
-  async findById(id: number) {
+    return result
+  },
+
+  async findById(communityId: number) {
     const result = await prisma.community.findUnique({
-      where: { id },
+      where: { id: communityId },
       include: {
         Classrooms: true,
         Forums: true,
-        Tags:true,
+        Tags: true,
       },
     })
     return result
   },
 
   async update(id: number, post: Partial<z.infer<typeof CommunitySchema>>) {
-    const { Tags, ...rest } = post;
-  
+    const { Tags, ...rest } = post
+
     const updateData: Prisma.CommunityUpdateInput = {
       ...rest,
       ...(Tags && {
         Tags: {
           set: [],
-          connectOrCreate: Tags.map(tag => ({
+          connectOrCreate: Tags.map((tag) => ({
             where: { name: tag },
             create: { name: tag },
           })),
         },
       }),
-    };
-  
+    }
+
     const result = await prisma.community.update({
       where: { id },
       data: updateData,
       include: { Tags: true },
-    });
-  
-    return result;
-  },  
+    })
+
+    return result
+  },
 
   async delete(id: number) {
     const result = await prisma.community.delete({
@@ -169,28 +169,28 @@ export const CommunityRepo = {
     return communitiesForUser
   },
 
-  async getAllUsersInACommunity(id: number){
+  async getAllUsersInACommunity(id: number) {
     const usersCount = await prisma.communityMembers.count({
-      where:{
-        communityId:id
+      where: {
+        communityId: id,
       },
-    });
-    return usersCount;
+    })
+    return usersCount
   },
 
-  async getAllOnlineUsersInACommunity(id: number){
-    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+  async getAllOnlineUsersInACommunity(id: number) {
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000)
 
     const usersCount = await prisma.communityMembers.count({
       where: {
         communityId: id,
-        User:{
+        User: {
           lastLogin: {
             gte: threeMinutesAgo,
           },
-        }
+        },
       },
-    });
-    return usersCount;
-  }
+    })
+    return usersCount
+  },
 }

@@ -39,17 +39,21 @@ async function discoverCommunities(
   return { data: await CommunityRepo.getPopularCommunities(), type: 'popular' }
 }
 
-async function getCommunityById(id: number) {
-  if (!id || isNaN(id)) throw new APIError('Invalid Community ID', 400)
+async function getCommunityById(communityId: number, userId: number) {
+  if (!communityId || isNaN(communityId))
+    throw new APIError('Invalid Community ID', 400)
 
-  const community = await CommunityRepo.findById(id)
+  const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
-  const membersCount = await CommunityRepo.getAllUsersInACommunity(id);
-  const onlineMembers = await CommunityRepo.getAllOnlineUsersInACommunity(id);
-  return {membersCount,onlineMembers, ...community};
+  const membersCount = await CommunityRepo.getAllUsersInACommunity(communityId)
+  const onlineMembers =
+    await CommunityRepo.getAllOnlineUsersInACommunity(communityId)
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(
+    communityId,
+    userId,
+  )
+  return { membersCount, onlineMembers, role, ...community }
 }
-
-
 
 async function createDefaultForumForCommuinity(communityId: number) {
   const forum = await ForumRepo.create(
@@ -70,7 +74,9 @@ async function createCommunity(
   const validatedData = await CommunitySchema.parseAsync(data)
   const createCommunity = await CommunityRepo.create(validatedData, userId)
   await CommunityMembersRepo.addUserToCommunity({
-    communityId: createCommunity.id, userId: userId, Role: Role.OWNER
+    communityId: createCommunity.id,
+    userId: userId,
+    Role: Role.OWNER,
   })
   const defaultForum = await createDefaultForumForCommuinity(createCommunity.id)
 
@@ -83,17 +89,16 @@ async function updateCommunity(
   userId: number,
   data: Omit<z.infer<typeof CommunitySchema>, 'id'>,
 ) {
-  const validatedData = await CommunitySchema.partial().parse(data);
-  if (!validatedData) throw new APIError('Invalid data', 400);
+  const validatedData = await CommunitySchema.partial().parse(data)
+  if (!validatedData) throw new APIError('Invalid data', 400)
 
-  const community = await CommunityRepo.findById(communityId);
-  if (!community) throw new APIError('Community not found', 404);
+  const community = await CommunityRepo.findById(communityId)
+  if (!community) throw new APIError('Community not found', 404)
 
-  return CommunityRepo.update(communityId, validatedData);
+  return CommunityRepo.update(communityId, validatedData)
 }
 
 async function deleteCommunity(communityId: number, userId: number) {
-
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
@@ -108,20 +113,20 @@ async function getJoinedCommunities(userId: number) {
   return joinedCommunities
 }
 
-async function getAllUsersInACommunity(id:number){
-  const community = await CommunityRepo.findById(id);
-  if (!community) throw new APIError('Community not found', 404);
+async function getAllUsersInACommunity(id: number) {
+  const community = await CommunityRepo.findById(id)
+  if (!community) throw new APIError('Community not found', 404)
 
-  const usersCount = await CommunityRepo.getAllUsersInACommunity(id);
-  return usersCount;
+  const usersCount = await CommunityRepo.getAllUsersInACommunity(id)
+  return usersCount
 }
 
-async function getAllOnlineUsersInACommunity(id:number){
-  const community = await CommunityRepo.findById(id);
-  if (!community) throw new APIError('Community not found', 404);
+async function getAllOnlineUsersInACommunity(id: number) {
+  const community = await CommunityRepo.findById(id)
+  if (!community) throw new APIError('Community not found', 404)
 
-  const usersCount = await CommunityRepo.getAllOnlineUsersInACommunity(id);
-  return usersCount;
+  const usersCount = await CommunityRepo.getAllOnlineUsersInACommunity(id)
+  return usersCount
 }
 export const CommunityService = {
   getAllCommunities,
@@ -132,5 +137,5 @@ export const CommunityService = {
   deleteCommunity,
   getJoinedCommunities,
   getAllUsersInACommunity,
-  getAllOnlineUsersInACommunity
+  getAllOnlineUsersInACommunity,
 }

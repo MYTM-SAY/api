@@ -3,27 +3,25 @@ import { Prisma, Role } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 
 export const CommunityMembersRepo = {
-
-  async findUser(id: number){
+  async findUser(id: number) {
     const user = await prisma.user.findUnique({
-      where:{id},
-    });
-    return user;
+      where: { id },
+    })
+    return user
   },
 
-  async findCommunity(id: number){
+  async findCommunity(id: number) {
     const community = await prisma.community.findUnique({
-      where:{id},
-    });
-    return community;
+      where: { id },
+    })
+    return community
   },
-
 
   async addUserToCommunity(data: Prisma.CommunityMembersUncheckedCreateInput) {
     const communities = await prisma.communityMembers.create({
       data,
-    });
-    
+    })
+
     return communities
   },
   async assignModRole(userId: number, communityId: number) {
@@ -41,13 +39,12 @@ export const CommunityMembersRepo = {
     return member
   },
 
-
   async getUserRoleInCommunity(userId: number, communityId: number) {
-    const member = await prisma.communityMembers.findUnique({
-      where: { communityId_userId: { communityId, userId } },
+    const member = await prisma.communityMembers.findFirst({
+      where: { communityId, userId },
       select: { Role: true },
     })
-    return member?.Role || null
+    return member?.Role ?? null
   },
 
   async getUsersInCommunity(communityId: number) {
@@ -63,23 +60,19 @@ export const CommunityMembersRepo = {
             email: true,
             UserProfile: {
               select: {
-                profilePictureURL: true
-              }
+                profilePictureURL: true,
+              },
             },
-            CommunityMembers:
-            {
+            CommunityMembers: {
               where: { communityId },
               select: {
-                Role: true
-              }
-            }
-
+                Role: true,
+              },
+            },
           },
         },
       },
-    });
-    return members;
-  }
-
-
+    })
+    return members
+  },
 }
