@@ -7,8 +7,8 @@ import cookieParser from 'cookie-parser'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 
-import './middlewares/googleAuthMiddleware'              // ← load your GoogleStrategy
-import router from './routes'                  // includes /auth routes (register, login, google, etc.)
+import './middlewares/googleAuthMiddleware' // ← load your GoogleStrategy
+import router from './routes' // includes /auth routes (register, login, google, etc.)
 import globalExceptionHandlerMiddleware from './middlewares/globalExceptionHandlingMiddleware'
 import swaggerOptions from './config/swagger/swagger.config'
 
@@ -20,7 +20,7 @@ const swaggerSpecs = swaggerJsdoc(swaggerOptions)
 // CORS & JSON parsing
 app.use(
   cors({
-    origin: '*',
+    origin: 'http://localhost:3000',
     credentials: true,
   }),
 )
