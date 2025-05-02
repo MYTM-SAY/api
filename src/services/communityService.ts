@@ -42,9 +42,14 @@ async function discoverCommunities(
 async function getCommunityById(communityId: number, userId: number) {
   if (!communityId || isNaN(communityId))
     throw new APIError('Invalid Community ID', 400)
-
   const community = await CommunityRepo.findById(communityId)
+
   if (!community) throw new APIError('Community not found', 404)
+
+  const forumId = community.Forums?.[0]?.id ?? null
+  // Use object destructuring to exclude Forums
+  const { Forums, ...restOfCommunity } = community
+
   const membersCount = await CommunityRepo.getAllUsersInACommunity(communityId)
   const onlineMembers =
     await CommunityRepo.getAllOnlineUsersInACommunity(communityId)
@@ -52,7 +57,14 @@ async function getCommunityById(communityId: number, userId: number) {
     communityId,
     userId,
   )
-  return { membersCount, onlineMembers, role, ...community }
+
+  return {
+    ...restOfCommunity,
+    forumId,
+    membersCount,
+    onlineMembers,
+    role,
+  }
 }
 
 async function createDefaultForumForCommuinity(communityId: number) {

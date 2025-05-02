@@ -2,7 +2,6 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { z } from 'zod'
-import { join } from 'path'
 
 export const CommunityRepo = {
   async findAll() {
@@ -42,9 +41,18 @@ export const CommunityRepo = {
     const result = await prisma.community.findUnique({
       where: { id: communityId },
       include: {
-        Classrooms: true,
-        Forums: true,
-        Tags: true,
+        Forums: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        Tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     })
     return result
