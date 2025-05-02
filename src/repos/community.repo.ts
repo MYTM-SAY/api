@@ -158,17 +158,25 @@ export const CommunityRepo = {
     })
   },
   async joinedCommunities(id: number) {
-    // get all joined communities (id, name) by user id
     const communitiesForUser = await prisma.communityMembers.findMany({
       where: { userId: id },
       select: {
         Role: true,
-
         Community: {
           select: {
             id: true,
             name: true,
             logoImgURL: true,
+            isPublic: true,
+            bio: true,
+            description: true,
+            Owner: {
+              select: {
+                id: true,
+                fullname: true,
+                username: true,
+              },
+            },
           },
         },
       },
