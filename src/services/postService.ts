@@ -5,9 +5,33 @@ import { PostRepo } from '../repos/post.repo'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 import { UserRepo } from '../repos/user.repo'
 
+
 async function getPostsByForumId(forumId: number) {
-  return await PostRepo.findPostsByForumId(forumId)
+
+
+  if (!forumId) throw new APIError('Missing forumId', 404)
+
+  const forum = await ForumRepo.findById(forumId)
+  if (!forum) throw new APIError('Forum not found', 404)
+    
+  let posts = await PostRepo.findPostsByForumId(forumId);
+  if (!posts) {
+    throw new APIError('Posts not found', 404);
+  }
+
+  const filiterdPosts = posts.map((post) => {
+    const { _count, ...rest } = post; 
+
+    return {
+      ...rest,
+      commentsCount: _count.Comments,  
+    };
+  
+  });
+
+  return filiterdPosts
 }
+
 
 async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
   const forumExist = await ForumRepo.findById(data.forumId)
