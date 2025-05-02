@@ -43,8 +43,11 @@ export const discoverCommunities = asyncHandler(
 )
 
 export const getCommunity = asyncHandler(
-  async (req: Request, res: Response) => {
-    const community = await CommunityService.getCommunityById(+req.params.id)
+  async (req: AuthenticatedRequest, res: Response) => {
+    const community = await CommunityService.getCommunityById(
+      +req.params.id,
+      req.claims!.id,
+    )
     res
       .status(200)
       .json(
@@ -52,16 +55,13 @@ export const getCommunity = asyncHandler(
       )
   },
 )
+
 // get joined communities by user id
 export const getJoinedCommunities = asyncHandler(
   async (req: Request, res: Response) => {
-
-    console.log('user id', req.params.userId);
     const joinedCommunities = await CommunityService.getJoinedCommunities(
-      +req.params.userId
+      +req.params.userId,
     )
-
-
     res
       .status(200)
       .json(
@@ -74,7 +74,7 @@ export const getJoinedCommunities = asyncHandler(
 )
 // get number of joined communities by user id
 export const createCommunity = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => { 
+  async (req: AuthenticatedRequest, res: Response) => {
     const newCommunity = await CommunityService.createCommunity(
       req.body,
       req.claims!.id,
@@ -114,28 +114,32 @@ export const deleteCommunity = asyncHandler(
 
 export const getAllUsersInACommunity = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const usersCount = await CommunityService.getAllUsersInACommunity(+req.params.communityId)
-    res
-    .status(200)
-    .json(
-      ResponseHelper.success(
-        'Community members fetched successfully',
-        usersCount,
-      ),
+    const usersCount = await CommunityService.getAllUsersInACommunity(
+      +req.params.communityId,
     )
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success(
+          'Community members fetched successfully',
+          usersCount,
+        ),
+      )
   },
 )
 
 export const getAllOnlineUsersInACommunity = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const usersCount = await CommunityService.getAllOnlineUsersInACommunity(+req.params.communityId)
-    res
-    .status(200)
-    .json(
-      ResponseHelper.success(
-        'Community online members fetched successfully',
-        usersCount,
-      ),
+    const usersCount = await CommunityService.getAllOnlineUsersInACommunity(
+      +req.params.communityId,
     )
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success(
+          'Community online members fetched successfully',
+          usersCount,
+        ),
+      )
   },
 )
