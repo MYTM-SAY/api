@@ -16,3 +16,7 @@ export const MaterialSchema = CreateMaterialSchema.extend({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 }).strict()
+
+export const CreateMaterialWithLessonSchema = CreateMaterialSchema.extend({
+  lessonId: z.number().int().positive(),
+})

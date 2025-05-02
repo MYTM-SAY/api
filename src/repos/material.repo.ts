@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import {
-  CreateMaterialSchema,
+  CreateMaterialWithLessonSchema,
   UpdateMaterialSchema,
 } from '../utils/zod/materialSchemes' // Assuming this exists or will be created
 
@@ -28,7 +28,7 @@ export const MaterialRepo = {
     return material
   },
 
-  async create(data: z.infer<typeof CreateMaterialSchema>) {
+  async create(data: z.infer<typeof CreateMaterialWithLessonSchema>) {
     const material = await prisma.material.create({
       data,
     })
