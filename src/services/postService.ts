@@ -7,15 +7,29 @@ import { UserRepo } from '../repos/user.repo'
 
 
 async function getPostsByForumId(forumId: number) {
-  // 1️⃣ Fetch the raw data
-  const raw = await PostRepo.findPostsByForumId(forumId);
-  
-  if (!raw) {
+
+
+  if (!forumId) throw new APIError('Missing forumId', 404)
+
+  const forum = await ForumRepo.findById(forumId)
+  if (!forum) throw new APIError('Forum not found', 404)
+    
+  let posts = await PostRepo.findPostsByForumId(forumId);
+  if (!posts) {
     throw new APIError('Posts not found', 404);
   }
 
-  return raw
+  const filiterdPosts = posts.map((post) => {
+    const { _count, ...rest } = post; 
 
+    return {
+      ...rest,
+      commentsCount: _count.Comments,  
+    };
+  
+  });
+
+  return filiterdPosts
 }
 
 

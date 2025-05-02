@@ -34,55 +34,52 @@ const router = express.Router()
  *             example:
  *               success: true
  *               message: Posts fetched successfully
-* data:
-*   - id: 7
-*     title: "string"
-*     content: "string"
-*     voteCounter: 0
-*     attachments:
-*       - https://example.com/file1
-*     forumId: 1
-*     createdAt: "2025-05-02T19:43:02.054Z"
-*     updatedAt: "2025-05-02T19:43:02.054Z"
-*     commentCount: 0
-*     author:
-*       id: 1
-*       username: johndoe
-*       fullname: John Doe
-*       avatarUrl: https://example.com/profile.jpg
-*
-*   - id: 6
-*     title: "string abdelsalam"
-*     content: "string"
-*     voteCounter: 0
-*     attachments:
-*       - https://example.com/file1
-*     forumId: 1
-*     createdAt: "2025-05-02T19:34:01.225Z"
-*     updatedAt: "2025-05-02T19:34:01.225Z"
-*     commentCount: 0
-*     author:
-*       id: 2
-*       username: johndoe12
-*       fullname: John Doe12
-*       avatarUrl: defaultavatar.jpg
-*
-*   - id: 4
-*     title: "string"
-*     content: "string"
-*     voteCounter: 0
-*     attachments:
-*       - https://example.com/file1
-*     forumId: 1
-*     createdAt: "2025-05-02T18:44:11.608Z"
-*     updatedAt: "2025-05-02T18:44:11.608Z"
-*     commentCount: 0
-*     author:
-*       id: 1
-*       username: johndoe
-*       fullname: John Doe
-*       avatarUrl: https://example.com/profile.jpg
-
+ *               data:
+ *                 - id: 7
+ *                   title: "string"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments:
+ *                     - https://example.com/file1
+ *                   forumId: 1
+ *                   createdAt: "2025-05-02T19:43:02.054Z"
+ *                   updatedAt: "2025-05-02T19:43:02.054Z"
+ *                   commentCount: 0
+ *                   author:
+ *                     id: 1
+ *                     username: johndoe
+ *                     fullname: John Doe
+ *                     avatarUrl: https://example.com/profile.jpg
+ *                 - id: 6
+ *                   title: "string abdelsalam"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments:
+ *                     - https://example.com/file1
+ *                   forumId: 1
+ *                   createdAt: "2025-05-02T19:34:01.225Z"
+ *                   updatedAt: "2025-05-02T19:34:01.225Z"
+ *                   commentCount: 0
+ *                   author:
+ *                     id: 2
+ *                     username: johndoe12
+ *                     fullname: John Doe12
+ *                     avatarUrl: defaultavatar.jpg
+ *                 - id: 4
+ *                   title: "string"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments:
+ *                     - https://example.com/file1
+ *                   forumId: 1
+ *                   createdAt: "2025-05-02T18:44:11.608Z"
+ *                   updatedAt: "2025-05-02T18:44:11.608Z"
+ *                   commentCount: 0
+ *                   author:
+ *                     id: 1
+ *                     username: johndoe
+ *                     fullname: John Doe
+ *                     avatarUrl: https://example.com/profile.jpg
  *       401:
  *         description: Unauthorized
  *       404:

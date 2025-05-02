@@ -35,27 +35,7 @@ export const PostRepo = {
       },
     });
 
-    return results.map(post => {
-      const commentCount = post._count.Comments;
-      const avatarUrl = post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg';
-      return {
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        voteCounter: post.voteCounter,
-        attachments: post.attachments,
-        forumId: post.forumId,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-        commentCount,
-        author: {
-          id: post.Author.id,
-          username: post.Author.username,
-          fullname: post.Author.fullname,
-          avatarUrl,
-        },
-      };
-    });
+    return results
   },
   async findById(id: number) {
     const result = await prisma.post.findUnique({
