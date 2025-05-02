@@ -83,7 +83,7 @@ export const upVoteComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const result = await CommentService.upVoteComment(
       +req.params.commentId,
-      +req.params.userId,
+      +req.claims!.id,
     );
     await upsertUserContribution(+req.claims!.id);
     res
@@ -96,7 +96,7 @@ export const downVoteComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const result = await CommentService.downVoteComment(
       +req.params.commentId,
-      +req.params.userId,
+      +req.claims!.id,
     );
     await upsertUserContribution(+req.claims!.id);
     res

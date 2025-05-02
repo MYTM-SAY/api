@@ -162,7 +162,7 @@ model Comment {
   Author       User          @relation(fields: [authorId], references: [id])
   Parent       Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
   Children     Comment[]     @relation("CommentReplies")
-  Post         Post          @relation(fields: [postId], references: [id])
+  Post         Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
   CommentVotes CommentVote[]
 }
 
@@ -170,7 +170,7 @@ model PostVote {
   count  Int
   userId Int
   postId Int
-  Post   Post @relation(fields: [postId], references: [id])
+  Post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   User   User @relation(fields: [userId], references: [id])
 
   @@id([userId, postId])
@@ -180,7 +180,7 @@ model CommentVote {
   count     Int
   userId    Int
   commentId Int
-  Comment   Comment @relation(fields: [commentId], references: [id])
+  Comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   User      User    @relation(fields: [userId], references: [id])
 
   @@id([userId, commentId])
