@@ -225,7 +225,7 @@ router.get(
 
 /**
  * @swagger
- * /comments/upvote/{commentId}/{userId}:
+ * /comments/upvote/{commentId}:
  *   put:
  *     summary: Upvote a comment
  *     description: Increments the upvote count of a comment by a specific user. If the user has not upvoted before, a new vote record is created.
@@ -238,12 +238,6 @@ router.get(
  *         schema:
  *           type: integer
  *         description: ID of the comment to upvote
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the user upvoting the comment
  *     responses:
  *       200:
  *         description: Comment successfully upvoted
@@ -258,8 +252,6 @@ router.get(
  *                 vote:
  *                   type: object
  *                   properties:
- *                     userId:
- *                       type: integer
  *                     commentId:
  *                       type: integer
  *                     count:
@@ -272,11 +264,11 @@ router.get(
  *         description: Server error
  */
 
-router.put('/upvote/:commentId/:userId', upVoteComment)
+router.put('/upvote/:commentId', isAuthenticated, upVoteComment)
 
 /**
  * @swagger
- * /comments/downvote/{commentId}/{userId}:
+ * /comments/downvote/{commentId}:
  *   put:
  *     summary: Downvote a comment
  *     description: Decreases the vote count of a comment by 1 for a specific user.
@@ -289,12 +281,6 @@ router.put('/upvote/:commentId/:userId', upVoteComment)
  *         schema:
  *           type: integer
  *         description: ID of the comment to downvote
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the user downvoting the comment
  *     responses:
  *       200:
  *         description: Comment downvoted successfully
@@ -313,6 +299,6 @@ router.put('/upvote/:commentId/:userId', upVoteComment)
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:commentId/:userId', downVoteComment)
+router.put('/downvote/:commentId', isAuthenticated, downVoteComment)
 
 export default router

@@ -294,7 +294,7 @@ router.delete('/:id', isAuthenticated, deletePost)
 
 /**
  * @swagger
- * /posts/upvote/{postId}/{userId}:
+ * /posts/upvote/{postId}:
  *   put:
  *     summary: Upvote a post
  *     description: Increments the upvote count for a specific post by a specific user. If the user has not upvoted before, a new vote record is created.
@@ -307,12 +307,6 @@ router.delete('/:id', isAuthenticated, deletePost)
  *         schema:
  *           type: integer
  *         description: ID of the post to upvote
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the user upvoting the post
  *     responses:
  *       200:
  *         description: Post upvoted successfully
@@ -340,11 +334,11 @@ router.delete('/:id', isAuthenticated, deletePost)
  *       500:
  *         description: Server error
  */
-router.put('/upvote/:postId/:userId', upVotePost)
+router.put('/upvote/:postId',  isAuthenticated, upVotePost)
 
 /**
  * @swagger
- * /posts/downvote/{postId}/{userId}:
+ * /posts/downvote/{postId}:
  *   put:
  *     summary: Downvote a post
  *     description: Decreases the vote count of a specific post by a specific user. If the user has not voted before, a new vote record is created with a negative value.
@@ -357,12 +351,6 @@ router.put('/upvote/:postId/:userId', upVotePost)
  *         schema:
  *           type: integer
  *         description: ID of the post to downvote
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the user downvoting the post
  *     responses:
  *       200:
  *         description: Post downvoted successfully
@@ -390,6 +378,6 @@ router.put('/upvote/:postId/:userId', upVotePost)
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:postId/:userId', downVotePost)
+router.put('/downvote/:postId', isAuthenticated, downVotePost)
 
 export default router
