@@ -4,12 +4,20 @@ import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
-    // Fetch posts with additional details for each post
+    // may need changes in the future ISA
     const results = await prisma.post.findMany({
       where: { forumId },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        voteCounter: true,         
+        attachments: true,       
+        forumId: true,              
+        createdAt: true,
+        updatedAt: true,
         _count: {
-          select: { Comments: true },
+          select: { Comments: true }, 
         },
         Author: {
           select: {
@@ -25,39 +33,30 @@ export const PostRepo = {
       orderBy: {
         createdAt: 'desc',
       },
-    })
+    });
 
-    const transformedResults = results.map((result) => {
-      const { _count, Author, ...postData } = result as {
-        _count: { Comments: number }
-        Author: {
-          id: number
-          username: string
-          fullname: string
-          UserProfile: {
-            profilePictureURL: string
-          }
-        }
-        [key: string]: any
-      }
-
-      const { UserProfile, ...authorProps } = Author
-
-      const Authorfiltered = {
-        ...authorProps,
-        profilePictureURL: UserProfile.profilePictureURL,
-      }
-
+    return results.map(post => {
+      const commentCount = post._count.Comments;
+      const avatarUrl = post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg';
       return {
-        ...postData,
-        Authorfiltered,
-        commentsCount: _count.Comments,
-      }
-    })
-
-    return transformedResults
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        voteCounter: post.voteCounter,
+        attachments: post.attachments,
+        forumId: post.forumId,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        commentCount,
+        author: {
+          id: post.Author.id,
+          username: post.Author.username,
+          fullname: post.Author.fullname,
+          avatarUrl,
+        },
+      };
+    });
   },
-
   async findById(id: number) {
     const result = await prisma.post.findUnique({
       where: { id },
