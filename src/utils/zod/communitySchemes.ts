@@ -9,6 +9,9 @@ export const CommunitySchema = z
     updatedAt: z.union([z.string().datetime(), z.date()]).optional(),
     coverImgURL: z.string().url().optional().nullable(),
     logoImgURL: z.string().url().optional().nullable(),
-    Tags: z.array(z.string().min(1, 'Tag must be at least 1 character')).optional(),
+    Tags: z
+      .array(z.string().min(1, 'Tag must be at least 1 character'))
+      .optional(),
+    isPublic: z.boolean().optional(),
   })
   .strict()

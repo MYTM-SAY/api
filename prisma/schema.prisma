@@ -25,8 +25,7 @@ model User {
   Post              Post[]
   PostVote          PostVote[]
   QuizScore         QuizScore[]
-  UserProfile       UserProfile? 
-  Communities       Community[]         @relation("CommunityMembers")
+  UserProfile       UserProfile?
   JoinRequests      JoinRequest[]
   Progress          Progress[]
   CompletedLessons  CompletedLessons[]
@@ -57,14 +56,13 @@ model InstructorProfile {
 }
 
 model Tag {
-  id              Int           @id @default(autoincrement())
-  name            String        @unique
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  Communities     Community[]   @relation("CommunityToTag")
-  UserProfiles    UserProfile[] @relation("TagToUserProfile")
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Communities  Community[]   @relation("CommunityToTag")
+  UserProfiles UserProfile[] @relation("TagToUserProfile")
 }
-
 
 model Community {
   id               Int                @id @default(autoincrement())
@@ -81,7 +79,6 @@ model Community {
   Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
   Forums           Forum[]
   CommunityMembers CommunityMembers[]
-  Members          User[]             @relation("CommunityMembers")
   Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
   JoinRequests     JoinRequest[] // Removed incorrect `map` argument
