@@ -41,11 +41,22 @@ async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
 
 async function getPostById(postId: number) {
 
+  if (!postId) throw new APIError('Missing postId', 404)
+
   const post = await PostRepo.findById(postId)
 
   if (!post) throw new APIError('Post not found', 404)
-    
-  return post
+
+    const { _count, ...rest } = post; 
+
+    const filiterdPost = {
+      ...rest,
+      commentsCount: _count.Comments,  
+    };
+  
+  
+
+  return filiterdPost
 }
 
 async function updatePost(
@@ -55,10 +66,13 @@ async function updatePost(
   const validatedData = await PostUpdateSchema.parseAsync(data)
   const postExist = await PostRepo.findById(postId)
   if (!postExist) throw new APIError('Post not found', 404)
+  validatedData.updatedAt = new Date()
   return await PostRepo.update(postId, validatedData)
 }
 
 async function deletePost(postId: number) {
+  // TODO issue if post deleted, it deletes the fourm too
+  if (!postId) throw new APIError('Missing postId', 404)
   const postExist = await PostRepo.findById(postId)
   if (!postExist) throw new APIError('Post not found', 404)
   await PostRepo.delete(postId)
@@ -89,8 +103,18 @@ async function getAllPostContribByUser(userId: number) {
   const posts = await PostRepo.getAllContribByUserId(userId)
   if (!posts) throw new APIError('Posts not found', 404)
  
-  return posts
-}
+    const filiterdPosts = posts.map((post) => {
+      const { _count, ...rest } = post; 
+  
+      return {
+        ...rest,
+        commentsCount: _count.Comments,  
+      };
+    
+    });
+  
+    return filiterdPosts
+  }
 
 export const PostService = {
   getPostsByForumId,
