@@ -246,6 +246,12 @@ router.get('/:id', isAuthenticated, getPost);
  *                 items:
  *                   type: string
  *                   format: url
+ *             example:
+ *               title: "Updated Post Title"
+ *               content: "This is the updated content of the post."
+ *               attachments:
+ *                 - "https://example.com/file1.pdf"
+ *                 - "https://cdn.example.com/image.jpg"
  *     responses:
  *       200:
  *         description: Post updated successfully
