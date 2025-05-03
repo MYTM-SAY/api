@@ -57,14 +57,13 @@ model InstructorProfile {
 }
 
 model Tag {
-  id              Int           @id @default(autoincrement())
-  name            String        @unique
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  Communities     Community[]   @relation("CommunityToTag")
-  UserProfiles    UserProfile[] @relation("TagToUserProfile")
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Communities  Community[]   @relation("CommunityToTag")
+  UserProfiles UserProfile[] @relation("TagToUserProfile")
 }
-
 
 model Community {
   id               Int                @id @default(autoincrement())
@@ -167,7 +166,8 @@ model Comment {
 }
 
 model PostVote {
-  count  Int
+  count  Int  @default(0)
+  type   VoteType   @default(NONE)
   userId Int
   postId Int
   Post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -178,6 +178,7 @@ model PostVote {
 
 model CommentVote {
   count     Int
+  type      VoteType   @default(NONE)
   userId    Int
   commentId Int
   Comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
@@ -327,4 +328,10 @@ enum JoinRequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum VoteType {
+  DOWNVOTE
+  UPVOTE
+  NONE
 }

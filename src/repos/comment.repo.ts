@@ -3,6 +3,7 @@ import { prisma } from '../db/PrismaClient'
 import APIError from '../errors/APIError'
 import { CommentSchema } from '../utils/zod/commentSchemes'
 import { count } from 'console';
+import { VoteType } from '@prisma/client'
 
 export const CommentRepo = {
   async findAll(postId: number) {
@@ -143,42 +144,65 @@ export const CommentRepo = {
     return result
   },
 
-  async upVoteComment(commentId: number, userId: number) {
-    let result;
-  
-    result = await prisma.commentVote.upsert({
+  async votedBefore(commentId: number, userId: number) {
+    return await prisma.commentVote.findUnique({
       where: {
-        userId_commentId: { userId, commentId },
+        userId_commentId: {
+          userId,
+          commentId,
+        },
       },
-      update: {
-        count: { increment: 1 },
+    });
+  },
+  
+  async upVoteComment(commentId: number, userId: number, voteType: VoteType, by: number) {
+    let comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+    let voteCounter = comment?.voteCounter || 0;
+  
+    const result = await prisma.commentVote.upsert({
+      where: {
+        userId_commentId: {
+          userId,
+          commentId,
+        },
       },
-      create: {
-        userId,
-        commentId,
-        count: 1,
-      },
+      update: { count: { increment: by }, type: voteType },
+      create: { userId, commentId, count: voteCounter + by, type: voteType },
+    });
+  
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: { voteCounter: voteCounter + by },
     });
   
     return result;
   },
-  async downVoteComment(commentId: number, userId: number) {
-    let result
-
-    result = await prisma.commentVote.upsert({
+  
+  async downVoteComment(commentId: number, userId: number, voteType: VoteType, by: number) {
+    let comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+    let voteCounter = comment?.voteCounter || 0;
+  
+    const result = await prisma.commentVote.upsert({
       where: {
-        userId_commentId: { userId, commentId },
+        userId_commentId: {
+          userId,
+          commentId,
+        },
       },
-      update: {
-        count: { decrement: 1 },
-      },
-      create: {
-        userId,
-        commentId,
-        count: -1,
-      },
-    })
-
-    return result
-  },
+      update: { count: { decrement: by }, type: voteType },
+      create: { userId, commentId, count: voteCounter - by, type: voteType },
+    });
+  
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: { voteCounter: voteCounter - by },
+    });
+  
+    return result;
+  }
+  
 }

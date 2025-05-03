@@ -4,6 +4,7 @@ import { ForumRepo } from '../repos/forum.repo'
 import { PostRepo } from '../repos/post.repo'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 import { UserRepo } from '../repos/user.repo'
+import { VoteType } from '@prisma/client';
 
 async function getPostsByForumId(forumId: number) {
   return await PostRepo.findPostsByForumId(forumId)
@@ -16,11 +17,10 @@ async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
 }
 
 async function getPostById(postId: number) {
-
   const post = await PostRepo.findById(postId)
 
   if (!post) throw new APIError('Post not found', 404)
-    
+
   return post
 }
 
@@ -41,22 +41,47 @@ async function deletePost(postId: number) {
 }
 
 async function upVotePost(postId: number, userId: number) {
-  if (!postId || !userId)
-    throw new APIError('Missing postId or userId', 404);
+  if (!postId || !userId) throw new APIError('Missing postId or userId', 404);
+
   const post = await PostRepo.findById(postId);
-  if(!post) throw new APIError("Post not found", 404);
-  const result = PostRepo.upVotePost(postId, userId)
-  return result
+  if (!post) throw new APIError('Post not found', 404);
+
+  const voted = await PostRepo.votedBefore(postId, userId);
+
+  if (voted) {
+    if (voted.type === VoteType.DOWNVOTE) {
+      return await PostRepo.upVotePost(postId, userId, VoteType.UPVOTE, 2);
+    } else if (voted.type === VoteType.UPVOTE) {
+      return await PostRepo.downVotePost(postId, userId, VoteType.NONE, 1);
+    } else {
+      return await PostRepo.upVotePost(postId, userId, VoteType.UPVOTE, 1);
+    }
+  } else {
+    return await PostRepo.upVotePost(postId, userId, VoteType.UPVOTE, 1);
+  }
 }
 
 async function downVotePost(postId: number, userId: number) {
-  if (!postId || !userId)
-    throw new APIError('Missing postId or userId', 404);
+  if (!postId || !userId) throw new APIError('Missing postId or userId', 404);
+
   const post = await PostRepo.findById(postId);
-  if(!post) throw new APIError("Post not found", 404);
-  const result = PostRepo.downVotePost(postId, userId)
-  return result
+  if (!post) throw new APIError('Post not found', 404);
+
+  const voted = await PostRepo.votedBefore(postId, userId);
+
+  if (voted) {
+      if (voted.type === VoteType.UPVOTE) {
+        return await PostRepo.downVotePost(postId, userId, VoteType.DOWNVOTE, 2);
+      } else if (voted.type === VoteType.DOWNVOTE) {
+        return await PostRepo.upVotePost(postId, userId, VoteType.NONE, 1);
+      } else { 
+        return await PostRepo.downVotePost(postId, userId, VoteType.DOWNVOTE, 1);
+      }
+    } else {
+      return await PostRepo.downVotePost(postId, userId, VoteType.DOWNVOTE, 1);
+    }
 }
+
 
 async function getAllPostContribByUser(userId: number) {
   if (!userId) throw new APIError('Missing userId', 404)
@@ -64,7 +89,7 @@ async function getAllPostContribByUser(userId: number) {
   if (!user) throw new APIError('User not found', 404)
   const posts = await PostRepo.getAllContribByUserId(userId)
   if (!posts) throw new APIError('Posts not found', 404)
- 
+
   return posts
 }
 
