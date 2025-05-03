@@ -143,7 +143,7 @@ model Post {
   updatedAt   DateTime   @updatedAt
   Comments    Comment[]
   Author      User       @relation(fields: [authorId], references: [id])
-  Forum       Forum      @relation(fields: [forumId], references: [id])
+  Forum       Forum      @relation(fields: [forumId], references: [id], onDelete: NoAction)
   PostVotes   PostVote[]
 }
 
