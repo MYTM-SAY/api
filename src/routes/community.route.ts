@@ -213,7 +213,7 @@ app.delete('/:id', isAuthenticated, deleteCommunity)
  *               message: Community not found
  *               data: null
  */
-app.get('/:id', getCommunity)
+app.get('/:id', isAuthenticated, getCommunity)
 /**
  * @swagger
  * /communities/{id}:

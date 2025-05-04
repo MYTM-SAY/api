@@ -43,7 +43,7 @@ async function getCommunityById(communityId: number, userId: number) {
   if (!communityId || isNaN(communityId))
     throw new APIError('Invalid Community ID', 400)
   const community = await CommunityRepo.findById(communityId)
-
+  
   if (!community) throw new APIError('Community not found', 404)
 
   const forumId = community.Forums?.[0]?.id ?? null
