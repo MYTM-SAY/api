@@ -3,6 +3,7 @@ import { CommunityRepo } from '../repos/community.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommentSchema } from '../utils/zod/commentSchemes'
+import { VoteType, CommentVote } from '@prisma/client';
 
 async function findAllComments(postId: number) {
   const comments = await CommentRepo.findAll(postId)
@@ -52,22 +53,44 @@ async function getCommentsByUserIdAndCommunityId(
 
   return CommentRepo.getCommentsByUserIdAndCommunityId(userId, communityId)
 }
-async function upVoteComment(commentId: number, userId: number) {
-  if (!commentId || !userId)
-    throw new APIError('Missing userId or commentId', 404)
-  const comment = await CommentRepo.findCommentById(commentId)
-  if (!comment) throw new APIError('Comment not found', 404)
-  const result = await CommentRepo.upVoteComment(commentId, userId)
-  return result
+ async function upVoteComment(
+  commentId: number,
+  userId: number
+): Promise<{ vote: CommentVote; voteCount: number }> {
+  const existing = await CommentRepo.votedBefore(commentId, userId);
+  let newType: VoteType = VoteType.UPVOTE;
+
+  if (existing) {
+    if (existing.type === VoteType.UPVOTE) {
+      newType = VoteType.NONE;
+    } else if (existing.type === VoteType.DOWNVOTE) {
+      newType = VoteType.UPVOTE;
+    }
+  }
+
+  const vote = await CommentRepo.setVote(commentId, userId, newType);
+  const voteCount = await CommentRepo.getVoteCount(commentId);
+  return { vote, voteCount };
 }
 
-async function downVoteComment(commentId: number, userId: number) {
-  if (!commentId || !userId)
-    throw new APIError('Missing userId or commentId', 404)
-  const comment = await CommentRepo.findCommentById(commentId)
-  if (!comment) throw new APIError('Comment not found', 404)
-  const result = await CommentRepo.downVoteComment(commentId, userId)
-  return result
+ async function downVoteComment(
+  commentId: number,
+  userId: number
+): Promise<{ vote: CommentVote; voteCount: number }> {
+  const existing = await CommentRepo.votedBefore(commentId, userId);
+  let newType: VoteType = VoteType.DOWNVOTE;
+
+  if (existing) {
+    if (existing.type === VoteType.DOWNVOTE) {
+      newType = VoteType.NONE;
+    } else if (existing.type === VoteType.UPVOTE) {
+      newType = VoteType.DOWNVOTE;
+    }
+  }
+
+  const vote = await CommentRepo.setVote(commentId, userId, newType);
+  const voteCount = await CommentRepo.getVoteCount(commentId);
+  return { vote, voteCount };
 }
 
 export const CommentService = {

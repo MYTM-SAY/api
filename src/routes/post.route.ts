@@ -281,12 +281,12 @@ router.put('/:id', isAuthenticated, updatePost)
  */
 router.delete('/:id', isAuthenticated, deletePost)
 
+
 /**
  * @swagger
  * /posts/upvote/{postId}:
  *   put:
  *     summary: Upvote a post
- *     description: Increments the upvote count for a specific post by a specific user. If the user has not upvoted before, a new vote record is created.
  *     tags:
  *       - Posts
  *     parameters:
@@ -298,7 +298,7 @@ router.delete('/:id', isAuthenticated, deletePost)
  *         description: ID of the post to upvote
  *     responses:
  *       200:
- *         description: Post upvoted successfully
+ *         description: Post successfully upvoted
  *         content:
  *           application/json:
  *             schema:
@@ -314,8 +314,12 @@ router.delete('/:id', isAuthenticated, deletePost)
  *                       type: integer
  *                     postId:
  *                       type: integer
- *                     count:
- *                       type: integer
+ *                     type:
+ *                       type: string
+ *                       enum: [UPVOTE, DOWNVOTE, NONE]
+ *                 voteCount:
+ *                   type: integer
+ *                   example: 10
  *       400:
  *         description: Invalid request parameters
  *       404:
@@ -323,14 +327,13 @@ router.delete('/:id', isAuthenticated, deletePost)
  *       500:
  *         description: Server error
  */
-router.put('/upvote/:postId',  isAuthenticated, upVotePost)
+router.put('/upvote/:postId', isAuthenticated, upVotePost);
 
 /**
  * @swagger
  * /posts/downvote/{postId}:
  *   put:
  *     summary: Downvote a post
- *     description: Decreases the vote count of a specific post by a specific user. If the user has not voted before, a new vote record is created with a negative value.
  *     tags:
  *       - Posts
  *     parameters:
@@ -342,7 +345,7 @@ router.put('/upvote/:postId',  isAuthenticated, upVotePost)
  *         description: ID of the post to downvote
  *     responses:
  *       200:
- *         description: Post downvoted successfully
+ *         description: Post successfully downvoted
  *         content:
  *           application/json:
  *             schema:
@@ -358,8 +361,12 @@ router.put('/upvote/:postId',  isAuthenticated, upVotePost)
  *                       type: integer
  *                     postId:
  *                       type: integer
- *                     count:
- *                       type: integer
+ *                     type:
+ *                       type: string
+ *                       enum: [UPVOTE, DOWNVOTE, NONE]
+ *                 voteCount:
+ *                   type: integer
+ *                   example: 8
  *       400:
  *         description: Invalid request parameters
  *       404:
@@ -367,6 +374,6 @@ router.put('/upvote/:postId',  isAuthenticated, upVotePost)
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:postId', isAuthenticated, downVotePost)
+router.put('/downvote/:postId', isAuthenticated, downVotePost);
 
 export default router

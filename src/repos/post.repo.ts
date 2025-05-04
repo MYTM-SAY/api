@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
+import { VoteType, PostVote } from '@prisma/client';
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
@@ -11,7 +12,6 @@ export const PostRepo = {
         id: true,
         title: true,
         content: true,
-        voteCounter: true,         
         attachments: true,       
         forumId: true,              
         createdAt: true,
@@ -45,7 +45,6 @@ export const PostRepo = {
         id: true,
         title: true,
         content: true,
-        voteCounter: true,         
         attachments: true,       
         forumId: true,              
         createdAt: true,
@@ -91,38 +90,28 @@ export const PostRepo = {
     return result
   },
 
-  async upVotePost(postId: number, userId: number) {
-    let result
-
-    result = await prisma.postVote.upsert({
-      where: {
-        userId_postId: {
-          userId,
-          postId,
-        },
-      },
-      update: { count: { increment: 1 } },
-      create: { userId, postId, count: 1 },
-    })
-
-    return result
+   async votedBefore(postId: number, userId: number): Promise<PostVote | null> {
+    return prisma.postVote.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
   },
-
-  async downVotePost(postId: number, userId: number) {
-    let result
-
-    result = await prisma.postVote.upsert({
-      where: {
-        userId_postId: {
-          userId,
-          postId,
-        },
-      },
-      update: { count: { decrement: 1 } },
-      create: { userId, postId, count: -1 },
-    })
-
-    return result
+  async getVoteCount(postId: number): Promise<number> {
+    const [up, down] = await Promise.all([
+      prisma.postVote.count({ where: { postId, type: VoteType.UPVOTE } }),
+      prisma.postVote.count({ where: { postId, type: VoteType.DOWNVOTE } }),
+    ]);
+    return up - down;
+  },
+  async setVote(
+    postId: number,
+    userId: number,
+    type: VoteType
+  ): Promise<PostVote> {
+    return prisma.postVote.upsert({
+      where: { userId_postId: { userId, postId } },
+      create: { userId, postId, type },
+      update: { type },
+    });
   },
 
   async getAllContribByUserId(userId: number) {
@@ -139,7 +128,6 @@ export const PostRepo = {
         id: true,
         title: true,
         content: true,
-        voteCounter: true,         
         attachments: true,       
         forumId: true,              
         createdAt: true,

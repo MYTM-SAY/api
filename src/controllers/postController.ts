@@ -56,29 +56,27 @@ export const deletePost = asyncHandler(async (req: Request, res: Response) => {
 
 export const upVotePost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const result = await PostService.upVotePost(
-      +req.params.postId,
-      +req.claims!.id,
-    );
-    await upsertUserContribution(+req.claims!.id);
+    const postId = +req.params.postId;
+    const userId = +req.claims!.id;
+    const result = await PostService.upVotePost(postId, userId);
+    await upsertUserContribution(userId);
     res
       .status(200)
-      .json(ResponseHelper.success('Post upvoted successfully', result))
-  },
-)
+      .json(ResponseHelper.success('Post upvoted successfully', result));
+  }
+);
 
 export const downVotePost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const result = await PostService.downVotePost(
-      +req.params.postId,
-      +req.claims!.id,
-    );
-    await upsertUserContribution(+req.claims!.id);
+    const postId = +req.params.postId;
+    const userId = +req.claims!.id;
+    const result = await PostService.downVotePost(postId, userId);
+    await upsertUserContribution(userId);
     res
       .status(200)
-      .json(ResponseHelper.success('Post downvoted successfully', result))
-  },
-)
+      .json(ResponseHelper.success('Post downvoted successfully', result));
+  }
+);
 
 
 export const getAllPostContribByUser = asyncHandler(
