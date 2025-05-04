@@ -4,7 +4,7 @@ import { ForumRepo } from '../repos/forum.repo'
 import { PostRepo } from '../repos/post.repo'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 import { UserRepo } from '../repos/user.repo'
-import { VoteType } from '@prisma/client';
+import { VoteType, PostVote } from '@prisma/client';
 
 async function getPostsByForumId(forumId: number) {
 
@@ -78,47 +78,47 @@ async function deletePost(postId: number) {
   await PostRepo.delete(postId)
 }
 
-async function upVotePost(postId: number, userId: number) {
-  if (!postId || !userId) throw new APIError('Missing postId or userId', 404);
+async function upVotePost(
+  postId: number,
+    userId: number
+  ): Promise<{ vote: PostVote; voteCount: number }> {
+    const existing = await PostRepo.votedBefore(postId, userId);
+    let newType: VoteType = VoteType.UPVOTE;
 
-  const post = await PostRepo.findById(postId);
-  if (!post) throw new APIError('Post not found', 404);
-
-  const voted = await PostRepo.votedBefore(postId, userId);
-
-  if (voted) {
-    if (voted.type === VoteType.DOWNVOTE) {
-      return await PostRepo.upVotePost(postId, userId, VoteType.UPVOTE, 2);
-    } else if (voted.type === VoteType.UPVOTE) {
-      return await PostRepo.downVotePost(postId, userId, VoteType.NONE, 1);
-    } else {
-      return await PostRepo.upVotePost(postId, userId, VoteType.UPVOTE, 1);
-    }
-  } else {
-    return await PostRepo.upVotePost(postId, userId, VoteType.UPVOTE, 1);
-  }
-}
-
-async function downVotePost(postId: number, userId: number) {
-  if (!postId || !userId) throw new APIError('Missing postId or userId', 404);
-
-  const post = await PostRepo.findById(postId);
-  if (!post) throw new APIError('Post not found', 404);
-
-  const voted = await PostRepo.votedBefore(postId, userId);
-
-  if (voted) {
-      if (voted.type === VoteType.UPVOTE) {
-        return await PostRepo.downVotePost(postId, userId, VoteType.DOWNVOTE, 2);
-      } else if (voted.type === VoteType.DOWNVOTE) {
-        return await PostRepo.upVotePost(postId, userId, VoteType.NONE, 1);
-      } else { 
-        return await PostRepo.downVotePost(postId, userId, VoteType.DOWNVOTE, 1);
+    if (existing) {
+      if (existing.type === VoteType.UPVOTE) {
+        newType = VoteType.NONE;
+      } else if (existing.type === VoteType.DOWNVOTE) {
+        newType = VoteType.UPVOTE;
       }
-    } else {
-      return await PostRepo.downVotePost(postId, userId, VoteType.DOWNVOTE, 1);
     }
-}
+
+    const vote = await PostRepo.setVote(postId, userId, newType);
+    const voteCount = await PostRepo.getVoteCount(postId);
+
+    return { vote, voteCount };
+  }
+
+async function downVotePost(
+  postId: number,
+    userId: number
+  ): Promise<{ vote: PostVote; voteCount: number }> {
+    const existing = await PostRepo.votedBefore(postId, userId);
+    let newType: VoteType = VoteType.DOWNVOTE;
+
+    if (existing) {
+      if (existing.type === VoteType.DOWNVOTE) {
+        newType = VoteType.NONE;
+      } else if (existing.type === VoteType.UPVOTE) {
+        newType = VoteType.DOWNVOTE;
+      }
+    }
+
+    const vote = await PostRepo.setVote(postId, userId, newType);
+    const voteCount = await PostRepo.getVoteCount(postId);
+
+    return { vote, voteCount };
+  }
 
 
 async function getAllPostContribByUser(userId: number) {

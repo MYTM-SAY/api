@@ -228,7 +228,6 @@ router.get(
  * /comments/upvote/{commentId}:
  *   put:
  *     summary: Upvote a comment
- *     description: Increments the upvote count of a comment by a specific user. If the user has not upvoted before, a new vote record is created.
  *     tags:
  *       - Comments
  *     parameters:
@@ -252,10 +251,16 @@ router.get(
  *                 vote:
  *                   type: object
  *                   properties:
+ *                     userId:
+ *                       type: integer
  *                     commentId:
  *                       type: integer
- *                     count:
- *                       type: integer
+ *                     type:
+ *                       type: string
+ *                       enum: [UPVOTE, DOWNVOTE, NONE]
+ *                 voteCount:
+ *                   type: integer
+ *                   example: 5
  *       400:
  *         description: Invalid request parameters
  *       404:
@@ -263,15 +268,13 @@ router.get(
  *       500:
  *         description: Server error
  */
-
-router.put('/upvote/:commentId', isAuthenticated, upVoteComment)
+router.put('/upvote/:commentId', isAuthenticated, upVoteComment);
 
 /**
  * @swagger
  * /comments/downvote/{commentId}:
  *   put:
  *     summary: Downvote a comment
- *     description: Decreases the vote count of a comment by 1 for a specific user.
  *     tags:
  *       - Comments
  *     parameters:
@@ -283,7 +286,7 @@ router.put('/upvote/:commentId', isAuthenticated, upVoteComment)
  *         description: ID of the comment to downvote
  *     responses:
  *       200:
- *         description: Comment downvoted successfully
+ *         description: Comment successfully downvoted
  *         content:
  *           application/json:
  *             schema:
@@ -292,6 +295,19 @@ router.put('/upvote/:commentId', isAuthenticated, upVoteComment)
  *                 message:
  *                   type: string
  *                   example: "Comment downvoted successfully"
+ *                 vote:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                     commentId:
+ *                       type: integer
+ *                     type:
+ *                       type: string
+ *                       enum: [UPVOTE, DOWNVOTE, NONE]
+ *                 voteCount:
+ *                   type: integer
+ *                   example: 2
  *       400:
  *         description: Invalid request parameters
  *       404:
@@ -299,6 +315,5 @@ router.put('/upvote/:commentId', isAuthenticated, upVoteComment)
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:commentId', isAuthenticated, downVoteComment)
-
+router.put('/downvote/:commentId', isAuthenticated, downVoteComment);
 export default router

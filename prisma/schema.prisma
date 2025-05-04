@@ -135,7 +135,6 @@ model Post {
   id          Int        @id @default(autoincrement())
   title       String
   content     String?
-  voteCounter Int        @default(0)
   attachments String[]
   forumId     Int
   authorId    Int
@@ -150,7 +149,6 @@ model Post {
 model Comment {
   id           Int           @id @default(autoincrement())
   content      String?
-  voteCounter  Int           @default(0)
   parentId     Int?
   postId       Int
   authorId     Int
@@ -164,7 +162,6 @@ model Comment {
 }
 
 model PostVote {
-  count  Int  @default(0)
   type   VoteType   @default(NONE)
   userId Int
   postId Int
@@ -175,7 +172,6 @@ model PostVote {
 }
 
 model CommentVote {
-  count     Int
   type      VoteType   @default(NONE)
   userId    Int
   commentId Int

@@ -81,26 +81,24 @@ export const getCommentsByUserIdAndCommunityId = asyncHandler(
 
 export const upVoteComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const result = await CommentService.upVoteComment(
-      +req.params.commentId,
-      +req.claims!.id,
-    );
-    await upsertUserContribution(+req.claims!.id);
+    const commentId = +req.params.commentId;
+    const userId = +req.claims!.id;
+    const result = await CommentService.upVoteComment(commentId, userId);
+    await upsertUserContribution(userId);
     res
       .status(200)
-      .json(ResponseHelper.success('Comment upvoted successfully', result))
-  },
-)
+      .json(ResponseHelper.success('Comment upvoted successfully', result));
+  }
+);
 
 export const downVoteComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const result = await CommentService.downVoteComment(
-      +req.params.commentId,
-      +req.claims!.id,
-    );
-    await upsertUserContribution(+req.claims!.id);
+    const commentId = +req.params.commentId;
+    const userId = +req.claims!.id;
+    const result = await CommentService.downVoteComment(commentId, userId);
+    await upsertUserContribution(userId);
     res
       .status(200)
-      .json(ResponseHelper.success('Comment downvoted successfully', result))
-  },
-)
+      .json(ResponseHelper.success('Comment downvoted successfully', result));
+  }
+);
