@@ -5,12 +5,20 @@ import { VoteType } from '@prisma/client'
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
-    // Fetch posts with additional details for each post
+    // may need changes in the future ISA
     const results = await prisma.post.findMany({
       where: { forumId },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        voteCounter: true,         
+        attachments: true,       
+        forumId: true,              
+        createdAt: true,
+        updatedAt: true,
         _count: {
-          select: { Comments: true },
+          select: { Comments: true }, 
         },
         Author: {
           select: {
@@ -26,90 +34,40 @@ export const PostRepo = {
       orderBy: {
         createdAt: 'desc',
       },
-    })
+    });
 
-    const transformedResults = results.map((result) => {
-      const { _count, Author, ...postData } = result as {
-        _count: { Comments: number }
-        Author: {
-          id: number
-          username: string
-          fullname: string
-          UserProfile: {
-            profilePictureURL: string
-          }
-        }
-        [key: string]: any
-      }
-
-      const { UserProfile, ...authorProps } = Author
-
-      const Authorfiltered = {
-        ...authorProps,
-        profilePictureURL: UserProfile.profilePictureURL,
-      }
-
-      return {
-        ...postData,
-        Authorfiltered,
-        commentsCount: _count.Comments,
-      }
-    })
-
-    return transformedResults
+    return results
   },
-
   async findById(id: number) {
     const result = await prisma.post.findUnique({
+
       where: { id },
-      include: {
-        Comments: {},
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        voteCounter: true,         
+        attachments: true,       
+        forumId: true,              
+        createdAt: true,
+        updatedAt: true,
         _count: {
-          select: {
-            Comments: true,
-          },
+          select: { Comments: true }, 
         },
         Author: {
           select: {
             id: true,
             username: true,
             fullname: true,
-
             UserProfile: {
               select: { profilePictureURL: true },
             },
           },
         },
       },
+    
     })
-
-    const { _count, Author, ...postData } = result as {
-      _count: { Comments: number }
-      Author: {
-        id: number
-        username: string
-        fullname: string
-
-        UserProfile: {
-          profilePictureURL: string
-        }
-      }
-      [key: string]: any
-    }
-    const { UserProfile, ...RestProfileData } = Author
-
-    const Authorfiltered = {
-      ...RestProfileData,
-      profilePictureURL: Author.UserProfile.profilePictureURL,
-    }
-
-    const result2 = {
-      ...postData,
-      Authorfiltered,
-      commentsCount: _count.Comments,
-    }
-
-    return result2
+    return result
   },
 
   async create(post: z.infer<typeof PostSchema>, authorId: number) {
@@ -202,9 +160,17 @@ export const PostRepo = {
           { Comments: { some: { CommentVotes: { some: { userId } } } } },
         ],
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        voteCounter: true,         
+        attachments: true,       
+        forumId: true,              
+        createdAt: true,
+        updatedAt: true,
         _count: {
-          select: { Comments: true },
+          select: { Comments: true }, 
         },
         Author: {
           select: {
@@ -217,45 +183,10 @@ export const PostRepo = {
             },
           },
         },
-        PostVotes: {
-          where: { userId },
-          select: { count: true },
-        },
+
       },
     })
 
-    const transformedResults = results.map((result) => {
-      // Destructure the post result to get _count, Author, and PostVotes
-      const { _count, Author, PostVotes, ...postData } = result as {
-        _count: { Comments: number }
-        Author: {
-          id: number
-          username: string
-          fullname: string
-          email: string
-          UserProfile: { profilePictureURL: string }
-        }
-        PostVotes: { count: number }[]
-        [key: string]: any
-      }
-
-      const { UserProfile, ...authorRest } = Author
-
-      const Authorfiltered = {
-        ...authorRest,
-        profilePictureURL: UserProfile?.profilePictureURL,
-      }
-
-      const votesCount = PostVotes.length > 0 ? PostVotes[0].count : 0
-
-      return {
-        ...postData,
-        Authorfiltered,
-        commentsCount: _count.Comments,
-        votesCount,
-      }
-    })
-
-    return transformedResults
+    return results
   },
 }

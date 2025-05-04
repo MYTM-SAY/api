@@ -121,6 +121,9 @@ app.get('/', isAuthenticated, getCommunities)
  *                 items:
  *                   type: string
  *                 example: ["javascript", "backend", "cloud"]
+ *               isPublic:
+ *                 type: boolean
+ *                 example: true
  *     responses:
  *       201:
  *         description: Community created successfully.
@@ -255,6 +258,9 @@ app.get('/:id', getCommunity)
  *                 items:
  *                   type: string
  *                 example: ["javascript", "backend", "cloud"]
+ *               isPublic:
+ *                 type: boolean
+ *                 example: true
  *     responses:
  *       200:
  *         description: Community updated successfully.
@@ -562,6 +568,10 @@ app.get('/:communityId/online-users-count', getAllOnlineUsersInACommunity)
  *         description: Internal server error.
  */
 
-app.get('/:communityId/user-role-in-a-community', isAuthenticated, getUserRoleInCommunity);
+app.get(
+  '/:communityId/user-role-in-a-community',
+  isAuthenticated,
+  getUserRoleInCommunity,
+)
 
 export default app

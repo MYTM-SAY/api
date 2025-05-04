@@ -35,68 +35,51 @@ const router = express.Router()
  *               success: true
  *               message: Posts fetched successfully
  *               data:
- *                 - id: 2
- *                   title: string2
- *                   content: string2
+ *                 - id: 7
+ *                   title: "string"
+ *                   content: "string"
  *                   voteCounter: 0
- *                   attachments: []
+ *                   attachments:
+ *                     - https://example.com/file1
  *                   forumId: 1
- *                   authorId: 1
- *                   createdAt: "2025-04-11T06:49:29.716Z"
- *                   updatedAt: "2025-04-11T06:49:29.716Z"
- *                   Authorfiltered:
+ *                   createdAt: "2025-05-02T19:43:02.054Z"
+ *                   updatedAt: "2025-05-02T19:43:02.054Z"
+ *                   commentCount: 0
+ *                   author:
  *                     id: 1
  *                     username: johndoe
  *                     fullname: John Doe
- *                     profilePictureURL: https://example.com/profile.jpg
- *                   commentsCount: 0
+ *                     avatarUrl: https://example.com/profile.jpg
+ *                 - id: 6
+ *                   title: "string abdelsalam"
+ *                   content: "string"
+ *                   voteCounter: 0
+ *                   attachments:
+ *                     - https://example.com/file1
+ *                   forumId: 1
+ *                   createdAt: "2025-05-02T19:34:01.225Z"
+ *                   updatedAt: "2025-05-02T19:34:01.225Z"
+ *                   commentCount: 0
+ *                   author:
+ *                     id: 2
+ *                     username: johndoe12
+ *                     fullname: John Doe12
+ *                     avatarUrl: defaultavatar.jpg
  *                 - id: 4
- *                   title: string
- *                   content: string
+ *                   title: "string"
+ *                   content: "string"
  *                   voteCounter: 0
  *                   attachments:
  *                     - https://example.com/file1
  *                   forumId: 1
- *                   authorId: 1
- *                   createdAt: "2025-04-11T06:57:55.875Z"
- *                   updatedAt: "2025-04-11T06:57:55.875Z"
- *                   Authorfiltered:
+ *                   createdAt: "2025-05-02T18:44:11.608Z"
+ *                   updatedAt: "2025-05-02T18:44:11.608Z"
+ *                   commentCount: 0
+ *                   author:
  *                     id: 1
  *                     username: johndoe
  *                     fullname: John Doe
- *                     profilePictureURL: https://example.com/profile.jpg
- *                   commentsCount: 0
- *                 - id: 1
- *                   title: string
- *                   content: string
- *                   voteCounter: 0
- *                   attachments: []
- *                   forumId: 1
- *                   authorId: 1
- *                   createdAt: "2025-04-11T06:41:58.470Z"
- *                   updatedAt: "2025-04-11T06:41:58.470Z"
- *                   Authorfiltered:
- *                     id: 1
- *                     username: johndoe
- *                     fullname: John Doe
- *                     profilePictureURL: https://example.com/profile.jpg
- *                   commentsCount: 0
- *                 - id: 3
- *                   title: string
- *                   content: string
- *                   voteCounter: 0
- *                   attachments:
- *                     - https://example.com/file1
- *                   forumId: 1
- *                   authorId: 1
- *                   createdAt: "2025-04-11T06:55:32.833Z"
- *                   updatedAt: "2025-04-11T06:55:32.833Z"
- *                   Authorfiltered:
- *                     id: 1
- *                     username: johndoe
- *                     fullname: John Doe
- *                     profilePictureURL: https://example.com/profile.jpg
- *                   commentsCount: 0
+ *                     avatarUrl: https://example.com/profile.jpg
  *       401:
  *         description: Unauthorized
  *       404:
@@ -263,6 +246,12 @@ router.get('/:id', isAuthenticated, getPost);
  *                 items:
  *                   type: string
  *                   format: url
+ *             example:
+ *               title: "Updated Post Title"
+ *               content: "This is the updated content of the post."
+ *               attachments:
+ *                 - "https://example.com/file1.pdf"
+ *                 - "https://cdn.example.com/image.jpg"
  *     responses:
  *       200:
  *         description: Post updated successfully

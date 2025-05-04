@@ -122,7 +122,18 @@ async function getJoinedCommunities(userId: number) {
   const joinedCommunities = await CommunityRepo.joinedCommunities(userId)
   if (!joinedCommunities) throw new APIError('No communities found', 404)
 
-  return joinedCommunities
+  // Transform and remove _count from the response
+  const formattedCommunities = joinedCommunities.map(({ Role, Community }) => {
+    const { _count, ...rest } = Community
+    return {
+      Role,
+      Community: {
+        ...rest,
+        MembersCount: _count?.CommunityMembers ?? 0,
+      },
+    }
+  })
+  return formattedCommunities
 }
 
 async function getAllUsersInACommunity(id: number) {

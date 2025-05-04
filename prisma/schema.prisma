@@ -26,7 +26,6 @@ model User {
   PostVote          PostVote[]
   QuizScore         QuizScore[]
   UserProfile       UserProfile?
-  Communities       Community[]         @relation("CommunityMembers")
   JoinRequests      JoinRequest[]
   Progress          Progress[]
   CompletedLessons  CompletedLessons[]
@@ -80,7 +79,6 @@ model Community {
   Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
   Forums           Forum[]
   CommunityMembers CommunityMembers[]
-  Members          User[]             @relation("CommunityMembers")
   Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
   JoinRequests     JoinRequest[] // Removed incorrect `map` argument
@@ -145,7 +143,7 @@ model Post {
   updatedAt   DateTime   @updatedAt
   Comments    Comment[]
   Author      User       @relation(fields: [authorId], references: [id])
-  Forum       Forum      @relation(fields: [forumId], references: [id])
+  Forum       Forum      @relation(fields: [forumId], references: [id], onDelete: NoAction)
   PostVotes   PostVote[]
 }
 

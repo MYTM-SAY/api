@@ -7,8 +7,31 @@ import { UserRepo } from '../repos/user.repo'
 import { VoteType } from '@prisma/client';
 
 async function getPostsByForumId(forumId: number) {
-  return await PostRepo.findPostsByForumId(forumId)
+
+
+  if (!forumId) throw new APIError('Missing forumId', 404)
+
+  const forum = await ForumRepo.findById(forumId)
+  if (!forum) throw new APIError('Forum not found', 404)
+    
+  let posts = await PostRepo.findPostsByForumId(forumId);
+  if (!posts) {
+    throw new APIError('Posts not found', 404);
+  }
+
+  const filiterdPosts = posts.map((post) => {
+    const { _count, ...rest } = post; 
+
+    return {
+      ...rest,
+      commentsCount: _count.Comments,  
+    };
+  
+  });
+
+  return filiterdPosts
 }
+
 
 async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
   const forumExist = await ForumRepo.findById(data.forumId)
@@ -17,11 +40,23 @@ async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
 }
 
 async function getPostById(postId: number) {
+
+  if (!postId) throw new APIError('Missing postId', 404)
+
   const post = await PostRepo.findById(postId)
 
   if (!post) throw new APIError('Post not found', 404)
 
-  return post
+    const { _count, ...rest } = post; 
+
+    const filiterdPost = {
+      ...rest,
+      commentsCount: _count.Comments,  
+    };
+  
+  
+
+  return filiterdPost
 }
 
 async function updatePost(
@@ -31,10 +66,13 @@ async function updatePost(
   const validatedData = await PostUpdateSchema.parseAsync(data)
   const postExist = await PostRepo.findById(postId)
   if (!postExist) throw new APIError('Post not found', 404)
+  validatedData.updatedAt = new Date()
   return await PostRepo.update(postId, validatedData)
 }
 
 async function deletePost(postId: number) {
+  // TODO issue if post deleted, it deletes the fourm too
+  if (!postId) throw new APIError('Missing postId', 404)
   const postExist = await PostRepo.findById(postId)
   if (!postExist) throw new APIError('Post not found', 404)
   await PostRepo.delete(postId)
@@ -89,9 +127,19 @@ async function getAllPostContribByUser(userId: number) {
   if (!user) throw new APIError('User not found', 404)
   const posts = await PostRepo.getAllContribByUserId(userId)
   if (!posts) throw new APIError('Posts not found', 404)
-
-  return posts
-}
+ 
+    const filiterdPosts = posts.map((post) => {
+      const { _count, ...rest } = post; 
+  
+      return {
+        ...rest,
+        commentsCount: _count.Comments,  
+      };
+    
+    });
+  
+    return filiterdPosts
+  }
 
 export const PostService = {
   getPostsByForumId,

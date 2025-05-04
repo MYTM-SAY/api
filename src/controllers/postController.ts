@@ -9,6 +9,7 @@ import { upsertUserContribution } from '../services/contributionService'
 
 export const getPostsByForumId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
+
     const posts = await PostService.getPostsByForumId(+req.params.id)
     res
       .status(200)
@@ -40,6 +41,7 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
     .json(ResponseHelper.success('Post fetched successfully', post))
 })
 
+// in attachments, while testing add a complete url like http://localhost:3000/attachments/1234.png
 export const updatePost = asyncHandler(async (req: Request, res: Response) => {
   const post = await PostService.updatePost(+req.params.id, req.body)
   res

@@ -110,7 +110,10 @@ export const CommunityRepo = {
 
   async getPopularCommunities() {
     return prisma.community.findMany({
-      orderBy: [{ Members: { _count: 'desc' } }, { createdAt: 'desc' }],
+      orderBy: [
+        { CommunityMembers: { _count: 'desc' } },
+        { createdAt: 'desc' },
+      ],
       include: {
         Tags: true,
         Owner: true,
@@ -157,19 +160,19 @@ export const CommunityRepo = {
       },
     })
   },
+
   async joinedCommunities(id: number) {
     const communitiesForUser = await prisma.communityMembers.findMany({
       where: { userId: id },
       select: {
         Role: true,
         Community: {
-          select: {
-            id: true,
-            name: true,
-            logoImgURL: true,
-            isPublic: true,
-            bio: true,
-            description: true,
+          include: {
+            _count: {
+              select: {
+                CommunityMembers: true,
+              },
+            },
             Owner: {
               select: {
                 id: true,
