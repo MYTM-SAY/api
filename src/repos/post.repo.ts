@@ -61,6 +61,11 @@ export const PostRepo = {
             },
           },
         },
+        Forum: {
+          select: {
+            Community: true,
+          },
+        },
         Comments: {
           include: {
             Author: {
@@ -77,6 +82,7 @@ export const PostRepo = {
         },
       },
     })
+
     return result
   },
 
