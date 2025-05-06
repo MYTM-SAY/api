@@ -62,6 +62,7 @@ export const PostRepo = {
             },
           },
         },
+        Comments: true,
       },
     
     })
