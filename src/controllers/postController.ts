@@ -34,7 +34,6 @@ export const createPost = asyncHandler(
 )
 
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
-  
   const post = await PostService.getPostById(+req.params.id)
   res
     .status(200)

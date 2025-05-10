@@ -37,11 +37,12 @@ async function getPostById(postId: number) {
 
   if (!post) throw new APIError('Post not found', 404)
 
-    const { _count, ...rest } = post; 
-
-    const filiterdPost = {
+  const voteScore = await PostRepo.getVoteCount(post.id);
+  const { _count, ...rest } = post
+  const filiterdPost = {
       ...rest,
       commentsCount: _count.Comments,  
+      voteScore
     };
 
   return filiterdPost
