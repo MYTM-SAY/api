@@ -68,6 +68,7 @@ export const CommentRepo = {
         Author: {
           select: {
             username: true,
+            id: true,
             UserProfile: {
               select: {
                 profilePictureURL: true,
@@ -75,6 +76,10 @@ export const CommentRepo = {
             },
           },
         },
+        Post: {
+          select:{ Forum: {select  : {Community: {select : {id : true}}}}}
+        }
+        ,
         Children: true,
       },
     })
@@ -168,6 +173,73 @@ export const CommentRepo = {
       create: { userId, commentId, type },
       update: { type },
     });
-  }
+  },
+  // get comment Auth and Role
+  async getCommentAuthAndRole( userId: number,commentId: number,) {
+    const result = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: {
+        authorId: true,
+        Post: {
+          select: {
+            Forum: {
+              select: {
+                 Community: {
+                  select: {
+                    CommunityMembers: {
+                      where: {
+                        userId: userId,
+                      },
+                      select: {
+                        Role: true,
+                      },
+                    }
+                },
+              },
+            },
+          },
+        },
+      },
+    }})
+    return result
+  }, 
+
+  
+  async getPostAuthorAndCommunity(userId: number, postId: number) {
+    const result = await prisma.post.findUnique({
+      where: { id: postId },
+      select: {
+
+        Author: {
+          select: { id: true },
+        },
+        Forum: {
+          select: {
+            Community: {
+              select : {id : true}
+            },
+          },
+        },
+      }
+
+
+    })
+    return result
+  },
+  // get role by communityId and userId
+  async getRoleByCommunityIdAndUserId(userId: number, communityId: number) {
+    const result = await prisma.communityMembers.findUnique({
+      where: {  communityId_userId: {
+        communityId,
+        userId,
+      }, },
+      select: {
+        Role: true,
+      },
+    })
+    return result
+  },
   
 }

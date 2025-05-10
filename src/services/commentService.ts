@@ -4,6 +4,7 @@ import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommentSchema } from '../utils/zod/commentSchemes'
 import { VoteType, CommentVote } from '@prisma/client';
+import { PostRepo } from '../repos/post.repo'
 
 async function findAllComments(postId: number) {
   const comments = await CommentRepo.findAll(postId)
@@ -35,10 +36,28 @@ async function updateComment(
   return CommentRepo.updateComment(commentId, data)
 }
 
-async function deleteComment(commentId: number) {
+async function deleteComment( userId: number, commentId: number,) {
+
   const comment = await CommentRepo.findCommentById(commentId)
   if (!comment) throw new APIError('Comment not found', 404)
+
+  // 3 types of users can delete a comment
+  // 1. The author of the comment
+  // 2. The Owner or moderator of the community
+  // 3. The owner of the post
+
+  const post = await PostRepo.getRoleByCommunityIdAndUserId(userId,comment.postId,)
+  if(!post) throw new APIError('Post not found', 404)
+
+
+  if (comment.authorId !== userId && comment.Post.Forum.Community.id !== userId    ) {
+    throw new APIError('You are not allowed to delete this comment', 403)
+    
+  }
+
+
   return CommentRepo.deleteComment(commentId)
+
 }
 
 async function getCommentsByUserIdAndCommunityId(

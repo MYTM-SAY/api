@@ -59,7 +59,9 @@ export const updateComment = asyncHandler(
 
 export const deleteComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    await CommentService.deleteComment(+req.params.id)
+    const actualUserId = +req.claims!.id
+    const commentId = +req.params.id
+    await CommentService.deleteComment(actualUserId, commentId);
     res.status(200).json(ResponseHelper.success('Comment deleted successfully'))
   },
 )
