@@ -7,15 +7,14 @@ import { CommunityRepo } from '../repos/community.repo'
 import APIError from '../errors/APIError'
 import { ParsedQs } from 'qs'
 import { querySchema } from '../utils'
+import { Role } from '@prisma/client'
+import { CommunityMemberService } from '../services/communityMemberService'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
+import { ClassroomRepo } from '../repos/classroom.repo'
 
 export const getClassrooms = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const id = +req.params.id
-    const community = await CommunityRepo.findById(id)
-
-    if (!community) throw new APIError('Community not found', 404)
-
-    const classrooms = await ClassroomService.getClassroomsByCommunityId(id)
+    const classrooms = await ClassroomService.getClassroomsByCommunityId(+req.params.id)
     res
       .status(200)
       .json(
@@ -31,6 +30,7 @@ export const getClassroom = asyncHandler(
       +req.params.id,
       includes,
     )
+
     res
       .status(200)
       .json(
@@ -41,7 +41,8 @@ export const getClassroom = asyncHandler(
 
 export const createClassroom = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const newClassroom = await ClassroomService.createClassroom(req.body)
+    const newClassroom = await ClassroomService.createClassroom(req.body, req.claims!.id)
+
     res
       .status(201)
       .json(
@@ -52,7 +53,8 @@ export const createClassroom = asyncHandler(
 
 export const deleteClassroom = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    await ClassroomService.deleteClassroom(+req.params.id)
+    await ClassroomService.deleteClassroom(+req.params.id, req.claims!.id)
+
     res
       .status(200)
       .json(ResponseHelper.success('Classroom deleted successfully'))
@@ -63,6 +65,7 @@ export const updateClassroom = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const updatedClassroom = await ClassroomService.updateClassroom(
       +req.params.id,
+      req.claims!.id,
       req.body,
     )
     res
@@ -75,8 +78,5 @@ export const updateClassroom = asyncHandler(
       )
   },
 )
-function parseBool(
-  section: string | ParsedQs | (string | ParsedQs)[] | undefined,
-) {
-  throw new Error('Function not implemented.')
-}
+
+

@@ -34,7 +34,6 @@ const router = express.Router()
 router.get(
   '/communities/:id',
   isAuthenticated,
-  isJoined('id'),
   getClassroomsByCommunityId,
 )
 /**
@@ -104,7 +103,6 @@ router.get('/:id', isAuthenticated, getClassroom)
 router.post(
   '/',
   isAuthenticated,
-  hasRoles([Role.MODERATOR, Role.OWNER]),
   createClassroom,
 )
 /**
