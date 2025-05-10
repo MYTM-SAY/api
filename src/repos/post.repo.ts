@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
-import { VoteType, PostVote } from '@prisma/client';
+import { VoteType, PostVote } from '@prisma/client'
 
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
@@ -17,9 +17,13 @@ export const PostRepo = {
         createdAt: true,
         updatedAt: true,
         _count: {
+<<<<<<< HEAD
           select: {
             Comments: true,
           },
+=======
+          select: { Comments: true },
+>>>>>>> 5b4c1e45698278ce6ac13de4e6798a1ef7892a3c
         },
         Author: {
           select: {
@@ -35,6 +39,7 @@ export const PostRepo = {
       orderBy: {
         createdAt: 'desc',
       },
+<<<<<<< HEAD
     });
   
     const postIds = posts.map(post => post.id);
@@ -61,23 +66,25 @@ export const PostRepo = {
       voteScore: voteMap.get(post.id) || 0,
       commentsCount: post._count.Comments
     }));
+=======
+    })
+>>>>>>> 5b4c1e45698278ce6ac13de4e6798a1ef7892a3c
 
     return postsWithVoteScore;
   },
   async findById(id: number) {
     const result = await prisma.post.findUnique({
-
       where: { id },
       select: {
         id: true,
         title: true,
         content: true,
-        attachments: true,       
-        forumId: true,              
+        attachments: true,
+        forumId: true,
         createdAt: true,
         updatedAt: true,
         _count: {
-          select: { Comments: true }, 
+          select: { Comments: true },
         },
         Author: {
           select: {
@@ -89,9 +96,28 @@ export const PostRepo = {
             },
           },
         },
+        Forum: {
+          select: {
+            Community: true,
+          },
+        },
+        Comments: {
+          include: {
+            Author: {
+              select: {
+                id: true,
+                username: true,
+                fullname: true,
+                UserProfile: {
+                  select: { profilePictureURL: true },
+                },
+              },
+            },
+          },
+        },
       },
-    
     })
+
     return result
   },
 
@@ -117,28 +143,28 @@ export const PostRepo = {
     return result
   },
 
-   async votedBefore(postId: number, userId: number): Promise<PostVote | null> {
+  async votedBefore(postId: number, userId: number): Promise<PostVote | null> {
     return prisma.postVote.findUnique({
       where: { userId_postId: { userId, postId } },
-    });
+    })
   },
   async getVoteCount(postId: number): Promise<number> {
     const [up, down] = await Promise.all([
       prisma.postVote.count({ where: { postId, type: VoteType.UPVOTE } }),
       prisma.postVote.count({ where: { postId, type: VoteType.DOWNVOTE } }),
-    ]);
-    return up - down;
+    ])
+    return up - down
   },
   async setVote(
     postId: number,
     userId: number,
-    type: VoteType
+    type: VoteType,
   ): Promise<PostVote> {
     return prisma.postVote.upsert({
       where: { userId_postId: { userId, postId } },
       create: { userId, postId, type },
       update: { type },
-    });
+    })
   },
 
   async getAllContribByUserId(userId: number) {
@@ -155,12 +181,12 @@ export const PostRepo = {
         id: true,
         title: true,
         content: true,
-        attachments: true,       
-        forumId: true,              
+        attachments: true,
+        forumId: true,
         createdAt: true,
         updatedAt: true,
         _count: {
-          select: { Comments: true }, 
+          select: { Comments: true },
         },
         Author: {
           select: {
@@ -173,7 +199,6 @@ export const PostRepo = {
             },
           },
         },
-
       },
     })
 
