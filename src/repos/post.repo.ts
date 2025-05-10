@@ -6,18 +6,20 @@ import { VoteType, PostVote } from '@prisma/client';
 export const PostRepo = {
   async findPostsByForumId(forumId: number) {
     // may need changes in the future ISA
-    const results = await prisma.post.findMany({
+    const posts = await prisma.post.findMany({
       where: { forumId },
       select: {
         id: true,
         title: true,
         content: true,
-        attachments: true,       
-        forumId: true,              
+        attachments: true,
+        forumId: true,
         createdAt: true,
         updatedAt: true,
         _count: {
-          select: { Comments: true }, 
+          select: {
+            Comments: true,
+          },
         },
         Author: {
           select: {
@@ -34,8 +36,33 @@ export const PostRepo = {
         createdAt: 'desc',
       },
     });
+  
+    const postIds = posts.map(post => post.id);
+  
+    const voteCounts = await prisma.postVote.groupBy({
+      by: ['postId', 'type'],
+      where: {
+        postId: { in: postIds },
+      },
+      _count: true,
+    });
+  
+    // Convert to a map for quick lookup
+    const voteMap = new Map<number, number>();
+    for (const { postId, type, _count } of voteCounts) {
+      const current = voteMap.get(postId) || 0;
+      const delta = type === 'UPVOTE' ? _count : type === 'DOWNVOTE' ? -_count : 0;
+      voteMap.set(postId, current + delta);
+    }
+  
+    // Attach vote scores to posts
+    const postsWithVoteScore = posts.map(post => ({
+      ...post,
+      voteScore: voteMap.get(post.id) || 0,
+      commentsCount: post._count.Comments
+    }));
 
-    return results
+    return postsWithVoteScore;
   },
   async findById(id: number) {
     const result = await prisma.post.findUnique({

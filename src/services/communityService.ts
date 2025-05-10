@@ -104,6 +104,10 @@ async function updateCommunity(
   const validatedData = await CommunitySchema.partial().parse(data)
   if (!validatedData) throw new APIError('Invalid data', 400)
 
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
+  if (role != Role.OWNER)
+    throw new APIError("You must be an Owner to edit it");
+
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
@@ -113,6 +117,11 @@ async function updateCommunity(
 async function deleteCommunity(communityId: number, userId: number) {
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
+
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
+  if (role != Role.OWNER)
+    throw new APIError("You must be an Owner to edit it");
+
 
   await CommunityRepo.delete(communityId)
 }

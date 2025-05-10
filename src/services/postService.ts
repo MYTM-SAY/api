@@ -18,18 +18,8 @@ async function getPostsByForumId(forumId: number) {
   if (!posts) {
     throw new APIError('Posts not found', 404);
   }
-
-  const filiterdPosts = posts.map((post) => {
-    const { _count, ...rest } = post; 
-
-    return {
-      ...rest,
-      commentsCount: _count.Comments,  
-    };
   
-  });
-
-  return filiterdPosts
+  return posts
 }
 
 
@@ -53,8 +43,6 @@ async function getPostById(postId: number) {
       ...rest,
       commentsCount: _count.Comments,  
     };
-  
-  
 
   return filiterdPost
 }

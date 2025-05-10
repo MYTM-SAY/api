@@ -37,7 +37,7 @@ const generateAccessToken = (user: User): string => {
     username: user.username,
     fullname: user.fullname,
   }
-  return jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
+  return jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
 }
 
 export const JwtService = {
