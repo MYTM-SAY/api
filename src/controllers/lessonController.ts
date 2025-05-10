@@ -14,7 +14,7 @@ export const getLessonsBySectionId = asyncHandler(
       throw new APIError('Invalid section ID', 400)
     }
 
-    const lessons = await LessonService.getLessonsBySectionId(sectionId)
+    const lessons = await LessonService.getLessonsBySectionId(sectionId, req.claims!.id)
     return res
       .status(200)
       .json(ResponseHelper.success('Lessons retrieved successfully', lessons))
@@ -28,7 +28,7 @@ export const getLessonById = asyncHandler(
       throw new APIError('Invalid lesson ID', 400)
     }
 
-    const lesson = await LessonService.getLessonById(id)
+    const lesson = await LessonService.getLessonById(id, req.claims!.id)
     return res
       .status(200)
       .json(ResponseHelper.success('Lesson retrieved successfully', lesson))
@@ -40,7 +40,7 @@ export const createLessonWithNewMaterial = asyncHandler(
     const validatedLessonData = CreateLessonWithMaterialSchema.parse(req.body)
 
     const newLesson =
-      await LessonService.createLessonWithNewMaterial(validatedLessonData)
+      await LessonService.createLessonWithNewMaterial(req.claims!.id, validatedLessonData)
 
     return res
       .status(201)
@@ -55,7 +55,7 @@ export const deleteLesson = asyncHandler(
       throw new APIError('Invalid lesson ID', 400)
     }
 
-    await LessonService.deleteLesson(id)
+    await LessonService.deleteLesson(id, req.claims!.id)
     return res
       .status(200)
       .json(ResponseHelper.success('Lesson deleted successfully'))
@@ -73,6 +73,7 @@ export const updateLesson = asyncHandler(
 
     const updatedLesson = await LessonService.updateLesson(
       id,
+      req.claims!.id,
       validatedUpdateData,
     )
     return res

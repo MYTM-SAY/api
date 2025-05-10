@@ -24,6 +24,11 @@ export const LessonRepo = {
       where: { id },
       include: {
         Materials: true,
+        Section: {
+          include: {
+            Classroom: true
+          }
+        }
       },
     })
     return lesson

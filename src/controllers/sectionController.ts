@@ -16,7 +16,7 @@ export const getSectionsByClassroomId = asyncHandler(
       throw new APIError('Invalid classroom ID', 400)
     }
 
-    const sections = await SectionService.getSectionsByClassroomId(classroomId)
+    const sections = await SectionService.getSectionsByClassroomId(classroomId, req.claims!.id)
     return res
       .status(200)
       .json(ResponseHelper.success('Sections retrieved successfully', sections))
@@ -30,7 +30,7 @@ export const getSectionById = asyncHandler(
       throw new APIError('Invalid section ID', 400)
     }
 
-    const section = await SectionService.getSectionById(id)
+    const section = await SectionService.getSectionById(id, req.claims!.id)
     return res
       .status(200)
       .json(ResponseHelper.success('Section retrieved successfully', section))
@@ -41,7 +41,7 @@ export const createSection = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const validatedData = CreateSectionSchema.parse(req.body)
 
-    const newSection = await SectionService.createSection(validatedData)
+    const newSection = await SectionService.createSection(validatedData, req.claims!.id)
     return res
       .status(201)
       .json(ResponseHelper.success('Section created successfully', newSection))
@@ -55,7 +55,7 @@ export const deleteSection = asyncHandler(
       throw new APIError('Invalid section ID', 400)
     }
 
-    await SectionService.deleteSection(id)
+    await SectionService.deleteSection(id, req.claims!.id)
     return res
       .status(200)
       .json(ResponseHelper.success('Section deleted successfully'))
@@ -68,13 +68,13 @@ export const updateSection = asyncHandler(
     if (!id || isNaN(id)) {
       throw new APIError('Invalid section ID', 400)
     }
-
     const validatedUpdateData = UpdateSectionSchema.parse(req.body)
-
     const updatedSection = await SectionService.updateSection(
       id,
+      req.claims!.id,
       validatedUpdateData,
     )
+
     return res
       .status(200)
       .json(

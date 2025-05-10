@@ -24,7 +24,7 @@ export const createClassroom = async (data: any, userId: number) => {
     const isOwnerOrMod = await isHasRole(userId, validatedData.communityId,
       [Role.MODERATOR, Role.OWNER]);
     if (!isOwnerOrMod)
-      throw new APIError("You must be an owner or mod")
+      throw new APIError("You must be an owner or mod", 403)
 
   return ClassroomRepo.create(validatedData)
 }
@@ -37,7 +37,7 @@ const deleteClassroom = async (id: number, userId: number) => {
     [Role.MODERATOR, Role.OWNER]);
 
   if (!isOwnerOrMod)
-    throw new APIError("You must be an owner or mod")    
+    throw new APIError("You must be an owner or mod", 403)    
   const classroom = await ClassroomRepo.delete(id)
 
   if (!classroom) throw new APIError('Classroom not found', 404)
@@ -53,7 +53,7 @@ const updateClassroom = async (id: number, userId:number, data: any) => {
     [Role.MODERATOR, Role.OWNER])
 
   if (!isOwnerOrMod)
-    throw new APIError("You must be an owner or mod")
+    throw new APIError("You must be an owner or mod", 403)
   const updatedClassroom = await ClassroomRepo.update(id, validatedData)
 
   return updatedClassroom
@@ -63,7 +63,7 @@ const isHasRole = async (userId: number, communityId: number, roles: Role[]) =>
   {
     const userRole = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
   
-    if (!userRole || !roles.includes(userRole))
+    if (userRole && !roles.includes(userRole))
       return false
     return true
   }
