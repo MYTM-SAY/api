@@ -17,13 +17,9 @@ export const PostRepo = {
         createdAt: true,
         updatedAt: true,
         _count: {
-<<<<<<< HEAD
           select: {
             Comments: true,
           },
-=======
-          select: { Comments: true },
->>>>>>> 5b4c1e45698278ce6ac13de4e6798a1ef7892a3c
         },
         Author: {
           select: {
@@ -39,7 +35,6 @@ export const PostRepo = {
       orderBy: {
         createdAt: 'desc',
       },
-<<<<<<< HEAD
     });
   
     const postIds = posts.map(post => post.id);
@@ -66,9 +61,6 @@ export const PostRepo = {
       voteScore: voteMap.get(post.id) || 0,
       commentsCount: post._count.Comments
     }));
-=======
-    })
->>>>>>> 5b4c1e45698278ce6ac13de4e6798a1ef7892a3c
 
     return postsWithVoteScore;
   },
