@@ -12,6 +12,21 @@ export const CommunityRepo = {
     })
     return results
   },
+  // get community by fourm id
+  async findByForumId(forumId: number) {
+    const result = await prisma.forum.findUnique({
+      where: { id: forumId },
+      include: {
+        Community: {
+          include: {
+            Tags: true,
+            Owner: true,
+          },
+        },
+      },
+    })
+    return result?.Community
+  },
 
   async create(community: z.infer<typeof CommunitySchema>, userId: number) {
     const { Tags, ...rest } = community

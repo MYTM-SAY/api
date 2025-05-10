@@ -196,4 +196,39 @@ export const PostRepo = {
 
     return results
   },
+  
+  async getPostAuthorAndCommunity(userId: number, postId: number) {
+    const result = await prisma.post.findUnique({
+      where: { id: postId },
+      select: {
+
+        Author: {
+          select: { id: true },
+        },
+        Forum: {
+          select: {
+            Community: {
+              select : {id : true}
+            },
+          },
+        },
+      }
+
+
+    })
+    return result
+  },
+  // get role by communityId and userId
+  async getRoleByCommunityIdAndUserId(userId: number, communityId: number) {
+    const result = await prisma.communityMembers.findUnique({
+      where: {  communityId_userId: {
+        communityId,
+        userId,
+      }, },
+      select: {
+        Role: true,
+      },
+    })
+    return result
+  },
 }

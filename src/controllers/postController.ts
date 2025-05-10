@@ -48,8 +48,11 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
     .json(ResponseHelper.success('Post updated successfully', post))
 })
 
-export const deletePost = asyncHandler(async (req: Request, res: Response) => {
-  await PostService.deletePost(+req.params.id)
+// TODO here we need to check if the user is the owner of the post or moderator, or owner of the communty
+export const deletePost = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const actualUserId = +req.claims!.id
+  const postId = +req.params.id
+  await PostService.deletePost( actualUserId, postId  )
   res.status(204).json(ResponseHelper.success('Post deleted successfully'))
 })
 

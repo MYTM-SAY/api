@@ -5,6 +5,10 @@ import { PostRepo } from '../repos/post.repo'
 import { PostSchema, PostUpdateSchema } from '../utils/zod/postSchemes'
 import { UserRepo } from '../repos/user.repo'
 import { VoteType, PostVote } from '@prisma/client';
+import { CommunityRepo } from '../repos/community.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
+import { use } from 'passport'
+import { Role } from '@prisma/client'
 
 async function getPostsByForumId(forumId: number) {
 
@@ -59,12 +63,21 @@ async function updatePost(
   return await PostRepo.update(postId, validatedData)
 }
 
-async function deletePost(postId: number) {
-  // TODO issue if post deleted, it deletes the fourm too
+async function deletePost( userId: number,postId: number,) {
+
   if (!postId) throw new APIError('Missing postId', 404)
-  const postExist = await PostRepo.findById(postId)
-  if (!postExist) throw new APIError('Post not found', 404)
-  await PostRepo.delete(postId)
+
+  const post = await PostRepo.findById(postId)
+  if (!post) throw new APIError('Post not found', 404)
+
+  const AccessAndCommunity= await PostRepo.getPostAuthorAndCommunity(userId, postId);
+  if (!AccessAndCommunity) throw new APIError('Can not get the Access Info for this post', 404)
+  
+
+    if(AccessAndCommunity.Author.id !== userId )
+      throw new APIError('You are not allowed to delete this post', 403)
+
+  return post
 }
 
 async function upVotePost(
