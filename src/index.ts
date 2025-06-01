@@ -53,6 +53,11 @@ app.get('/', (_req, res) => {
   })
 })
 
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerSpecs)
+})
+
 // Mount API routes (includes your google-auth endpoints under /api/v1/auth/google…)
 app.use('/api/v1/', router)
 

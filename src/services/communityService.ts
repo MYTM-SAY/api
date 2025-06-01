@@ -43,7 +43,7 @@ async function getCommunityById(communityId: number, userId: number) {
   if (!communityId || isNaN(communityId))
     throw new APIError('Invalid Community ID', 400)
   const community = await CommunityRepo.findById(communityId)
-  
+
   if (!community) throw new APIError('Community not found', 404)
 
   const forumId = community.Forums?.[0]?.id ?? null
@@ -104,9 +104,11 @@ async function updateCommunity(
   const validatedData = await CommunitySchema.partial().parse(data)
   if (!validatedData) throw new APIError('Invalid data', 400)
 
-  const role = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
-  if (role != Role.OWNER)
-    throw new APIError("You must be an Owner to edit it");
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    communityId,
+  )
+  if (role != Role.OWNER) throw new APIError('You must be an Owner to edit it')
 
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
@@ -118,10 +120,11 @@ async function deleteCommunity(communityId: number, userId: number) {
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
-  const role = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
-  if (role != Role.OWNER)
-    throw new APIError("You must be an Owner to edit it");
-
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    communityId,
+  )
+  if (role != Role.OWNER) throw new APIError('You must be an Owner to edit it')
 
   await CommunityRepo.delete(communityId)
 }
@@ -160,6 +163,7 @@ async function getAllOnlineUsersInACommunity(id: number) {
   const usersCount = await CommunityRepo.getAllOnlineUsersInACommunity(id)
   return usersCount
 }
+
 export const CommunityService = {
   getAllCommunities,
   discoverCommunities,

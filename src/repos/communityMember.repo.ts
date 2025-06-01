@@ -75,4 +75,14 @@ export const CommunityMembersRepo = {
     })
     return members
   },
+
+  async getAllMods(communityId: number) {
+    const modsCount = await prisma.communityMembers.count({
+      where: {
+        communityId,
+        Role: Role.MODERATOR,
+      },
+    })
+    return modsCount
+  },
 }

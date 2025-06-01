@@ -1,4 +1,6 @@
+import { Role } from '@prisma/client'
 import APIError from '../errors/APIError'
+import { CommunityRepo } from '../repos/community.repo'
 import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { asyncHandler } from '../utils/asyncHandler'
 
@@ -15,6 +17,29 @@ async function getUserRoleInCommunity(userId: number, communityId: number) {
   return memberRole
 }
 
+async function getAllMods(communityId: number) {
+  const isExists = await CommunityMembersRepo.findCommunity(communityId)
+
+  if (!isExists) throw new APIError('Community not found', 404)
+  return await CommunityMembersRepo.getAllMods(communityId)
+}
+
+async function LeaveFromCommunity(userId: number, communityId: number) {
+  console.log('LeaveFromCommunity called with:', userId, communityId)
+  const community = await CommunityRepo.findById(communityId)
+  if (!community) throw new APIError('Community not found', 404)
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    communityId,
+  )
+  if (role === Role.OWNER)
+    throw new APIError('You cannot leave a community if you are the owner', 403)
+
+  await CommunityMembersRepo.delete(userId, communityId)
+  return { message: 'You have left the community successfully' }
+}
 export const CommunityMemberService = {
   getUserRoleInCommunity,
+  getAllMods,
+  LeaveFromCommunity,
 }

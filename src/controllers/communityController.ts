@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../middlewares/authMiddleware'
 import { CommunityService } from '../services/communityService'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
+import { CommunityMemberService } from '../services/communityMemberService'
 
 export const getCommunities = asyncHandler(
   async (_: Request, res: Response) => {
@@ -141,5 +142,17 @@ export const getAllOnlineUsersInACommunity = asyncHandler(
           usersCount,
         ),
       )
+  },
+)
+export const LeaveFromCommunity = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.claims!.id
+    const communityId = +req.params.communityId
+
+    const { message } = await CommunityMemberService.LeaveFromCommunity(
+      userId,
+      communityId,
+    )
+    res.status(204).json(ResponseHelper.success(message, null))
   },
 )

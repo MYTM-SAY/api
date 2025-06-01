@@ -127,7 +127,7 @@ model Forum {
   communityId Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Community   Community @relation(fields: [communityId], references: [id],  onDelete: Cascade)
+  Community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   Posts       Post[]
 }
 
@@ -162,38 +162,36 @@ model Comment {
 }
 
 model PostVote {
-  type   VoteType   @default(NONE)
+  type   VoteType @default(NONE)
   userId Int
   postId Int
-  Post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  User   User @relation(fields: [userId], references: [id])
+  Post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  User   User     @relation(fields: [userId], references: [id])
 
   @@id([userId, postId])
 }
 
 model CommentVote {
-  type      VoteType   @default(NONE)
+  type      VoteType @default(NONE)
   userId    Int
   commentId Int
-  Comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [userId], references: [id])
+  Comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id])
 
   @@id([userId, commentId])
 }
 
 model Classroom {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  coverImg    String?
-  communityId Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  progress    Int       @default(0)
-  Community   Community @relation(fields: [communityId], references: [id])
-  Quiz        Quiz[]
-  Sections    Section[]
-
+  id               Int                @id @default(autoincrement())
+  name             String
+  description      String?
+  coverImg         String?
+  communityId      Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Community        Community          @relation(fields: [communityId], references: [id])
+  Quiz             Quiz[]
+  Sections         Section[]
   Progress         Progress[]
   CompletedLessons CompletedLessons[]
 }
@@ -241,9 +239,8 @@ model Progress {
   userId      Int
   classroomId Int
   progress    Int
-
-  Classroom Classroom @relation(fields: [classroomId], references: [id])
-  User      User      @relation(fields: [userId], references: [id])
+  Classroom   Classroom @relation(fields: [classroomId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, classroomId])
 }

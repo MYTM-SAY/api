@@ -8,6 +8,7 @@ import {
   getCommunity,
   getAllUsersInACommunity,
   getAllOnlineUsersInACommunity,
+  LeaveFromCommunity,
 } from '../controllers/communityController'
 import { hasRoles, isAuthenticated } from '../middlewares/authMiddleware'
 import {
@@ -20,7 +21,9 @@ import {
   getUsersInCommunity,
   removeUserInCommunity,
   getUserRoleInCommunity,
+  getAllMods,
 } from '../controllers/communityMemberController'
+import { get } from 'http'
 
 const app = express.Router()
 
@@ -574,4 +577,67 @@ app.get(
   getUserRoleInCommunity,
 )
 
+/**
+ * @swagger
+ * /communities/{communityId}/mods:
+ *   get:
+ *     summary: Get all moderators in a community
+ *     description: Retrieves a list of all moderators in the specified community.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to fetch moderators for.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all moderators.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Retrieved all moderators successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *       404:
+ *         description: Community not found.
+ */
+app.get('/:communityId/mods', getAllMods)
+
+/**
+ * @swagger
+ * /communities/{communityId}/leave:
+ *   delete:
+ *     summary: Leave a community
+ *     description: Allows a user to leave a specified community.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community to leave.
+ *     responses:
+ *       204:
+ *         description: Successfully left the community.
+ *       404:
+ *         description: Community not found or user not a member of the community.
+ */
+app.delete('/:communityId/leave', isAuthenticated, LeaveFromCommunity)
 export default app
