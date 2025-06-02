@@ -382,7 +382,7 @@ router.put('/downvote/:postId', isAuthenticated, downVotePost);
  * @swagger
  * /posts/feed/{userId}:
  *   get:
- *     summary: Get posts by forum ID
+ *     summary: Get feed by userId
  *     tags: [Posts]
  *     parameters:
  *       - in: path
