@@ -15,9 +15,10 @@ const getClassroomById = async (id: number, includes: QuerySchema) => {
   if (!classroom) throw new APIError('Classroom not found', 404)
 
   for (const section of classroom?.Sections || []) {
-    for (const lesson of section?.Lessons || []) {
-      lesson.isCompleted = Math.random() < 0.5 // 50% chance true/false
-      lesson.duration = Math.floor(Math.random() * 41) + 10 // Random duration between 10 and 50
+    const lessons = (section as any).Lessons as Array<any>
+    for (const lesson of lessons || []) {
+      lesson.isCompleted = Math.random() < 0.5
+      lesson.duration = Math.floor(Math.random() * 41) + 10
     }
   }
   return classroom

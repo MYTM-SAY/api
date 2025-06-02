@@ -20,16 +20,16 @@ model User {
   Comment           Comment[]
   CommentVote       CommentVote[]
   OwnedCommunities  Community[]         @relation("CommunityOwner")
-  InstructorProfile InstructorProfile[]
   CommunityMembers  CommunityMembers[]
+  CompletedLessons  CompletedLessons[]
+  InstructorProfile InstructorProfile[]
+  JoinRequests      JoinRequest[]
   Post              Post[]
   PostVote          PostVote[]
-  QuizScore         QuizScore[]
-  UserProfile       UserProfile?
-  JoinRequests      JoinRequest[]
   Progress          Progress[]
-  CompletedLessons  CompletedLessons[]
+  QuizScore         QuizScore[]
   UserContributions UserContributions[]
+  UserProfile       UserProfile?
 }
 
 model UserProfile {
@@ -77,11 +77,11 @@ model Community {
   isPublic         Boolean            @default(true)
   Classrooms       Classroom[]
   Owner            User               @relation("CommunityOwner", fields: [ownerId], references: [id])
-  Forums           Forum[]
   CommunityMembers CommunityMembers[]
-  Tags             Tag[]              @relation("CommunityToTag")
   CompletedLessons CompletedLessons[]
-  JoinRequests     JoinRequest[] // Removed incorrect `map` argument
+  Forums           Forum[]
+  JoinRequests     JoinRequest[]
+  Tags             Tag[]              @relation("CommunityToTag")
 }
 
 model JoinRequest {
@@ -91,8 +91,8 @@ model JoinRequest {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   status      JoinRequestStatus @default(PENDING)
-  User        User              @relation(fields: [userId], references: [id])
   Community   Community         @relation(fields: [communityId], references: [id])
+  User        User              @relation(fields: [userId], references: [id])
 
   @@unique([userId, communityId])
 }
@@ -162,9 +162,9 @@ model Comment {
 }
 
 model PostVote {
-  type   VoteType @default(NONE)
   userId Int
   postId Int
+  type   VoteType @default(NONE)
   Post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   User   User     @relation(fields: [userId], references: [id])
 
@@ -172,9 +172,9 @@ model PostVote {
 }
 
 model CommentVote {
-  type      VoteType @default(NONE)
   userId    Int
   commentId Int
+  type      VoteType @default(NONE)
   Comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   User      User     @relation(fields: [userId], references: [id])
 
@@ -190,10 +190,10 @@ model Classroom {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   Community        Community          @relation(fields: [communityId], references: [id])
+  CompletedLessons CompletedLessons[]
+  Progress         Progress[]
   Quiz             Quiz[]
   Sections         Section[]
-  Progress         Progress[]
-  CompletedLessons CompletedLessons[]
 }
 
 model Section {
@@ -209,16 +209,15 @@ model Section {
 }
 
 model Lesson {
-  id        Int        @id @default(autoincrement())
-  name      String
-  notes     String?
-  sectionId Int
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Section   Section    @relation(fields: [sectionId], references: [id])
-  Materials Material[] @relation("LessonMaterials")
-
+  id               Int                @id @default(autoincrement())
+  name             String
+  notes            String?
+  sectionId        Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   CompletedLessons CompletedLessons[]
+  Section          Section            @relation(fields: [sectionId], references: [id])
+  Materials        Material[]         @relation("LessonMaterials")
 }
 
 model CompletedLessons {
@@ -226,11 +225,10 @@ model CompletedLessons {
   lessonId    Int
   communityId Int
   classroomId Int
-
-  Lesson    Lesson    @relation(fields: [lessonId], references: [id])
-  User      User      @relation(fields: [userId], references: [id])
-  Community Community @relation(fields: [communityId], references: [id])
-  Classroom Classroom @relation(fields: [classroomId], references: [id])
+  Classroom   Classroom @relation(fields: [classroomId], references: [id])
+  Community   Community @relation(fields: [communityId], references: [id])
+  Lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, lessonId, communityId, classroomId])
 }
@@ -287,8 +285,8 @@ model UserContributions {
   id       Int      @id @default(autoincrement())
   userId   Int
   count    Int      @default(0)
-  User     User     @relation(fields: [userId], references: [id])
   dateOnly DateTime @db.Date
+  User     User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, dateOnly])
 }
