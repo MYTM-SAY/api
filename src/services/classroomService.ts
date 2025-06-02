@@ -13,6 +13,13 @@ const getClassroomsByCommunityId = async (communityId: number) => {
 const getClassroomById = async (id: number, includes: QuerySchema) => {
   const classroom = await ClassroomRepo.findbyId(id, includes)
   if (!classroom) throw new APIError('Classroom not found', 404)
+
+  for (const section of classroom?.Sections || []) {
+    for (const lesson of section?.Lessons || []) {
+      lesson.isCompleted = Math.random() < 0.5 // 50% chance true/false
+      lesson.duration = Math.floor(Math.random() * 41) + 10 // Random duration between 10 and 50
+    }
+  }
   return classroom
 }
 
@@ -21,10 +28,11 @@ export const createClassroom = async (data: any, userId: number) => {
   const community = await CommunityRepo.findById(validatedData.communityId)
   if (!community) throw new APIError('Community not found', 404)
 
-    const isOwnerOrMod = await isHasRole(userId, validatedData.communityId,
-      [Role.MODERATOR, Role.OWNER]);
-    if (!isOwnerOrMod)
-      throw new APIError("You must be an owner or mod", 403)
+  const isOwnerOrMod = await isHasRole(userId, validatedData.communityId, [
+    Role.MODERATOR,
+    Role.OWNER,
+  ])
+  if (!isOwnerOrMod) throw new APIError('You must be an owner or mod', 403)
 
   return ClassroomRepo.create(validatedData)
 }
@@ -33,41 +41,48 @@ const deleteClassroom = async (id: number, userId: number) => {
   const existingClassroom = await ClassroomRepo.findbyId(id)
   if (!existingClassroom) throw new APIError('Classroom not found', 404)
 
-  const isOwnerOrMod = await isHasRole(userId, existingClassroom.communityId, 
-    [Role.MODERATOR, Role.OWNER]);
+  const isOwnerOrMod = await isHasRole(userId, existingClassroom.communityId, [
+    Role.MODERATOR,
+    Role.OWNER,
+  ])
 
-  if (!isOwnerOrMod)
-    throw new APIError("You must be an owner or mod", 403)    
+  if (!isOwnerOrMod) throw new APIError('You must be an owner or mod', 403)
   const classroom = await ClassroomRepo.delete(id)
 
   if (!classroom) throw new APIError('Classroom not found', 404)
   return classroom
 }
 
-const updateClassroom = async (id: number, userId:number, data: any) => {
+const updateClassroom = async (id: number, userId: number, data: any) => {
   const validatedData = ClassroomSchema.partial().parse(data)
   const existingClassroom = await ClassroomRepo.findbyId(id)
 
   if (!existingClassroom) throw new APIError('Classroom not found', 404)
-  const isOwnerOrMod = await isHasRole(userId, existingClassroom.communityId, 
-    [Role.MODERATOR, Role.OWNER])
+  const isOwnerOrMod = await isHasRole(userId, existingClassroom.communityId, [
+    Role.MODERATOR,
+    Role.OWNER,
+  ])
 
-  if (!isOwnerOrMod)
-    throw new APIError("You must be an owner or mod", 403)
+  if (!isOwnerOrMod) throw new APIError('You must be an owner or mod', 403)
   const updatedClassroom = await ClassroomRepo.update(id, validatedData)
 
   return updatedClassroom
 }
 
-const isHasRole = async (userId: number, communityId: number, roles: Role[]) =>
-  {
-    const userRole = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
-  
-    if (userRole && !roles.includes(userRole))
-      return false
-    return true
-  }
-  
+const isHasRole = async (
+  userId: number,
+  communityId: number,
+  roles: Role[],
+) => {
+  const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    communityId,
+  )
+
+  if (userRole && !roles.includes(userRole)) return false
+  return true
+}
+
 export const ClassroomService = {
   getClassroomsByCommunityId,
   getClassroomById,
@@ -75,4 +90,3 @@ export const ClassroomService = {
   deleteClassroom,
   updateClassroom,
 }
-
