@@ -377,7 +377,6 @@ router.put('/upvote/:postId', isAuthenticated, upVotePost);
  *         description: Server error
  */
 router.put('/downvote/:postId', isAuthenticated, downVotePost);
-
 /**
  * @swagger
  * /posts/me/feed:
@@ -442,7 +441,12 @@ router.put('/downvote/:postId', isAuthenticated, downVotePost);
  *                     avatarUrl: https://example.com/profile.jpg
  *       401:
  *         description: Unauthorized
+ *       403:
+ *         description: Forbidden — insufficient permissions
+ *       404:
+ *         description: Feed not found
  */
+
 router.get('/me/feed', isAuthenticated, getAllPostsFromCommunitiesJoinedByUser)
 
 
