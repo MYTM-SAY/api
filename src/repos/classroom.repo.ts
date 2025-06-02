@@ -25,7 +25,9 @@ export const ClassroomRepo = {
         Sections: includes?.section
           ? {
               include: {
-                Lessons: includes?.lesson ? true : false,
+                Lessons: includes?.lesson
+                  ? { include: { Materials: true } }
+                  : false,
               },
             }
           : false,
