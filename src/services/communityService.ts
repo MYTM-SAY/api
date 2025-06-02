@@ -46,6 +46,7 @@ async function getCommunityById(communityId: number, userId: number) {
 
   if (!community) throw new APIError('Community not found', 404)
 
+  //hassan
   const forumId = community.Forums?.[0]?.id ?? null
   // Use object destructuring to exclude Forums
   const { Forums, ...restOfCommunity } = community
@@ -54,10 +55,9 @@ async function getCommunityById(communityId: number, userId: number) {
   const onlineMembers =
     await CommunityRepo.getAllOnlineUsersInACommunity(communityId)
   const role = await CommunityMembersRepo.getUserRoleInCommunity(
-    communityId,
     userId,
+    communityId,
   )
-
   return {
     ...restOfCommunity,
     forumId,
