@@ -380,17 +380,10 @@ router.put('/downvote/:postId', isAuthenticated, downVotePost);
 
 /**
  * @swagger
- * /posts/feed/{userId}:
+ * /posts/me/feed:
  *   get:
- *     summary: Get feed by userId
+ *     summary: Get feed for the authenticated user
  *     tags: [Posts]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: integer
- *         description: Forum ID
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -449,9 +442,8 @@ router.put('/downvote/:postId', isAuthenticated, downVotePost);
  *                     avatarUrl: https://example.com/profile.jpg
  *       401:
  *         description: Unauthorized
- *       404:
- *         description: Forum not found
  */
-router.get('/feed/:userId', isAuthenticated, getAllPostsFromCommunitiesJoinedByUser)
+router.get('/me/feed', isAuthenticated, getAllPostsFromCommunitiesJoinedByUser)
+
 
 export default router

@@ -143,19 +143,12 @@ async function getAllPostContribByUser(userId: number) {
   }
 
 async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
-  // 1️⃣ Input validation
-  if (!userId) {
-    throw new APIError('Missing userId', 400);
-  }
 
-  // 2️⃣ Ensure user exists
-  const user = await UserRepo.findById(userId);
-  if (!user) {
-    throw new APIError('User not found', 404);
-  }
+  
 
   // 3️⃣ Fetch flat list of posts  
   const posts = await PostRepo.getPostsFromCommunitiesJoinedByUser(userId);
+
   if (!posts.length) {
     return []; 
   }
