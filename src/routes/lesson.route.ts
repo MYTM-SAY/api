@@ -252,7 +252,7 @@ router.delete('/:id', deleteLesson)
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: "Lesson completion status toggled"
+ *                   example: Lesson completion status toggled
  *                 data:
  *                   type: object
  *                   properties:
@@ -261,8 +261,30 @@ router.delete('/:id', deleteLesson)
  *                       example: false
  *       400:
  *         description: Invalid lesson ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid lesson ID
  *       404:
  *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Lesson not found
  *       500:
  *         description: Internal server error
  */

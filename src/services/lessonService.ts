@@ -1,6 +1,6 @@
 import { LessonRepo } from '../repos/lesson.repo'
 import APIError from '../errors/APIError'
-import z from 'zod'
+import z, { boolean } from 'zod'
 import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
 import { SectionRepo } from '../repos/section.repo'
 import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
@@ -82,12 +82,16 @@ const isHasRole = async (userId: number, communityId: number, roles: Role[]) => 
   return true
 }
 
-const toggleCompleted = async (id: number) => {
-  const lesson = await LessonRepo.findById(id)
-  if (!lesson) throw new APIError('Lesson not found', 404)
-  const updatedLesson = await LessonRepo.toggleCompleted(id, lesson.isCompleted)
-  return updatedLesson
-}
+const toggleCompleted = async (lessonId: number, userId: number) => {
+  const lesson = await LessonRepo.findById(lessonId);
+  if (!lesson) throw new APIError('Lesson not found', 404);
+
+  const isAlreadyCompleted = await LessonRepo.findCompletedLessonForUser(lessonId, userId);
+  const isCompleted = await LessonRepo.toggleCompleted(lessonId, userId, !!isAlreadyCompleted);
+
+  return isCompleted; // boolean
+};
+
 
 export const LessonService = {
   getLessonsBySectionId,

@@ -86,14 +86,19 @@ export const updateLesson = asyncHandler(
 
 export const toggleCompleted = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const id = +req.params.id
-    if (!id || isNaN(id)) {
-      throw new APIError('Invalid lesson ID', 400)
+    const lessonId = Number(req.params.id);
+    const userId = req.claims!.id;
+
+    if (!lessonId || isNaN(lessonId)) {
+      throw new APIError('Invalid lesson ID', 400);
     }
 
-    const updatedLesson = await LessonService.toggleCompleted(id)
-    return res
-      .status(200)
-      .json(ResponseHelper.success('Lesson completion status toggled', updatedLesson))
+    const isCompleted = await LessonService.toggleCompleted(lessonId, userId);
+
+    return res.status(200).json(
+      ResponseHelper.success('Lesson completion status toggled', {
+        isCompleted,
+      }),
+    );
   },
-)
+);

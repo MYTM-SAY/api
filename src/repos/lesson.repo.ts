@@ -67,24 +67,36 @@ export const LessonRepo = {
     return updatedlesson
   },
 
-  async toggleCompleted(id: number, status: boolean) {
-    const lesson = await prisma.lesson.findUnique({
-      where: { id },
+
+  async findCompletedLessonForUser(lessonId: number, userId: number) {
+    const completedLesson = await prisma.completedLessons.findFirst({
+      where: {
+        lessonId,
+        userId,
+      },
     })
+    return completedLesson
+  },
 
-    if (!lesson) {
-      throw new Error('Lesson not found')
-    }
-
-    const updatedLesson = await prisma.lesson.update({
-      where: { id },
+async toggleCompleted(lessonId: number, userId: number, found: boolean): Promise<boolean> {
+  if (found) {
+    await prisma.completedLessons.delete({
+      where: {
+        userId_lessonId: {
+          lessonId,
+          userId,
+        },
+      },
+    });
+    return false;
+  } else {
+    await prisma.completedLessons.create({
       data: {
-        isCompleted: !status,
+        lessonId,
+        userId,
       },
-      select: {
-        isCompleted: true,
-      },
-    })
-    return updatedLesson
+    });
+    return true;
   }
+}
 }
