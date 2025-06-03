@@ -82,10 +82,18 @@ const isHasRole = async (userId: number, communityId: number, roles: Role[]) => 
   return true
 }
 
+const toggleCompleted = async (id: number) => {
+  const lesson = await LessonRepo.findById(id)
+  if (!lesson) throw new APIError('Lesson not found', 404)
+  const updatedLesson = await LessonRepo.toggleCompleted(id, lesson.isCompleted)
+  return updatedLesson
+}
+
 export const LessonService = {
   getLessonsBySectionId,
   getLessonById,
   createLessonWithNewMaterial,
   deleteLesson,
   updateLesson,
+  toggleCompleted,
 }
