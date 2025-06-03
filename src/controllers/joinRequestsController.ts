@@ -26,7 +26,7 @@ export const createJoinRequstCommunity = asyncHandler(
     if (!joinRequest)
       return res
         .status(201)
-        .json(ResponseHelper.error('Joined community successfully'))
+        .json(ResponseHelper.success('Joined community successfully'))
 
     return res
       .status(201)

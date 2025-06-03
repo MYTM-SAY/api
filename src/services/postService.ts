@@ -143,6 +143,38 @@ async function getAllPostContribByUser(userId: number) {
     return filiterdPosts
   }
 
+async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
+
+  
+
+  // 3️⃣ Fetch flat list of posts  
+  const posts = await PostRepo.getPostsFromCommunitiesJoinedByUser(userId);
+
+  if (!posts.length) {
+    return []; 
+  }
+
+  // 4️⃣ Map to your exact JSON shape
+  return posts.map(post => ({
+    id:           post.id,
+    title:        post.title,
+    content:      post.content,
+    voteCounter:  post._count.PostVotes,
+    attachments:  post.attachments,
+    forumId:      post.forumId,
+    createdAt:    post.createdAt,
+    updatedAt:    post.updatedAt,
+    commentCount: post._count.Comments,
+    author: {
+      id:        post.Author.id,
+      username:  post.Author.username,
+      fullname:  post.Author.fullname,
+      // fallback to a default if none set
+      avatarUrl: post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg'
+    }
+  }));
+}
+
 export const PostService = {
   getPostsByForumId,
   createPost,
@@ -152,4 +184,6 @@ export const PostService = {
   upVotePost,
   downVotePost,
   getAllPostContribByUser,
+
+  getAllPostsFromCommunitiesJoinedByUser,
 }
