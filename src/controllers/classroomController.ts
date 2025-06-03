@@ -14,7 +14,9 @@ import { ClassroomRepo } from '../repos/classroom.repo'
 
 export const getClassrooms = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const classrooms = await ClassroomService.getClassroomsByCommunityId(+req.params.id)
+    const classrooms = await ClassroomService.getClassroomsByCommunityId(
+      +req.params.id,
+    )
     res
       .status(200)
       .json(
@@ -41,7 +43,10 @@ export const getClassroom = asyncHandler(
 
 export const createClassroom = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const newClassroom = await ClassroomService.createClassroom(req.body, req.claims!.id)
+    const newClassroom = await ClassroomService.createClassroom(
+      req.body,
+      req.claims!.id,
+    )
 
     res
       .status(201)
@@ -81,11 +86,17 @@ export const updateClassroom = asyncHandler(
 
 export const classroomProgress = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const progress = await ClassroomService.classroomProgress(+req.params.id, +req.claims!.id)
+    const progress = await ClassroomService.classroomProgress(
+      +req.params.id,
+      +req.claims!.id,
+    )
     res
       .status(200)
-      .json(ResponseHelper.success('Classroom progress retrieved successfuly', progress))
+      .json(
+        ResponseHelper.success(
+          'Classroom progress retrieved successfuly',
+          progress,
+        ),
+      )
   },
 )
-
-

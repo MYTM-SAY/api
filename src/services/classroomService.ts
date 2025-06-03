@@ -85,10 +85,10 @@ const isHasRole = async (
 }
 
 const classroomProgress = async (classroomId: number, userId: number) => {
-  const classroom = await ClassroomRepo.findbyId(classroomId);
-  if (!classroom) throw new APIError('Classroom not found', 404);
-  const progress = await ClassroomRepo.classroomProgress(classroomId, userId);
-  return progress;
+  const classroom = await ClassroomRepo.findbyId(classroomId)
+  if (!classroom) throw new APIError('Classroom not found', 404)
+  const progress = await ClassroomRepo.classroomProgress(classroomId, userId)
+  return progress
 }
 
 export const ClassroomService = {

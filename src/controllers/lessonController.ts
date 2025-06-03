@@ -14,7 +14,10 @@ export const getLessonsBySectionId = asyncHandler(
       throw new APIError('Invalid section ID', 400)
     }
 
-    const lessons = await LessonService.getLessonsBySectionId(sectionId, req.claims!.id)
+    const lessons = await LessonService.getLessonsBySectionId(
+      sectionId,
+      req.claims!.id,
+    )
     return res
       .status(200)
       .json(ResponseHelper.success('Lessons retrieved successfully', lessons))
@@ -39,8 +42,10 @@ export const createLessonWithNewMaterial = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const validatedLessonData = CreateLessonWithMaterialSchema.parse(req.body)
 
-    const newLesson =
-      await LessonService.createLessonWithNewMaterial(req.claims!.id, validatedLessonData)
+    const newLesson = await LessonService.createLessonWithNewMaterial(
+      req.claims!.id,
+      validatedLessonData,
+    )
 
     return res
       .status(201)
@@ -86,19 +91,19 @@ export const updateLesson = asyncHandler(
 
 export const toggleCompleted = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const lessonId = Number(req.params.id);
-    const userId = req.claims!.id;
+    const lessonId = Number(req.params.id)
+    const userId = req.claims!.id
 
     if (!lessonId || isNaN(lessonId)) {
-      throw new APIError('Invalid lesson ID', 400);
+      throw new APIError('Invalid lesson ID', 400)
     }
 
-    const isCompleted = await LessonService.toggleCompleted(lessonId, userId);
+    const isCompleted = await LessonService.toggleCompleted(lessonId, userId)
 
     return res.status(200).json(
       ResponseHelper.success('Lesson completion status toggled', {
         isCompleted,
       }),
-    );
+    )
   },
-);
+)

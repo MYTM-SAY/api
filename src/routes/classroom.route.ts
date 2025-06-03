@@ -5,7 +5,7 @@ import {
   createClassroom,
   deleteClassroom,
   updateClassroom,
-  classroomProgress
+  classroomProgress,
 } from '../controllers/classroomController'
 import {
   hasRoles,
@@ -32,11 +32,7 @@ const router = express.Router()
  *       200:
  *         description: List of all classrooms in the specified community
  */
-router.get(
-  '/communities/:id',
-  isAuthenticated,
-  getClassroomsByCommunityId,
-)
+router.get('/communities/:id', isAuthenticated, getClassroomsByCommunityId)
 /**
  * @swagger
  * /classrooms/{id}:
@@ -101,11 +97,7 @@ router.get('/:id', isAuthenticated, getClassroom)
  *       201:
  *         description: Classroom created successfully
  */
-router.post(
-  '/',
-  isAuthenticated,
-  createClassroom,
-)
+router.post('/', isAuthenticated, createClassroom)
 /**
  * @swagger
  * /classrooms/{id}:
@@ -195,6 +187,6 @@ router.put('/:id', isAuthenticated, updateClassroom)
  *         description: Classroom not found
  */
 
-router.get('/progress/:id', isAuthenticated, classroomProgress);
+router.get('/progress/:id', isAuthenticated, classroomProgress)
 
 export default router

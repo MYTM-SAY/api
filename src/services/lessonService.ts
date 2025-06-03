@@ -11,11 +11,12 @@ const getLessonsBySectionId = async (sectionId: number, userId: number) => {
   const sectionExist = await SectionRepo.findById(sectionId)
   if (!sectionExist) throw new APIError('Section not found', 404)
 
-  const isJoined = await isHasRole(userId, sectionExist.Classroom.communityId,
-    [Role.MODERATOR, Role.OWNER]);
+  const isJoined = await isHasRole(userId, sectionExist.Classroom.communityId, [
+    Role.MODERATOR,
+    Role.OWNER,
+  ])
 
-  if (!isJoined)
-    throw new APIError("You must be owner or mod", 403)
+  if (!isJoined) throw new APIError('You must be owner or mod', 403)
   return LessonRepo.findBySectionId(sectionId)
 }
 
@@ -23,11 +24,13 @@ const getLessonById = async (id: number, userId: number) => {
   const existingLesson = await LessonRepo.findById(id)
   if (!existingLesson) throw new APIError('Lesson not found', 404)
 
-  const isJoined = await isHasRole(userId, existingLesson.Section.Classroom.communityId,
-    [Role.MODERATOR, Role.OWNER]);
+  const isJoined = await isHasRole(
+    userId,
+    existingLesson.Section.Classroom.communityId,
+    [Role.MODERATOR, Role.OWNER],
+  )
 
-  if (!isJoined)
-    throw new APIError("You must be owner or mod", 403)
+  if (!isJoined) throw new APIError('You must be owner or mod', 403)
   return existingLesson
 }
 
@@ -37,22 +40,26 @@ const createLessonWithNewMaterial = async (
 ) => {
   const sectionExist = await SectionRepo.findById(data.lesson.sectionId)
   if (!sectionExist) throw new APIError('Section not found', 404)
-  const isOwnerMod = await isHasRole(userId, sectionExist.Classroom.communityId,
-    [Role.MODERATOR, Role.OWNER]);
+  const isOwnerMod = await isHasRole(
+    userId,
+    sectionExist.Classroom.communityId,
+    [Role.MODERATOR, Role.OWNER],
+  )
 
-  if (!isOwnerMod)
-    throw new APIError("You must be owner or mod", 403)
+  if (!isOwnerMod) throw new APIError('You must be owner or mod', 403)
   return LessonRepo.createWithMaterial(data)
 }
 
 const deleteLesson = async (id: number, userId: number) => {
   const lessonExists = await LessonRepo.findById(id)
   if (!lessonExists) throw new APIError('Lesson not found', 404)
-  const isOwnerMod = await isHasRole(userId, lessonExists.Section.Classroom.communityId,
-    [Role.MODERATOR, Role.OWNER]);
+  const isOwnerMod = await isHasRole(
+    userId,
+    lessonExists.Section.Classroom.communityId,
+    [Role.MODERATOR, Role.OWNER],
+  )
 
-  if (!isOwnerMod)
-    throw new APIError("You must be owner or mod", 403)
+  if (!isOwnerMod) throw new APIError('You must be owner or mod', 403)
   const lesson = await LessonRepo.delete(id)
   return lesson
 }
@@ -64,34 +71,47 @@ const updateLesson = async (
 ) => {
   const lessonExists = await LessonRepo.findById(id)
   if (!lessonExists) throw new APIError('Lesson not found', 404)
-  const isOwnerMod = await isHasRole(userId, lessonExists.Section.Classroom.communityId,
-    [Role.MODERATOR, Role.OWNER]);
+  const isOwnerMod = await isHasRole(
+    userId,
+    lessonExists.Section.Classroom.communityId,
+    [Role.MODERATOR, Role.OWNER],
+  )
 
-  if (!isOwnerMod)
-    throw new APIError("You must be owner or mod", 403)
+  if (!isOwnerMod) throw new APIError('You must be owner or mod', 403)
   const updatedLesson = await LessonRepo.update(id, data)
   return updatedLesson
 }
 
+const isHasRole = async (
+  userId: number,
+  communityId: number,
+  roles: Role[],
+) => {
+  const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    communityId,
+  )
 
-const isHasRole = async (userId: number, communityId: number, roles: Role[]) => {
-  const userRole = await CommunityMembersRepo.getUserRoleInCommunity(userId, communityId);
-
-  if (userRole && !roles.includes(userRole))
-    return false
+  if (userRole && !roles.includes(userRole)) return false
   return true
 }
 
 const toggleCompleted = async (lessonId: number, userId: number) => {
-  const lesson = await LessonRepo.findById(lessonId);
-  if (!lesson) throw new APIError('Lesson not found', 404);
+  const lesson = await LessonRepo.findById(lessonId)
+  if (!lesson) throw new APIError('Lesson not found', 404)
 
-  const isAlreadyCompleted = await LessonRepo.findCompletedLessonForUser(lessonId, userId);
-  const isCompleted = await LessonRepo.toggleCompleted(lessonId, userId, !!isAlreadyCompleted);
+  const isAlreadyCompleted = await LessonRepo.findCompletedLessonForUser(
+    lessonId,
+    userId,
+  )
+  const isCompleted = await LessonRepo.toggleCompleted(
+    lessonId,
+    userId,
+    !!isAlreadyCompleted,
+  )
 
-  return isCompleted; // boolean
-};
-
+  return isCompleted
+}
 
 export const LessonService = {
   getLessonsBySectionId,

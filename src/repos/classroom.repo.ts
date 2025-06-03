@@ -72,20 +72,19 @@ export const ClassroomRepo = {
   },
 
   async classroomProgress(classroomId: number, userId: number) {
-
     const lessons = await prisma.lesson.count({
-      where:{ Section:{classroomId} },
-    });
-    
+      where: { Section: { classroomId } },
+    })
+
     const completedLessons = await prisma.completedLessons.count({
       where: {
         userId,
       },
-    });
+    })
 
     if (lessons === 0 || completedLessons === 0) {
       return 0
     }
     return (completedLessons / lessons) * 100
-}
+  },
 }

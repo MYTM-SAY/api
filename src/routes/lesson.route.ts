@@ -5,7 +5,7 @@ import {
   createLessonWithNewMaterial,
   deleteLesson,
   updateLesson,
-  toggleCompleted
+  toggleCompleted,
 } from '../controllers/lessonController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
