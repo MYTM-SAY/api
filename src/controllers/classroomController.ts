@@ -79,4 +79,13 @@ export const updateClassroom = asyncHandler(
   },
 )
 
+export const classroomProgress = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const progress = await ClassroomService.clasroomProgress(+req.params.id)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Classroom progress retrieved successfuly', progress))
+  },
+)
+
 

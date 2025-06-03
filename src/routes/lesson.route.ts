@@ -254,7 +254,11 @@ router.delete('/:id', deleteLesson)
  *                   type: string
  *                   example: "Lesson completion status toggled"
  *                 data:
- *                   $ref: '#/components/schemas/Lesson'
+ *                   type: object
+ *                   properties:
+ *                     isCompleted:
+ *                       type: boolean
+ *                       example: false
  *       400:
  *         description: Invalid lesson ID
  *       404:

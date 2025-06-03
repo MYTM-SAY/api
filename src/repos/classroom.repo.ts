@@ -70,4 +70,23 @@ export const ClassroomRepo = {
 
     return updatedClassroom
   },
+
+  async clasroomProgress(classroomId: number) {
+
+    const lessons = await prisma.lesson.count({
+      where:{ Section:{classroomId} },
+    });
+    
+    const completedLessons = await prisma.lesson.count({
+      where: {
+        Section: { classroomId },
+        isCompleted: true,
+      },
+    });
+
+    if (lessons === 0 || completedLessons === 0) {
+      return 0
+    }
+    return (completedLessons / lessons) * 100
+}
 }
