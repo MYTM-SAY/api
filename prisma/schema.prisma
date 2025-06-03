@@ -26,7 +26,6 @@ model User {
   JoinRequests      JoinRequest[]
   Post              Post[]
   PostVote          PostVote[]
-  Progress          Progress[]
   QuizScore         QuizScore[]
   UserContributions UserContributions[]
   UserProfile       UserProfile?
@@ -191,7 +190,6 @@ model Classroom {
   updatedAt        DateTime           @updatedAt
   Community        Community          @relation(fields: [communityId], references: [id])
   CompletedLessons CompletedLessons[]
-  Progress         Progress[]
   Quiz             Quiz[]
   Sections         Section[]
 }
@@ -234,15 +232,6 @@ model CompletedLessons {
   @@unique([userId, lessonId, communityId, classroomId])
 }
 
-model Progress {
-  userId      Int
-  classroomId Int
-  progress    Int
-  Classroom   Classroom @relation(fields: [classroomId], references: [id])
-  User        User      @relation(fields: [userId], references: [id])
-
-  @@unique([userId, classroomId])
-}
 
 model Question {
   id        Int      @id @default(autoincrement())
