@@ -66,7 +66,6 @@ model Tag {
 }
 
 model Community {
-
   id                  Int                   @id @default(autoincrement())
   name                String
   description         String?
@@ -204,8 +203,6 @@ model Classroom {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   Community        Community          @relation(fields: [communityId], references: [id])
-  CompletedLessons CompletedLessons[]
-  Progress         Progress[]
   Quiz             Quiz[]
   Sections         Section[]
 }
@@ -237,24 +234,10 @@ model Lesson {
 model CompletedLessons {
   userId      Int
   lessonId    Int
-  communityId Int
-  classroomId Int
-  Classroom   Classroom @relation(fields: [classroomId], references: [id])
-  Community   Community @relation(fields: [communityId], references: [id])
   Lesson      Lesson    @relation(fields: [lessonId], references: [id])
   User        User      @relation(fields: [userId], references: [id])
 
-  @@unique([userId, lessonId, communityId, classroomId])
-}
-
-model Progress {
-  userId      Int
-  classroomId Int
-  progress    Int
-  Classroom   Classroom @relation(fields: [classroomId], references: [id])
-  User        User      @relation(fields: [userId], references: [id])
-
-  @@unique([userId, classroomId])
+  @@unique([userId, lessonId])
 }
 
 model Question {
@@ -311,6 +294,17 @@ model File {
   url       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+model favoriteCommunities {
+  userId      Int
+  communityId Int
+  createdAt   DateTime  @default(now())
+  Community   Community @relation(fields: [communityId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
+
+  @@id([userId, communityId])
 }
 
 enum MaterialType {

@@ -66,4 +66,37 @@ export const LessonRepo = {
     })
     return updatedlesson
   },
+
+
+  async findCompletedLessonForUser(lessonId: number, userId: number) {
+    const completedLesson = await prisma.completedLessons.findFirst({
+      where: {
+        lessonId,
+        userId,
+      },
+    })
+    return completedLesson
+  },
+
+async toggleCompleted(lessonId: number, userId: number, found: boolean): Promise<boolean> {
+  if (found) {
+    await prisma.completedLessons.delete({
+      where: {
+        userId_lessonId: {
+          lessonId,
+          userId,
+        },
+      },
+    });
+    return false;
+  } else {
+    await prisma.completedLessons.create({
+      data: {
+        lessonId,
+        userId,
+      },
+    });
+    return true;
+  }
+}
 }

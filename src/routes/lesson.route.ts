@@ -5,6 +5,7 @@ import {
   createLessonWithNewMaterial,
   deleteLesson,
   updateLesson,
+  toggleCompleted,
 } from '../controllers/lessonController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
@@ -223,4 +224,69 @@ router.patch('/:id', updateLesson)
  */
 router.delete('/:id', deleteLesson)
 
+/**
+ * @swagger
+ * /lessons/{id}/toggle-completed:
+ *   patch:
+ *     summary: Toggle the completion status of a lesson by ID
+ *     tags: [Lessons]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the lesson to toggle completion status
+ *     responses:
+ *       200:
+ *         description: Lesson completion status toggled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Lesson completion status toggled
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     isCompleted:
+ *                       type: boolean
+ *                       example: false
+ *       400:
+ *         description: Invalid lesson ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid lesson ID
+ *       404:
+ *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Lesson not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/:id/toggle-completed', toggleCompleted)
 export default router

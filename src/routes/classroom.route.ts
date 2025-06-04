@@ -5,6 +5,7 @@ import {
   createClassroom,
   deleteClassroom,
   updateClassroom,
+  classroomProgress,
 } from '../controllers/classroomController'
 import {
   hasRoles,
@@ -31,11 +32,7 @@ const router = express.Router()
  *       200:
  *         description: List of all classrooms in the specified community
  */
-router.get(
-  '/communities/:id',
-  isAuthenticated,
-  getClassroomsByCommunityId,
-)
+router.get('/communities/:id', isAuthenticated, getClassroomsByCommunityId)
 /**
  * @swagger
  * /classrooms/{id}:
@@ -100,11 +97,7 @@ router.get('/:id', isAuthenticated, getClassroom)
  *       201:
  *         description: Classroom created successfully
  */
-router.post(
-  '/',
-  isAuthenticated,
-  createClassroom,
-)
+router.post('/', isAuthenticated, createClassroom)
 /**
  * @swagger
  * /classrooms/{id}:
@@ -159,5 +152,41 @@ router.delete('/:id', isAuthenticated, deleteClassroom)
  *         description: Classroom not found
  */
 router.put('/:id', isAuthenticated, updateClassroom)
+
+/**
+ * @swagger
+ * /classrooms/progress/{id}:
+ *   get:
+ *     summary: Get the progress percentage of a classroom
+ *     tags: [Classrooms]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The classroom ID
+ *     responses:
+ *       200:
+ *         description: Classroom progress retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Classroom progress retrieved successfuly"
+ *                 data:
+ *                   type: number
+ *                   example: 25
+ *       404:
+ *         description: Classroom not found
+ */
+
+router.get('/progress/:id', isAuthenticated, classroomProgress)
 
 export default router
