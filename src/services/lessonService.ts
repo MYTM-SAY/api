@@ -99,18 +99,17 @@ const isHasRole = async (
 const toggleCompleted = async (lessonId: number, userId: number) => {
   const lesson = await LessonRepo.findById(lessonId)
   if (!lesson) throw new APIError('Lesson not found', 404)
-
   const isAlreadyCompleted = await LessonRepo.findCompletedLessonForUser(
     lessonId,
     userId,
-  )
-  const isCompleted = await LessonRepo.toggleCompleted(
-    lessonId,
-    userId,
-    !!isAlreadyCompleted,
-  )
-
-  return isCompleted
+  );
+  if (isAlreadyCompleted) {
+     await LessonRepo.toggleUnCompleted(lessonId, userId);
+     return false;
+  } else {
+     LessonRepo.toggleCompleted(lessonId, userId);
+     return true;
+  }
 }
 
 export const LessonService = {
