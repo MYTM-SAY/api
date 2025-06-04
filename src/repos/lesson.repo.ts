@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
 import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
+import { toggleCompleted } from '../controllers/lessonController'
 
 export const LessonRepo = {
   async findBySectionId(id: number) {
@@ -78,8 +79,7 @@ export const LessonRepo = {
     return completedLesson
   },
 
-async toggleCompleted(lessonId: number, userId: number, found: boolean): Promise<boolean> {
-  if (found) {
+async toggleUnCompleted(lessonId: number, userId: number) {
     await prisma.completedLessons.delete({
       where: {
         userId_lessonId: {
@@ -88,15 +88,15 @@ async toggleCompleted(lessonId: number, userId: number, found: boolean): Promise
         },
       },
     });
-    return false;
-  } else {
-    await prisma.completedLessons.create({
+},
+
+async toggleCompleted(lessonId: number, userId: number) {
+  await prisma.completedLessons.create({
       data: {
         lessonId,
         userId,
       },
     });
-    return true;
   }
 }
-}
+
