@@ -20,15 +20,16 @@ model User {
   Comment             Comment[]
   CommentVote         CommentVote[]
   OwnedCommunities    Community[]           @relation("CommunityOwner")
-  CommunityMembers    CommunityMembers[]
-  CompletedLessons    CompletedLessons[]
   InstructorProfile   InstructorProfile[]
-  JoinRequests        JoinRequest[]
+  CommunityMembers    CommunityMembers[]
   Post                Post[]
   PostVote            PostVote[]
   QuizScore           QuizScore[]
-  UserContributions   UserContributions[]
   UserProfile         UserProfile?
+  JoinRequests        JoinRequest[]
+  Progress            Progress[]
+  CompletedLessons    CompletedLessons[]
+  UserContributions   UserContributions[]
   favoriteCommunities favoriteCommunities[]
 }
 
@@ -77,11 +78,12 @@ model Community {
   isPublic            Boolean               @default(true)
   Classrooms          Classroom[]
   Owner               User                  @relation("CommunityOwner", fields: [ownerId], references: [id])
-  CommunityMembers    CommunityMembers[]
   Forums              Forum[]
-  JoinRequests        JoinRequest[]
-  favoriteCommunities favoriteCommunities[]
+  CommunityMembers    CommunityMembers[]
   Tags                Tag[]                 @relation("CommunityToTag")
+  CompletedLessons    CompletedLessons[]
+  JoinRequests        JoinRequest[] // Removed incorrect `map` argument
+  favoriteCommunities favoriteCommunities[]
 }
 
 model JoinRequest {
@@ -108,6 +110,17 @@ model CommunityMembers {
 
   @@id([communityId, userId])
   @@map("CommunityMembers")
+}
+
+model favoriteCommunities {
+  userId      Int
+  communityId Int
+  createdAt   DateTime @default(now())
+
+  User      User      @relation(fields: [userId], references: [id])
+  Community Community @relation(fields: [communityId], references: [id])
+
+  @@id([userId, communityId])
 }
 
 model Material {

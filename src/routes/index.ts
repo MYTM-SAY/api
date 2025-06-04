@@ -11,6 +11,7 @@ import auth from './auth.route'
 import user from './user.route'
 import uploadRoutes from './upload.route'
 import fileRoutes from './files.route'
+import favorites from './favoriteCommunities.route'
 
 const router = express.Router()
 
@@ -26,5 +27,6 @@ router.use('/auth', auth)
 router.use('/users', user)
 router.use('/upload', uploadRoutes)
 router.use('/files', fileRoutes)
+router.use('/favorites', favorites)
 
 export default router

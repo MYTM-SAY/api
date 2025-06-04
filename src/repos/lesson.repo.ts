@@ -26,9 +26,9 @@ export const LessonRepo = {
         Materials: true,
         Section: {
           include: {
-            Classroom: true
-          }
-        }
+            Classroom: true,
+          },
+        },
       },
     })
     return lesson

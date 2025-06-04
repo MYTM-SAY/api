@@ -291,4 +291,40 @@ export const schemas = {
       'ownerId',
     ],
   },
+  FavoriteCommunity: {
+    type: 'object',
+    properties: {
+      userId: { type: 'integer' },
+      communityId: { type: 'integer' },
+      createdAt: { type: 'string', format: 'date-time' },
+      Community: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          name: { type: 'string' },
+          description: { type: 'string', nullable: true },
+          bio: { type: 'string', nullable: true },
+          coverImgURL: { type: 'string', nullable: true },
+          logoImgURL: { type: 'string', nullable: true },
+          isPublic: { type: 'boolean' },
+          createdAt: { type: 'string', format: 'date-time' },
+        },
+      },
+    },
+    example: {
+      userId: 1,
+      communityId: 1,
+      createdAt: '2025-06-03T17:03:00.000Z',
+      Community: {
+        id: 1,
+        name: 'Tech Community',
+        description: 'A place for tech enthusiasts.',
+        bio: 'Join us to discuss the latest in tech!',
+        coverImgURL: 'https://example.com/cover.jpg',
+        logoImgURL: 'https://example.com/logo.jpg',
+        isPublic: true,
+        createdAt: '2025-04-11T06:25:08.279Z',
+      },
+    },
+  },
 }

@@ -16,6 +16,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
       { name: 'User', description: 'Endpoints for managing users' },
       { name: 'Profiles', description: 'Endpoints for user profiles' },
       { name: 'Communities', description: 'Endpoints for managing communities' },
+      { name: 'Favorites', description: 'Endpoints for managing favorite communities' },
       { name: 'Leaderboard', description: 'Endpoints for tracking and displaying leaderboard data' },
       { name: 'Classrooms', description: 'Endpoints for managing classrooms' },
       { name: 'Sections', description: 'Endpoints for managing sections' },
