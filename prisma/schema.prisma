@@ -27,7 +27,6 @@ model User {
   QuizScore           QuizScore[]
   UserProfile         UserProfile?
   JoinRequests        JoinRequest[]
-  Progress            Progress[]
   CompletedLessons    CompletedLessons[]
   UserContributions   UserContributions[]
   favoriteCommunities favoriteCommunities[]
@@ -81,7 +80,6 @@ model Community {
   Forums              Forum[]
   CommunityMembers    CommunityMembers[]
   Tags                Tag[]                 @relation("CommunityToTag")
-  CompletedLessons    CompletedLessons[]
   JoinRequests        JoinRequest[] // Removed incorrect `map` argument
   favoriteCommunities favoriteCommunities[]
 }
@@ -296,16 +294,6 @@ model File {
   updatedAt DateTime @updatedAt
 }
 
-
-model favoriteCommunities {
-  userId      Int
-  communityId Int
-  createdAt   DateTime  @default(now())
-  Community   Community @relation(fields: [communityId], references: [id])
-  User        User      @relation(fields: [userId], references: [id])
-
-  @@id([userId, communityId])
-}
 
 enum MaterialType {
   VIDEO
