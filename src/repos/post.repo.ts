@@ -241,7 +241,7 @@ export const PostRepo = {
           Community: {
             CommunityMembers: {
               some: { userId }
-            }
+            },
           }
         }
       },

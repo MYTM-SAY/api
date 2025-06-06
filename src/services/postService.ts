@@ -149,7 +149,9 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
 
   // 3️⃣ Fetch flat list of posts  
   const posts = await PostRepo.getPostsFromCommunitiesJoinedByUser(userId);
-
+  const voteCounts = await Promise.all(
+    posts.map(post => PostRepo.getVoteCount(post.id))
+  );
   if (!posts.length) {
     return []; 
   }
@@ -159,7 +161,7 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
     id:           post.id,
     title:        post.title,
     content:      post.content,
-    voteCounter:  post._count.PostVotes,
+    voteCounter:  voteCounts[posts.indexOf(post)],
     attachments:  post.attachments,
     forumId:      post.forumId,
     createdAt:    post.createdAt,
