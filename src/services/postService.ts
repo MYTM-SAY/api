@@ -152,6 +152,9 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
   const voteCounts = await Promise.all(
     posts.map(post => PostRepo.getVoteCount(post.id))
   );
+  const getPostVoteTypeForAUser = await Promise.all(
+    posts.map(post => PostRepo.getPostVoteTypeForAUser(post.id, userId))
+  );
   if (!posts.length) {
     return []; 
   }
@@ -173,7 +176,8 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
       fullname:  post.Author.fullname,
       // fallback to a default if none set
       avatarUrl: post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg'
-    }
+    },
+    voteType: getPostVoteTypeForAUser[posts.indexOf(post)]
   }));
 }
 

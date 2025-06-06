@@ -159,6 +159,15 @@ export const PostRepo = {
     })
   },
 
+  async getPostVoteTypeForAUser(
+    postId: number,
+    userId: number,
+  ): Promise<VoteType | null> {
+    const vote = await prisma.postVote.findUnique({
+      where: { userId_postId: { userId, postId } },
+    })
+    return vote ? vote.type : null
+  },
   async getAllContribByUserId(userId: number) {
     const results = await prisma.post.findMany({
       where: {
