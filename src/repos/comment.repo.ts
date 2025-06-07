@@ -92,10 +92,22 @@ export const CommentRepo = {
         ...data,
         authorId: data.authorId!,
       },
-    })
-    return result
-  },
+     include: {
+      Author: {
+        select: {
+          username: true,
+          UserProfile: {
+            select: {
+              profilePictureURL: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
+  return result;
+},
   async updateComment(
     commentId: number,
     data: Partial<z.infer<typeof CommentSchema>>,
