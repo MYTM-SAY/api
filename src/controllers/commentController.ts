@@ -9,7 +9,7 @@ import { upsertUserContribution } from '../services/contributionService'
 
 export const findAllComments = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const comments = await CommentService.findAllComments(+req.params.postId)
+    const comments = await CommentService.findAllComments(+req.params.postId, +req.claims!.id)
     res
       .status(200)
       .json(ResponseHelper.success('Comments fetched successfully', comments))

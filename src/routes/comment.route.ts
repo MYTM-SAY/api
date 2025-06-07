@@ -49,7 +49,7 @@ const router = express.Router()
  *       500:
  *         description: Server error
  */
-router.get('/:postId', findAllComments)
+router.get('/:postId', isAuthenticated, findAllComments)
 
 /**
  * @swagger

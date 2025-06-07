@@ -6,34 +6,44 @@ import { count } from 'console';
 import {VoteType, CommentVote } from '@prisma/client';
 
 export const CommentRepo = {
-  async findAll(postId: number) {
-    const results = await prisma.comment.findMany({
-      where: {
-        Post: {
-          id: postId,
-        },
-        parentId: null,
-      },
-      include: {
-        Author: {
-          select: {
-            username: true,
-            UserProfile: {
-              select: {
-                profilePictureURL: true,
-              },
+async findAll(postId: number, userId: number) {
+  const comments = await prisma.comment.findMany({
+    where: {
+      Post: { id: postId },
+      parentId: null,
+    },
+    include: {
+      Author: {
+        select: {
+          username: true,
+          UserProfile: {
+            select: {
+              profilePictureURL: true,
             },
           },
         },
-        Children: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-    return results
-  },
+      Children: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
 
+  const commentsWithVotes = await Promise.all(
+    comments.map(async (comment) => {
+      const voteCount = await this.getVoteCount(comment.id);
+      const vote = await this.votedBefore(comment.id, userId);
+      return {
+        ...comment,
+        voteCount,
+        voteType: vote?.type ?? 'NONE',
+      };
+    })
+  );
+
+  return commentsWithVotes;
+},
   async findComment(postId: number, commentId: number) {
     const result = await prisma.comment.findUnique({
       where: {
@@ -186,6 +196,28 @@ export const CommentRepo = {
       update: { type },
     });
   },
+
+async getCommentVoteCount(commentId: number): Promise<number> {
+  const [upvotes, downvotes] = await Promise.all([
+    prisma.commentVote.count({ where: { commentId, type: VoteType.UPVOTE } }),
+    prisma.commentVote.count({ where: { commentId, type: VoteType.DOWNVOTE } }),
+  ]);
+  return upvotes - downvotes;
+},
+
+async getUserVoteType(commentId: number, userId: number): Promise<VoteType | null> {
+  const vote = await prisma.commentVote.findUnique({
+    where: {
+      userId_commentId: {
+        userId,
+        commentId,
+      },
+    },
+  });
+
+  return vote?.type ?? null;
+},
+
   // get comment Auth and Role
   async getCommentAuthAndRole( userId: number,commentId: number,) {
     const result = await prisma.comment.findUnique({
