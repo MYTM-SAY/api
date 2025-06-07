@@ -8,19 +8,31 @@ export const UserRepo = {
   async findById(id: number) {
     const result = await prisma.user.findUnique({
       where: { id },
-    })
+      include: {
+        UserProfile: {
+          select: {
+            profilePictureURL: true,
+          },
+        },
+      },
+    });
     return result
   },
 
   // find user by email
-  async findByEmail(email: string) {
-    const result = await prisma.user.findUnique({
-      where: { email },
-
-    })
-    return result
-  },
-
+async findByEmail(email: string) {
+  const result = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      UserProfile: {
+        select: {
+          profilePictureURL: true,
+        },
+      },
+    },
+  });
+  return result;
+},
   // find user by username
   async findByUsername(username: string) {
     const result = await prisma.user.findUnique({
@@ -28,6 +40,11 @@ export const UserRepo = {
       select: {
         id: true,
         username: true,
+        UserProfile: {
+          select: {
+            profilePictureURL: true,
+          },
+        },
       },
     })
     return result

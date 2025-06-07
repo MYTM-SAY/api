@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-import { User } from '@prisma/client'
+import { User, UserProfile } from '@prisma/client'
 import { TokenPayload } from '../interfaces/tokenPayload'
 
 dotenv.config()
@@ -30,12 +30,13 @@ const verifyRefreshToken = (token: string) => {
 const decodeToken = (token: string): TokenPayload | null =>
   (jwt.decode(token) as TokenPayload) || null
 
-const generateAccessToken = (user: User): string => {
+const generateAccessToken = (user: User & { UserProfile?: { profilePictureURL?: string | null } }): string => {
   const payload: TokenPayload = {
     id: user.id,
     email: user.email,
     username: user.username,
     fullname: user.fullname,
+    profilePictureURL: user.UserProfile?.profilePictureURL || null,
   }
   return jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
 }
