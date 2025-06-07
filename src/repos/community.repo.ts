@@ -9,6 +9,10 @@ export const CommunityRepo = {
       orderBy: {
         createdAt: 'desc',
       },
+      include:{
+        Tags:true,
+        
+      }
     })
     return results
   },
@@ -21,6 +25,7 @@ export const CommunityRepo = {
           include: {
             Tags: true,
             Owner: true,
+            
           },
         },
       },

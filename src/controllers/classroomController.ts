@@ -16,6 +16,7 @@ export const getClassrooms = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const classrooms = await ClassroomService.getClassroomsByCommunityId(
       +req.params.id,
+      req.claims!.id,
     )
     res
       .status(200)

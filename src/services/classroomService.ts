@@ -6,9 +6,26 @@ import { boolean } from 'zod'
 import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { Role } from '@prisma/client'
 
-const getClassroomsByCommunityId = async (communityId: number) => {
-  return ClassroomRepo.findByCommunityId(communityId)
+const getClassroomsByCommunityId = async (communityId: number, userId: number) => {
+  const classrooms = await ClassroomRepo.findByCommunityId(communityId);
+
+  const classroomsWithProgress = await Promise.all(classrooms.map(async (classroom) => {
+    let progress = 0;
+    try {
+      progress = await classroomProgress(classroom.id, userId);
+    } catch (error) {
+      progress = 0;
+    }
+
+    return {
+      ...classroom,
+      progress,
+    };
+  }));
+
+  return classroomsWithProgress;
 }
+
 
 const getClassroomById = async (id: number, includes: QuerySchema) => {
   const classroom = await ClassroomRepo.findbyId(id, includes)
