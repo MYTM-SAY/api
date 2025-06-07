@@ -30,18 +30,24 @@ export const findComment = asyncHandler(
 
 export const createComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const validatedData = await CommentSchema.parseAsync(req.body)
+    const postId = Number(req.params.postId)
+
+    const validatedData = await CommentSchema.parseAsync({
+      ...req.body,
+      postId,
+    });
 
     const comment = await CommentService.createComment({
       ...validatedData,
       authorId: req.claims!.id,
     });
+
     await upsertUserContribution(req.claims!.id);
-    res
-      .status(201)
-      .json(ResponseHelper.success('Comment created successfully', comment))
-  },
-)
+
+    res.status(201).json(ResponseHelper.success('Comment created successfully', comment));
+  }
+);
+
 
 export const updateComment = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {

@@ -122,11 +122,18 @@ router.get('/:commentId/posts/:postId', isAuthenticated, findComment)
 
 /**
  * @swagger
- * /comments:
+ * /comments/{postId}:
  *   post:
  *     summary: Create a new comment
- *     description: Adds a new comment to a post.
+ *     description: Adds a new comment to a post by ID.
  *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post to comment on
  *     requestBody:
  *       required: true
  *       content:
@@ -136,18 +143,14 @@ router.get('/:commentId/posts/:postId', isAuthenticated, findComment)
  *             properties:
  *               content:
  *                 type: string
- *                 description: Content of the comment
- *               postId:
- *                 type: integer
- *                 description: ID of the post to comment on
  *               parentId:
- *                  type: integer
- *                  description: ID of the parent comment
+ *                 type: integer
+ *                 description: ID of the parent comment (optional)
  *     responses:
  *       201:
  *         description: Successfully created the comment
  */
-router.post('/', isAuthenticated, createComment)
+router.post('/:postId', isAuthenticated, createComment)
 
 /**
  * @swagger
