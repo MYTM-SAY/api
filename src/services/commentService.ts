@@ -6,11 +6,24 @@ import { CommentSchema } from '../utils/zod/commentSchemes'
 import { VoteType, CommentVote } from '@prisma/client';
 import { PostRepo } from '../repos/post.repo'
 
-async function findAllComments(postId: number, userId: number) {
-  const comments = await CommentRepo.findAll(postId, userId)
-  if (!comments) throw new APIError('Comments not found', 404)
-  return comments
-}
+const findAllComments = async (postId: number, userId: number) => {
+  const comments = await CommentRepo.findAll(postId);
+  if (!comments) throw new APIError('Comments not found', 404);
+
+  const commentsWithVotes = await Promise.all(
+    comments.map(async (comment) => {
+      const voteCount = await CommentRepo.getVoteCount(comment.id);
+      const vote = await CommentRepo.votedBefore(comment.id, userId);
+      return {
+        ...comment,
+        voteCount,
+        voteType: vote?.type ?? 'NONE',
+      };
+    })
+  );
+
+  return commentsWithVotes;
+};
 
 async function findComment(postId: number, commentId: number) {
   const comment = await CommentRepo.findComment(postId, commentId)

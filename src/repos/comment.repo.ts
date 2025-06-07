@@ -6,7 +6,8 @@ import { count } from 'console';
 import {VoteType, CommentVote } from '@prisma/client';
 
 export const CommentRepo = {
-async findAll(postId: number, userId: number) {
+// comment.repo.ts
+async findAll(postId: number) {
   const comments = await prisma.comment.findMany({
     where: {
       Post: { id: postId },
@@ -30,19 +31,7 @@ async findAll(postId: number, userId: number) {
     },
   });
 
-  const commentsWithVotes = await Promise.all(
-    comments.map(async (comment) => {
-      const voteCount = await this.getVoteCount(comment.id);
-      const vote = await this.votedBefore(comment.id, userId);
-      return {
-        ...comment,
-        voteCount,
-        voteType: vote?.type ?? 'NONE',
-      };
-    })
-  );
-
-  return commentsWithVotes;
+  return comments;
 },
   async findComment(postId: number, commentId: number) {
     const result = await prisma.comment.findUnique({
