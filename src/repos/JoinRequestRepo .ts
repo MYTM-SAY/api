@@ -20,7 +20,17 @@ export const JoinRequestRepo = {
       data: joinRequest,
     })
   },
-
+  
+async findByUserAndCommunity(userId: number, communityId: number) {
+  return await prisma.joinRequest.findUnique({
+    where: {
+      userId_communityId: {
+        userId,
+        communityId,
+      },
+    },
+  })
+},
   async findById(id: number) {
     return await prisma.joinRequest.findUnique({
       where: { id },

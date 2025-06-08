@@ -36,7 +36,10 @@ async function createJoinRequest(data: JoinRequestType) {
     })
     return null
   }
-  const isSentRequest = await JoinRequestRepo.findById(data.userId)
+const isSentRequest = await JoinRequestRepo.findByUserAndCommunity(
+  data.userId,
+  data.communityId,
+)
   if (isSentRequest) throw new APIError('Join request already sent', 400)
   
   return JoinRequestRepo.create(data)
