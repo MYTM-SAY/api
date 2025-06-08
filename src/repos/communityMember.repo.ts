@@ -58,6 +58,7 @@ export const CommunityMembersRepo = {
             id: true,
             fullname: true,
             email: true,
+            username: true,
             UserProfile: {
               select: {
                 profilePictureURL: true,

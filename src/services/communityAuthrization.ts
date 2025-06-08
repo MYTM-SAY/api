@@ -16,6 +16,7 @@ async function getAllUsersInCommunity(communityId: number) {
         fullname: User.fullname,
         email: User.email,
         profilePictureURL: User.UserProfile?.profilePictureURL ?? null,
+        username: User.username,
         role: User.CommunityMembers[0]?.Role ?? null,
     }));
 
