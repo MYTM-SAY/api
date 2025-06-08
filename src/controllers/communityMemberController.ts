@@ -13,14 +13,6 @@ import { CommunityRepo } from '../repos/community.repo'
 export const getUsersInCommunity = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const communityId = +req.params.id
-    const userId = req.claims!.id
-    const isOwner = await CommunityAuthrizationService.hasRoles(
-      userId,
-      communityId,
-      [Role.OWNER],
-    )
-    if (!isOwner)
-      return res.status(403).json(ResponseHelper.error('Access Denied'))
 
     const members =
       await CommunityAuthrizationService.getAllUsersInCommunity(communityId)
