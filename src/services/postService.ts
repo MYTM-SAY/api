@@ -20,9 +20,6 @@ async function getPostsByForumId(forumId: number, userId: number) {
     
   
   let posts = await PostRepo.findPostsByForumId(forumId);
-  if (!posts || posts.length === 0) {
-    throw new APIError('Posts not found', 404);
-  }
 
   const enrichedPosts = await Promise.all(
     posts.map(async (post) => {
