@@ -58,8 +58,14 @@ export const PostRepo = {
     // Attach vote scores to posts
     const postsWithVoteScore = posts.map(post => ({
       ...post,
-      voteScore: voteMap.get(post.id) || 0,
-      commentsCount: post._count.Comments
+      voteCounter: voteMap.get(post.id) || 0,
+      commentCount: post._count.Comments,
+      author: {
+    id: post.Author.id,
+    username: post.Author.username,
+    fullname: post.Author.fullname,
+    profilePictureURL: post.Author.UserProfile?.profilePictureURL || '',
+  },
     }));
 
     return postsWithVoteScore;

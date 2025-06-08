@@ -10,7 +10,7 @@ import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { use } from 'passport'
 import { Role } from '@prisma/client'
 
-async function getPostsByForumId(forumId: number) {
+async function getPostsByForumId(forumId: number, userId: number) {
 
 
   if (!forumId) throw new APIError('Missing forumId', 404)
@@ -18,12 +18,23 @@ async function getPostsByForumId(forumId: number) {
   const forum = await ForumRepo.findById(forumId)
   if (!forum) throw new APIError('Forum not found', 404)
     
+  
   let posts = await PostRepo.findPostsByForumId(forumId);
-  if (!posts) {
+  if (!posts || posts.length === 0) {
     throw new APIError('Posts not found', 404);
   }
-  
-  return posts
+
+  const enrichedPosts = await Promise.all(
+    posts.map(async (post) => {
+      const voteType = await PostRepo.getPostVoteTypeForAUser(post.id, userId);
+      return {
+        ...post,
+        voteType: voteType || 'NONE',
+      };
+    })
+  );
+
+  return enrichedPosts;
 }
 
 
@@ -175,7 +186,7 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
       username:  post.Author.username,
       fullname:  post.Author.fullname,
       // fallback to a default if none set
-      avatarUrl: post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg'
+      profilePictureURL: post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg'
     },
     voteType: getPostVoteTypeForAUser[posts.indexOf(post)]
   }));
