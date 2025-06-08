@@ -8,7 +8,6 @@ export const joinRequestSchema = z.object({
 })
 export const updateJoinRequestStatusSchema = z.object({
   status: z.enum(['APPROVED', 'REJECTED']),
-  communityId: z.number().int().positive(),
 })
 export type JoinRequestType = z.infer<typeof joinRequestSchema>
 export type UpdateJoinRequestType = z.infer<

@@ -61,16 +61,12 @@ export const JoinRequestRepo = {
   },
 
   async updateStatus(
-    communityId: number,
-    userId: number,
+    id: number,
     status: JoinRequestStatus,
   ) {
     return await prisma.joinRequest.update({
       where: {
-        userId_communityId: {
-          communityId: communityId,
-          userId: userId,
-        },
+        id,
       },
       data: {
         status: status,

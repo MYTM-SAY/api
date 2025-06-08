@@ -7,6 +7,7 @@ import {
 } from '../utils/zod/joinRequestSchema '
 import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { JoinRequestStatus, Role } from '@prisma/client'
+import { UserRepo } from '../repos/user.repo'
 
 async function getAllPendingJoinRequests(communityId: number) {
   console.log('communityId', communityId)
@@ -43,20 +44,25 @@ async function createJoinRequest(data: JoinRequestType) {
 
 async function updateJoinRequestStatus(
   updateJoinRequestType: UpdateJoinRequestType,
+  id: number,
   userId: number,
 ) {
-  const { communityId, status } = updateJoinRequestType
+  const { status } = updateJoinRequestType;
 
-  const existingRequest = await JoinRequestRepo.findByCommunityAndUser(
-    communityId,
-    userId,
-  )
+  const existingRequest = await JoinRequestRepo.findById(id)
 
   if (!existingRequest) throw new APIError('Join request not found', 404)
 
-  const updatedRequest = await JoinRequestRepo.updateStatus(
-    communityId,
+  const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,
+    existingRequest.communityId,
+  );
+  if (userRole !== Role.MODERATOR && userRole !== Role.OWNER) {
+    throw new APIError('You do not have permission to update this request', 403)
+  };
+
+  const updatedRequest = await JoinRequestRepo.updateStatus(
+    id,
     status,
   )
   return updatedRequest

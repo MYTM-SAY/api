@@ -61,19 +61,19 @@ export const getAllJoinRequests = asyncHandler(
 
 export const updateJoinRequestStatus = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const validatedData = updateJoinRequestStatusSchema.parse(req.body)
+    const validatedData = updateJoinRequestStatusSchema.parse(req.body);
+
     const updatedRequest = await JoinRequestService.updateJoinRequestStatus(
       validatedData,
+      +req.params.id,
       req.claims!.id,
-    )
+    );
 
-    return res
-      .status(200)
-      .json(
-        ResponseHelper.success(
-          `Join request status updated to ${validatedData.status}`,
-          updatedRequest,
-        ),
-      )
+    return res.status(200).json(
+      ResponseHelper.success(
+        `Join request status updated to ${validatedData.status}`,
+        updatedRequest,
+      ),
+    );
   },
-)
+);

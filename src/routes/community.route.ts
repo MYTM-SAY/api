@@ -327,10 +327,18 @@ app.post('/:id/join-requests', isAuthenticated, createJoinRequstCommunity)
 app.get('/:id/join-requests', isAuthenticated, getAllJoinRequests)
 /**
  * @swagger
- * /communities/join-requests/status:
+ * /communities/join-requests/status/{id}:
  *   patch:
  *     summary: Update the status of a join request for a community
  *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the join request to update
+ *         schema:
+ *           type: integer
+ *           example: 42
  *     requestBody:
  *       description: Status to update the join request to (APPROVED or REJECTED)
  *       required: true
@@ -338,30 +346,47 @@ app.get('/:id/join-requests', isAuthenticated, getAllJoinRequests)
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - status
  *             properties:
  *               status:
  *                 type: string
  *                 enum: [APPROVED, REJECTED]
  *                 example: APPROVED
- *               communityId:
- *                 type: integer
- *                 example: 1
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully updated join request status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Join request status updated to APPROVED
+ *                 data:
+ *                   type: object
+ *                   description: The updated join request
  *       400:
  *         description: Invalid data or request
+ *       403:
+ *         description: You do not have permission
  *       404:
  *         description: Join request not found
  *       500:
  *         description: Internal server error
  */
 app.patch(
-  '/join-requests/status',
+  '/join-requests/status/:id',
   isAuthenticated,
-  hasRoles([Role.OWNER]),
   updateJoinRequestStatus,
-)
+);
+
 /**
  * @swagger
  * /communities/{id}/users:
