@@ -1,18 +1,18 @@
 import { prisma } from '../db/PrismaClient'
 
 export async function upsertUserContribution(userId: number, customDate?: Date) {
+  if (!userId || isNaN(userId)) {
+    throw new Error('Invalid userId');
+  }
 
   let dateToUse = customDate ? new Date(customDate) : new Date();
-
-  dateToUse.setHours(0, 0, 0, 0);
-  dateToUse.toISOString();
-//    currentDate.setDate(currentDate.getDate() + 1); that's for me if i wanna test another day
- 
-  return await prisma.userContributions.upsert({
+  dateToUse = new Date(Date.UTC(dateToUse.getFullYear(), dateToUse.getMonth(), dateToUse.getDate()));
+  
+  const result = await prisma.userContributions.upsert({
     where: {
       userId_dateOnly: { 
         userId, 
-        dateOnly: dateToUse
+        dateOnly: dateToUse,
       },
     },
     update: {
@@ -24,4 +24,7 @@ export async function upsertUserContribution(userId: number, customDate?: Date) 
       dateOnly: dateToUse,
     },
   });
+
+  console.log('Upsert result:', result);
+  return result;
 }
