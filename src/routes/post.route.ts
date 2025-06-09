@@ -8,7 +8,8 @@ import {
   upVotePost,
   downVotePost,
   getAllPostContribByUser,
-  getAllPostsFromCommunitiesJoinedByUser
+  getAllPostsFromCommunitiesJoinedByUser,
+  getUserPosts
 } from '../controllers/postController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
@@ -448,6 +449,53 @@ router.put('/downvote/:postId', isAuthenticated, downVotePost);
  */
 
 router.get('/me/feed', isAuthenticated, getAllPostsFromCommunitiesJoinedByUser)
+
+/**
+ * @swagger
+ * /posts/user/{userId}:
+ *   get:
+ *     summary: Get posts from communities the user has joined
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully fetched user posts
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: Posts fetched successfully
+ *               data:
+ *                 - id: 10
+ *                   title: "Interesting Post"
+ *                   content: "Here's something insightful."
+ *                   voteCounter: 5
+ *                   attachments:
+ *                     - https://example.com/image.png
+ *                   forumId: 3
+ *                   createdAt: "2025-06-01T10:00:00.000Z"
+ *                   updatedAt: "2025-06-01T10:15:00.000Z"
+ *                   commentCount: 2
+ *                   voteType: "UPVOTE"
+ *                   author:
+ *                     id: 2
+ *                     username: johndoe
+ *                     fullname: John Doe
+ *                     profilePictureURL: "https://example.com/profile.jpg"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found or no posts available
+ */
+router.get('/user/:userId', isAuthenticated, getUserPosts);
 
 
 export default router

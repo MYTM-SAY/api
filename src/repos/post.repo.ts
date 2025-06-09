@@ -287,5 +287,46 @@ export const PostRepo = {
         }
       }
     });
-  }
+  },
+
+  async getPostsByUserId(userId: number) {
+   return prisma.post.findMany({
+      where: {
+        // Only posts whose forum’s community has a membership by this user
+        Forum: {
+          Community: {
+            CommunityMembers: {
+              some: { userId }
+            },
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        attachments: true,
+        forumId: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            Comments: true,
+            PostVotes: true
+          }
+        },
+        Author: {
+          select: {
+            id: true,
+            username: true,
+            fullname: true,
+            UserProfile: {
+              select: { profilePictureURL: true }
+            }
+          }
+        }
+      }
+    });
+  },
 }

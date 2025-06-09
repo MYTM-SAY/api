@@ -15,6 +15,8 @@ export const UserProfileRepo = {
     const result = await prisma.userProfile.findUnique({
       where: { userId },
       select: {
+        id: true,
+        userId: true,
         bio: true,
         twitter: true,
         facebook: true,

@@ -186,8 +186,44 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
     },
     voteType: getPostVoteTypeForAUser[posts.indexOf(post)]
   }));
+
 }
 
+async function getUserPosts(userId: number) {
+  if (!userId) throw new APIError('Missing userId', 404)
+  const user = await UserRepo.findById(userId)
+  if (!user) throw new APIError('User not found', 404)
+
+  const posts = await PostRepo.getPostsFromCommunitiesJoinedByUser(userId);
+  const voteCounts = await Promise.all(
+    posts.map(post => PostRepo.getVoteCount(post.id))
+  );
+  const getPostVoteTypeForAUser = await Promise.all(
+    posts.map(post => PostRepo.getPostVoteTypeForAUser(post.id, userId))
+  );
+  if (!posts.length) {
+    return []; 
+  }
+
+  return posts.map(post => ({
+    id:           post.id,
+    title:        post.title,
+    content:      post.content,
+    voteCounter:  voteCounts[posts.indexOf(post)],
+    attachments:  post.attachments,
+    forumId:      post.forumId,
+    createdAt:    post.createdAt,
+    updatedAt:    post.updatedAt,
+    commentCount: post._count.Comments,
+    author: {
+      id:        post.Author.id,
+      username:  post.Author.username,
+      fullname:  post.Author.fullname,
+      profilePictureURL: post.Author.UserProfile?.profilePictureURL?? null,
+    },
+    voteType: getPostVoteTypeForAUser[posts.indexOf(post)]
+  }));
+}
 export const PostService = {
   getPostsByForumId,
   createPost,
@@ -197,6 +233,6 @@ export const PostService = {
   upVotePost,
   downVotePost,
   getAllPostContribByUser,
-
+getUserPosts,
   getAllPostsFromCommunitiesJoinedByUser,
 }

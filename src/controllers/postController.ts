@@ -99,3 +99,11 @@ export const getAllPostsFromCommunitiesJoinedByUser = asyncHandler(
   },
 )
 
+export const getUserPosts = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const posts = await PostService.getUserPosts(+req.params.userId)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Posts fetched successfully', posts))
+  }
+)
