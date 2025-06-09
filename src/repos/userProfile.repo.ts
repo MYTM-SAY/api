@@ -23,7 +23,14 @@ export const UserProfileRepo = {
         youtube: true,
         profilePictureURL: true,
         Tags: true,
+        User: {
+          select: {
+            fullname: true,
+            username: true,
+
       },
+    },
+  },
     })
     return result
   },
