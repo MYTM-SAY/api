@@ -21,25 +21,39 @@ export const FavoriteCommunityRepo = {
     })
   },
 
-  async getFavoriteCommunities(userId: number) {
-    return prisma.favoriteCommunities.findMany({
-      where: { userId },
-      include: {
-        Community: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            bio: true,
-            coverImgURL: true,
-            logoImgURL: true,
-            isPublic: true,
-            createdAt: true,
-          },
+async getFavoriteCommunities(userId: number) {
+  const favorites = await prisma.favoriteCommunities.findMany({
+    where: { userId },
+    include: {
+      Community: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          bio: true,
+          coverImgURL: true,
+          logoImgURL: true,
+          isPublic: true,
+          createdAt: true,
         },
       },
-    })
-  },
+    },
+  });
+
+  // Flatten the Community fields into the favorite object
+  return favorites.map(fav => ({
+    userId: fav.userId,
+    communityId: fav.communityId,
+    id: fav.Community.id,
+    name: fav.Community.name,
+    description: fav.Community.description,
+    bio: fav.Community.bio,
+    coverImgURL: fav.Community.coverImgURL,
+    logoImgURL: fav.Community.logoImgURL,
+    isPublic: fav.Community.isPublic,
+    createdAt: fav.Community.createdAt,
+  }));
+},
 
   async isCommunityFavorited(userId: number, communityId: number) {
     const favorite = await prisma.favoriteCommunities.findUnique({
