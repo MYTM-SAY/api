@@ -110,3 +110,15 @@ export const downVoteComment = asyncHandler(
       .json(ResponseHelper.success('Comment downvoted successfully', result));
   }
 );
+export const getUserComments = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {   
+    const userId = +req.params.userId;
+
+    const comments = await CommentService.getUserComments(userId)
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success('User comments retrieved successfully', comments),
+      )
+  }
+);

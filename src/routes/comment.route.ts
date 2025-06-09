@@ -8,10 +8,88 @@ import {
   getCommentsByUserIdAndCommunityId,
   upVoteComment,
   downVoteComment,
+  getUserComments,
 } from '../controllers/commentController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
 const router = express.Router()
+/**
+ * @swagger
+ * /comments/user/{userId}:
+ *   get:
+ *     summary: Get comments by a specific user
+ *     description: Retrieves all comments made by a specific user along with vote count and vote type.
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user
+ *     responses:
+ *       200:
+ *         description: List of user comments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: User comments retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       content:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       authorId:
+ *                         type: integer
+ *                       voteCount:
+ *                         type: integer
+ *                       voteType:
+ *                         type: string
+ *                         enum: [UPVOTE, DOWNVOTE, NONE]
+ *                       Author:
+ *                         type: object
+ *                         properties:
+ *                           fullname:
+ *                             type: string
+ *                           UserProfile:
+ *                             type: object
+ *                             properties:
+ *                               profilePictureURL:
+ *                                 type: string
+ *                       Children:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                             content:
+ *                               type: string
+ *                             createdAt:
+ *                               type: string
+ *                               format: date-time
+ *       400:
+ *         description: Invalid user ID
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/user/:userId', isAuthenticated, getUserComments)
 
 /**
  * @swagger
@@ -319,4 +397,6 @@ router.put('/upvote/:commentId', isAuthenticated, upVoteComment);
  *         description: Server error
  */
 router.put('/downvote/:commentId', isAuthenticated, downVoteComment);
+
+
 export default router

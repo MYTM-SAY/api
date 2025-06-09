@@ -25,6 +25,8 @@ const findAllComments = async (postId: number, userId: number) => {
   return commentsWithVotes;
 };
 
+
+
 async function findComment(postId: number, commentId: number) {
   const comment = await CommentRepo.findComment(postId, commentId)
   if (!comment) throw new APIError('Comment not found', 404)
@@ -125,6 +127,24 @@ async function getCommentsByUserIdAndCommunityId(
   return { vote, voteCount };
 }
 
+
+const getUserComments = async (userId: number) => {
+  const comments = await CommentRepo.getUserComments(userId);
+
+  const commentsWithVotes = await Promise.all(
+    comments.map(async (comment) => {
+      const voteCount = await CommentRepo.getVoteCount(comment.id);
+      const vote = await CommentRepo.votedBefore(comment.id, userId);
+      return {
+        ...comment,
+        voteCount,
+        voteType: vote?.type ?? 'NONE',
+      };
+    })
+  );
+
+  return commentsWithVotes;
+};
 export const CommentService = {
   findAllComments,
   findComment,
@@ -134,4 +154,5 @@ export const CommentService = {
   getCommentsByUserIdAndCommunityId,
   upVoteComment,
   downVoteComment,
+  getUserComments
 }

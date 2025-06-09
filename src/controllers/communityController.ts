@@ -4,6 +4,7 @@ import { CommunityService } from '../services/communityService'
 import { asyncHandler } from '../utils/asyncHandler'
 import { ResponseHelper } from '../utils/responseHelper'
 import { CommunityMemberService } from '../services/communityMemberService'
+import { CommentService } from '../services/commentService'
 
 export const getCommunities = asyncHandler(
   async (_: Request, res: Response) => {
@@ -156,3 +157,4 @@ export const LeaveFromCommunity = asyncHandler(
     res.status(204).json(ResponseHelper.success(message, null))
   },
 )
+

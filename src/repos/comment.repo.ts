@@ -16,7 +16,7 @@ async findAll(postId: number) {
     include: {
       Author: {
         select: {
-          username: true,
+          fullname: true,
           UserProfile: {
             select: {
               profilePictureURL: true,
@@ -33,30 +33,39 @@ async findAll(postId: number) {
 
   return comments;
 },
-  async findComment(postId: number, commentId: number) {
-    const result = await prisma.comment.findUnique({
-      where: {
-        id: commentId,
-        Post: {
-          id: postId,
+async findComment(postId: number, commentId: number) {
+console.log('findComment called with:', { postId, commentId });
+  console.log('Stack trace:', new Error().stack); // Log the call stack
+  if (isNaN(postId) || isNaN(commentId)) {
+    throw new APIError('Invalid postId or commentId', 400);
+  }
+
+  const result = await prisma.comment.findUnique({
+    where: {
+      id: commentId,
+      Post: {
+        is: {
+          id: { equals: postId },
         },
       },
-      include: {
-        Author: {
-          select: {
-            username: true,
-            UserProfile: {
-              select: {
-                profilePictureURL: true,
-              },
+    },
+    include: {
+      Author: {
+        select: {
+          username: true,
+          UserProfile: {
+            select: {
+              profilePictureURL: true,
             },
           },
         },
-        Children: true,
       },
-    })
-    return result
-  },
+      Children: true,
+    },
+  });
+
+  return result;
+},
 
   async findCommentById(commentId: number) {
     const result = await prisma.comment.findUnique({
@@ -274,5 +283,30 @@ async getUserVoteType(commentId: number, userId: number): Promise<VoteType | nul
     })
     return result
   },
-  
+
+  async getUserComments(userId: number) {
+    const results = await prisma.comment.findMany({
+      where: {
+        authorId: userId,
+      },
+       include: {
+        
+      Author: {
+        select: {
+          fullname: true,
+          UserProfile: {
+            select: {
+              profilePictureURL: true,
+            },
+          },
+        },
+      },
+      Children: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+    return results
+  },  
 }
