@@ -12,6 +12,7 @@ import user from './user.route'
 import uploadRoutes from './upload.route'
 import fileRoutes from './files.route'
 import favorites from './favoriteCommunities.route'
+import search from './search.route'
 
 const router = express.Router()
 
@@ -28,5 +29,6 @@ router.use('/users', user)
 router.use('/upload', uploadRoutes)
 router.use('/files', fileRoutes)
 router.use('/favorites', favorites)
+router.use('/search', search)
 
 export default router
