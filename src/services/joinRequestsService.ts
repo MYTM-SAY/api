@@ -68,6 +68,14 @@ async function updateJoinRequestStatus(
     id,
     status,
   )
+
+    if (status === 'APPROVED') {
+    await CommunityMembersRepo.addUserToCommunity({
+      userId: existingRequest.userId,
+      communityId: existingRequest.communityId,
+      Role: Role.MEMBER,
+    });
+  }
   return updatedRequest
 }
 export const JoinRequestService = {

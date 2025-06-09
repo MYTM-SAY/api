@@ -182,8 +182,7 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
       id:        post.Author.id,
       username:  post.Author.username,
       fullname:  post.Author.fullname,
-      // fallback to a default if none set
-      profilePictureURL: post.Author.UserProfile?.profilePictureURL ?? 'defaultavatar.jpg'
+      profilePictureURL: post.Author.UserProfile?.profilePictureURL?? null,
     },
     voteType: getPostVoteTypeForAUser[posts.indexOf(post)]
   }));
