@@ -16,6 +16,7 @@ async findAll(postId: number) {
     include: {
       Author: {
         select: {
+          id: true,
           fullname: true,
           UserProfile: {
             select: {

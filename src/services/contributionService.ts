@@ -8,6 +8,7 @@ export async function upsertUserContribution(userId: number, customDate?: Date) 
   let dateToUse = customDate ? new Date(customDate) : new Date();
   dateToUse = new Date(Date.UTC(dateToUse.getFullYear(), dateToUse.getMonth(), dateToUse.getDate()));
   
+  
   const result = await prisma.userContributions.upsert({
     where: {
       userId_dateOnly: { 
