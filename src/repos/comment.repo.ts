@@ -294,6 +294,7 @@ async getUserVoteType(commentId: number, userId: number): Promise<VoteType | nul
         
       Author: {
         select: {
+          id: true,
           fullname: true,
           UserProfile: {
             select: {
