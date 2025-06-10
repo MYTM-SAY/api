@@ -35,40 +35,41 @@ export const PostRepo = {
       orderBy: {
         createdAt: 'desc',
       },
-    });
-  
-    const postIds = posts.map(post => post.id);
-  
+    })
+
+    const postIds = posts.map((post) => post.id)
+
     const voteCounts = await prisma.postVote.groupBy({
       by: ['postId', 'type'],
       where: {
         postId: { in: postIds },
       },
       _count: true,
-    });
-  
+    })
+
     // Convert to a map for quick lookup
-    const voteMap = new Map<number, number>();
+    const voteMap = new Map<number, number>()
     for (const { postId, type, _count } of voteCounts) {
-      const current = voteMap.get(postId) || 0;
-      const delta = type === 'UPVOTE' ? _count : type === 'DOWNVOTE' ? -_count : 0;
-      voteMap.set(postId, current + delta);
+      const current = voteMap.get(postId) || 0
+      const delta =
+        type === 'UPVOTE' ? _count : type === 'DOWNVOTE' ? -_count : 0
+      voteMap.set(postId, current + delta)
     }
-  
+
     // Attach vote scores to posts
-    const postsWithVoteScore = posts.map(post => ({
+    const postsWithVoteScore = posts.map((post) => ({
       ...post,
       voteCounter: voteMap.get(post.id) || 0,
       commentCount: post._count.Comments,
       author: {
-    id: post.Author.id,
-    username: post.Author.username,
-    fullname: post.Author.fullname,
-    profilePictureURL: post.Author.UserProfile?.profilePictureURL || '',
-  },
-    }));
+        id: post.Author.id,
+        username: post.Author.username,
+        fullname: post.Author.fullname,
+        profilePictureURL: post.Author.UserProfile?.profilePictureURL || '',
+      },
+    }))
 
-    return postsWithVoteScore;
+    return postsWithVoteScore
   },
   async findById(id: number) {
     const result = await prisma.post.findUnique({
@@ -211,35 +212,34 @@ export const PostRepo = {
 
     return results
   },
-  
+
   async getPostAuthorAndCommunity(userId: number, postId: number) {
     const result = await prisma.post.findUnique({
       where: { id: postId },
       select: {
-
         Author: {
           select: { id: true },
         },
         Forum: {
           select: {
             Community: {
-              select : {id : true}
+              select: { id: true },
             },
           },
         },
-      }
-
-
+      },
     })
     return result
   },
   // get role by communityId and userId
   async getRoleByCommunityIdAndUserId(userId: number, communityId: number) {
     const result = await prisma.communityMembers.findUnique({
-      where: {  communityId_userId: {
-        communityId,
-        userId,
-      }, },
+      where: {
+        communityId_userId: {
+          communityId,
+          userId,
+        },
+      },
       select: {
         Role: true,
       },
@@ -248,17 +248,60 @@ export const PostRepo = {
   },
 
   async getPostsFromCommunitiesJoinedByUser(userId: number) {
+    return prisma.post.findMany({
+      where: {
+        authorId: {
+          not: userId,
+        },
+        // Only posts whose forum’s community has a membership by this user
+        Forum: {
+          Community: {
+            CommunityMembers: {
+              some: { userId },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        attachments: true,
+        forumId: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            Comments: true,
+            PostVotes: true,
+          },
+        },
+        Author: {
+          select: {
+            id: true,
+            username: true,
+            fullname: true,
+            UserProfile: {
+              select: { profilePictureURL: true },
+            },
+          },
+        },
+      },
+    })
+  },
 
+  async getPostsByUserId(userId: number) {
     return prisma.post.findMany({
       where: {
         // Only posts whose forum’s community has a membership by this user
         Forum: {
           Community: {
             CommunityMembers: {
-              some: { userId }
+              some: { userId },
             },
-          }
-        }
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -272,8 +315,8 @@ export const PostRepo = {
         _count: {
           select: {
             Comments: true,
-            PostVotes: true
-          }
+            PostVotes: true,
+          },
         },
         Author: {
           select: {
@@ -281,52 +324,11 @@ export const PostRepo = {
             username: true,
             fullname: true,
             UserProfile: {
-              select: { profilePictureURL: true }
-            }
-          }
-        }
-      }
-    });
-  },
-
-  async getPostsByUserId(userId: number) {
-   return prisma.post.findMany({
-      where: {
-        // Only posts whose forum’s community has a membership by this user
-        Forum: {
-          Community: {
-            CommunityMembers: {
-              some: { userId }
+              select: { profilePictureURL: true },
             },
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        attachments: true,
-        forumId: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: {
-          select: {
-            Comments: true,
-            PostVotes: true
-          }
+          },
         },
-        Author: {
-          select: {
-            id: true,
-            username: true,
-            fullname: true,
-            UserProfile: {
-              select: { profilePictureURL: true }
-            }
-          }
-        }
-      }
-    });
+      },
+    })
   },
 }
