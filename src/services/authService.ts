@@ -6,38 +6,40 @@ import bcrypt from 'bcrypt'
 
 export const googleLogin = async (profile: any) => {
   // extract email from Google profile
-  const email = profile.emails?.[0]?.value;
+  const email = profile.emails?.[0]?.value
 
   if (!email) {
-    throw new APIError('No email received from Google', 400);
+    throw new APIError('No email received from Google', 400)
   }
 
-
-  
-  let user = await UserRepo.findByEmail(email);
-  //console.log('user', user)
+  let user = await UserRepo.findByEmail(email)
 
   // if can not find the user, create one with a random password
   if (!user) {
     // TODO : this a temporary solution, it's horrible to do this
-    const randomPassword = Math.random().toString(36).slice(-8); // generate a random password
-    const hashedPassword = await bcrypt.hash(randomPassword, 10);
-    user = await UserRepo.createUser({
+    const randomPassword = Math.random().toString(36).slice(-8) // generate a random password
+    const hashedPassword = await bcrypt.hash(randomPassword, 10)
+    const createdUser = await UserRepo.createUser({
       email,
       hashedPassword,
-      username: profile.displayName || email.split('@')[0], 
+      username: profile.displayName || email.split('@')[0],
       fullname: profile.displayName || email.split('@')[0],
-      dob: new Date(), 
-    });
+      dob: new Date(),
+    })
 
+    // Fetch the created user with UserProfile to ensure consistent type
+    user = await UserRepo.findById(createdUser.id)
   }
+
+  if (!user) {
+    throw new APIError('Failed to create or find user', 500)
+  }
+
   return {
-    accessToken:  JwtService.generateAccessToken(user),
+    accessToken: JwtService.generateAccessToken(user),
     refreshToken: JwtService.generateRefreshToken(user),
-  };
-};
-
-
+  }
+}
 
 const login = async (email: string, password: string) => {
   const user = await UserRepo.findByEmail(email)
@@ -65,8 +67,14 @@ const register = async (
   user.dob = new Date(user.dob)
   const createdUser = await UserRepo.createUser(user)
 
+  // Fetch the created user with UserProfile to ensure consistent type
+  const userWithProfile = await UserRepo.findById(createdUser.id)
+  if (!userWithProfile) {
+    throw new APIError('Failed to create user', 500)
+  }
+
   return {
-    accessToken: JwtService.generateAccessToken(createdUser),
+    accessToken: JwtService.generateAccessToken(userWithProfile),
     refreshToken: JwtService.generateRefreshToken(createdUser),
   }
 }
@@ -85,4 +93,10 @@ const logout = async (userId: string) => {
   console.log(`User ${userId} logged out`)
 }
 
-export const AuthService = { login, register, logout, refreshToken, googleLogin }
+export const AuthService = {
+  login,
+  register,
+  logout,
+  refreshToken,
+  googleLogin,
+}
