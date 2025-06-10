@@ -33,8 +33,8 @@ export const createPost = asyncHandler(
   },
 )
 
-export const getPost = asyncHandler(async (req: Request, res: Response) => {
-  const post = await PostService.getPostById(+req.params.id)
+export const getPost = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const post = await PostService.getPostById(+req.params.id, +req.claims!.id)
   res
     .status(200)
     .json(ResponseHelper.success('Post fetched successfully', post))

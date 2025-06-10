@@ -40,24 +40,25 @@ async function createPost(data: z.infer<typeof PostSchema>, authorId: number) {
   if (!forumExist) throw new APIError('Forum not found', 404)
   return await PostRepo.create(data, authorId)
 }
+async function getPostById(postId: number, userId: number) {
+  if (!postId) throw new APIError('Missing postId', 404);
 
-async function getPostById(postId: number) {
-
-  if (!postId) throw new APIError('Missing postId', 404)
-
-  const post = await PostRepo.findById(postId)
-
-  if (!post) throw new APIError('Post not found', 404)
+  const post = await PostRepo.findById(postId);
+  if (!post) throw new APIError('Post not found', 404);
 
   const voteScore = await PostRepo.getVoteCount(post.id);
-  const { _count, ...rest } = post
-  const filiterdPost = {
-      ...rest,
-      commentsCount: _count.Comments,  
-      voteScore
-    };
+  const voteType = await PostRepo.getPostVoteTypeForAUser(post.id, userId);
 
-  return filiterdPost
+  const { _count, ...rest } = post;
+
+  const filiterdPost = {
+    ...rest,
+    commentsCount: _count.Comments,
+    voteScore,
+    voteType: voteType || 'NONE'
+  };
+
+  return filiterdPost;
 }
 
 async function updatePost(
