@@ -194,28 +194,28 @@ model CommentVote {
 }
 
 model Classroom {
-  id          Int       @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   description String?
   coverImg    String?
   communityId Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Community   Community @relation(fields: [communityId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Community   Community  @relation(fields: [communityId], references: [id])
   Quiz        Quiz[]
   Sections    Section[]
+  Questions   Question[]
 }
 
 model Section {
-  id          Int        @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String?
   classroomId Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   Lessons     Lesson[]
-  Questions   Question[]
-  Classroom   Classroom  @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  Classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
@@ -244,11 +244,11 @@ model Question {
   questionHeader String?
   options        String[]
   answer         String
-  sectionId      Int
+  classroomId    Int
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-  Section        Section?       @relation(fields: [sectionId], references: [id])
   QuizQuestions  QuizQuestion[]
+  Classroom      Classroom?     @relation(fields: [classroomId], references: [id])
 }
 
 model Quiz {

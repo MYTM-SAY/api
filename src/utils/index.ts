@@ -164,43 +164,6 @@ export const querySchema = z.object({
 })
 
 export type QuerySchema = z.infer<typeof querySchema>
-export const QuestionSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    text: z
-      .string()
-      .max(500, 'Question text must be at most 500 characters')
-      .nullable(),
-    options: z
-      .array(z.string().max(200, 'Option must be at most 200 characters'))
-      .min(1, 'At least one option is required'),
-    answers: z
-      .array(z.string().max(200, 'Answer must be at most 200 characters'))
-      .min(1, 'At least one answer is required'),
-    sectionId: z.number().int().positive(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
-export const QuizSchema = z
-  .object({
-    id: z.number().int().positive().optional(),
-    name: z
-      .string()
-      .min(1, 'Quiz name is required')
-      .max(100, 'Quiz name must be at most 100 characters'),
-    questions: z.array(QuestionSchema),
-    duration: z.number().int().positive(),
-    active: z.boolean(),
-    classroomId: z.number().int().positive(),
-    startDate: z.date(),
-    endDate: z.date(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  })
-  .strict()
-
 export const FileSchema = z
   .object({
     id: z.number().int().positive().optional(),
