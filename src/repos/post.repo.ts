@@ -253,7 +253,6 @@ export const PostRepo = {
         authorId: {
           not: userId,
         },
-        // Only posts whose forum’s community has a membership by this user
         Forum: {
           Community: {
             CommunityMembers: {
@@ -294,14 +293,7 @@ export const PostRepo = {
   async getPostsByUserId(userId: number) {
     return prisma.post.findMany({
       where: {
-        // Only posts whose forum’s community has a membership by this user
-        Forum: {
-          Community: {
-            CommunityMembers: {
-              some: { userId },
-            },
-          },
-        },
+       authorId: userId,
       },
       orderBy: { createdAt: 'desc' },
       select: {

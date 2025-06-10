@@ -454,7 +454,7 @@ router.get('/me/feed', isAuthenticated, getAllPostsFromCommunitiesJoinedByUser)
  * @swagger
  * /posts/user/{userId}:
  *   get:
- *     summary: Get posts from communities the user has joined
+ *     summary: Get all posts by user ID
  *     tags: [Posts]
  *     parameters:
  *       - in: path
