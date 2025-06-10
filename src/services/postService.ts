@@ -194,7 +194,7 @@ async function getUserPosts(userId: number) {
   const user = await UserRepo.findById(userId)
   if (!user) throw new APIError('User not found', 404)
 
-  const posts = await PostRepo.getPostsFromCommunitiesJoinedByUser(userId);
+  const posts = await PostRepo.getPostsByUserId(userId);
   const voteCounts = await Promise.all(
     posts.map(post => PostRepo.getVoteCount(post.id))
   );
