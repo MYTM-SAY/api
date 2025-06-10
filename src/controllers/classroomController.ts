@@ -31,6 +31,7 @@ export const getClassroom = asyncHandler(
     const includes = await querySchema.parseAsync(req.query)
     const classroom = await ClassroomService.getClassroomById(
       +req.params.id,
+      req.claims!.id,
       includes,
     )
 

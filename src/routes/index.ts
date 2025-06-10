@@ -13,7 +13,7 @@ import uploadRoutes from './upload.route'
 import fileRoutes from './files.route'
 import favorites from './favoriteCommunities.route'
 import search from './search.route'
-
+import question from './question.route'
 const router = express.Router()
 
 router.use('/posts', post)
@@ -30,5 +30,5 @@ router.use('/upload', uploadRoutes)
 router.use('/files', fileRoutes)
 router.use('/favorites', favorites)
 router.use('/search', search)
-
+router.use('/questions', question)
 export default router

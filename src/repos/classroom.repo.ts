@@ -16,17 +16,26 @@ export const ClassroomRepo = {
     return classrooms
   },
 
-  async findbyId(id: number, includes?: QuerySchema) {
+  async findbyId(classroomId: number, userId?: number, includes?: QuerySchema) {
     console.log('includes', includes)
     const classroom = await prisma.classroom.findUnique({
-      where: { id },
+      where: { id: classroomId },
       include: {
         Community: true,
         Sections: includes?.section
           ? {
               include: {
                 Lessons: includes?.lesson
-                  ? { include: { Materials: true } }
+                  ? {
+                      include: {
+                        Materials: true,
+                        CompletedLessons: {
+                          where: {
+                            userId: userId,
+                          },
+                        },
+                      },
+                    }
                   : false,
               },
             }
@@ -70,7 +79,6 @@ export const ClassroomRepo = {
 
     return updatedClassroom
   },
-
 
   async countLessons(classroomId: number) {
     const count = await prisma.lesson.count({

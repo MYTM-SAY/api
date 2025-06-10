@@ -2,7 +2,7 @@ import { prisma } from '../db/PrismaClient'
 
 export const leaderBoardRepo = {
   async getTopTenByScore(commId: number) {
-    const result = await prisma.quizScore.findMany({
+    const result = await prisma.quizAttempted.findMany({
       where: {
         Quiz: {
           Classroom: {

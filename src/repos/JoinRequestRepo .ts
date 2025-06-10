@@ -12,6 +12,21 @@ export const JoinRequestRepo = {
         status: status,
         communityId: communityId,
       },
+      include: {
+        User: {
+          select: {
+            id: true,
+            username: true,
+            fullname: true,
+            email: true,
+            UserProfile: {
+              select: {
+                profilePictureURL: true,
+              },
+            },
+          },
+        },
+      },
     })
   },
 
@@ -20,17 +35,17 @@ export const JoinRequestRepo = {
       data: joinRequest,
     })
   },
-  
-async findByUserAndCommunity(userId: number, communityId: number) {
-  return await prisma.joinRequest.findUnique({
-    where: {
-      userId_communityId: {
-        userId,
-        communityId,
+
+  async findByUserAndCommunity(userId: number, communityId: number) {
+    return await prisma.joinRequest.findUnique({
+      where: {
+        userId_communityId: {
+          userId,
+          communityId,
+        },
       },
-    },
-  })
-},
+    })
+  },
   async findById(id: number) {
     return await prisma.joinRequest.findUnique({
       where: { id },
@@ -70,10 +85,7 @@ async findByUserAndCommunity(userId: number, communityId: number) {
     })
   },
 
-  async updateStatus(
-    id: number,
-    status: JoinRequestStatus,
-  ) {
+  async updateStatus(id: number, status: JoinRequestStatus) {
     return await prisma.joinRequest.update({
       where: {
         id,
