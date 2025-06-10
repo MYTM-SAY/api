@@ -46,7 +46,7 @@ async function getPostById(postId: number, userId: number) {
   const post = await PostRepo.findById(postId);
   if (!post) throw new APIError('Post not found', 404);
 
-  const voteScore = await PostRepo.getVoteCount(post.id);
+  const voteCounter = await PostRepo.getVoteCount(post.id);
   const voteType = await PostRepo.getPostVoteTypeForAUser(post.id, userId);
 
   const { _count, ...rest } = post;
@@ -54,7 +54,7 @@ async function getPostById(postId: number, userId: number) {
   const filiterdPost = {
     ...rest,
     commentsCount: _count.Comments,
-    voteScore,
+    voteCounter,
     voteType: voteType || 'NONE'
   };
 
