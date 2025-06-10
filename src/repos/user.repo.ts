@@ -20,19 +20,20 @@ export const UserRepo = {
   },
 
   // find user by email
-async findByEmail(email: string) {
-  const result = await prisma.user.findUnique({
-    where: { email },
-    include: {
-      UserProfile: {
-        select: {
-          profilePictureURL: true,
+  async findByEmail(email: string) {
+    const result = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        UserProfile: {
+          select: {
+            profilePictureURL: true,
+          },
         },
       },
-    },
-  });
-  return result;
-},
+    });
+    return result;
+  },
+  
   // find user by username
   async findByUsername(username: string) {
     const result = await prisma.user.findUnique({
@@ -50,7 +51,7 @@ async findByEmail(email: string) {
     return result
   },
 
-  // create User for the Authentication
+  // create User for the Authentication - Updated to include UserProfile
   async createUser(userData: Prisma.UserUncheckedCreateInput) {
     return prisma.user.create({
       data: {
@@ -59,6 +60,13 @@ async findByEmail(email: string) {
         email: userData.email,
         dob: userData.dob,
         hashedPassword: userData.hashedPassword,
+      },
+      include: {
+        UserProfile: {
+          select: {
+            profilePictureURL: true,
+          },
+        },
       },
     })
   },

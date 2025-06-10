@@ -27,10 +27,11 @@ const verifyRefreshToken = (token: string) => {
     return null
   }
 }
+
 const decodeToken = (token: string): TokenPayload | null =>
   (jwt.decode(token) as TokenPayload) || null
 
-const generateAccessToken = (user: User & { UserProfile?: { profilePictureURL?: string | null } }): string => {
+const generateAccessToken = (user: User & { UserProfile?: { profilePictureURL: string | null } | null }): string => {
   const payload: TokenPayload = {
     id: user.id,
     email: user.email,

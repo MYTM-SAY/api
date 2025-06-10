@@ -17,9 +17,7 @@ export const googleLogin = async (profile: any) => {
   let user = await UserRepo.findByEmail(email);
   //console.log('user', user)
 
-  // if can not find the user, create one with a random password
   if (!user) {
-    // TODO : this a temporary solution, it's horrible to do this
     const randomPassword = Math.random().toString(36).slice(-8); // generate a random password
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
     user = await UserRepo.createUser({
