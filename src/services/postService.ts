@@ -85,7 +85,7 @@ async function deletePost( userId: number,postId: number,) {
 
     if(AccessAndCommunity.Author.id !== userId )
       throw new APIError('You are not allowed to delete this post', 403)
-
+    await PostRepo.delete(postId)
   return post
 }
 
