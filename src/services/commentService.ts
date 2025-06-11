@@ -61,8 +61,8 @@ async function deleteComment( userId: number, commentId: number,) {
   // 2. The Owner or moderator of the community
   // 3. The owner of the post
 
-  const post = await PostRepo.getRoleByCommunityIdAndUserId(userId,comment.postId,)
-  if(!post) throw new APIError('Post not found', 404)
+  // const post = await PostRepo.getRoleByCommunityIdAndUserId(userId,comment.postId,)
+  // if(!post) throw new APIError('Post not found', 404)
 
 
   if (comment.authorId !== userId && comment.Post.Forum.Community.id !== userId    ) {
