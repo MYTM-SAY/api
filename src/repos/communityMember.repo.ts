@@ -38,7 +38,11 @@ export const CommunityMembersRepo = {
     })
     return member
   },
-
+async findByUserIdAndCommunityId(userId: number, communityId: number) {
+  return await prisma.communityMembers.findUnique({
+    where: { communityId_userId: { communityId, userId } },
+  });
+},
   async getUserRoleInCommunity(userId: number, communityId: number) {
     const member = await prisma.communityMembers.findFirst({
       where: { communityId, userId },
