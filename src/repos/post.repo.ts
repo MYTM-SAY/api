@@ -147,13 +147,17 @@ export const PostRepo = {
       where: { userId_postId: { userId, postId } },
     })
   },
-  async getVoteCount(postId: number): Promise<number> {
-    const [up, down] = await Promise.all([
-      prisma.postVote.count({ where: { postId, type: VoteType.UPVOTE } }),
-      prisma.postVote.count({ where: { postId, type: VoteType.DOWNVOTE } }),
-    ])
-    return up - down
-  },
+async getVoteCount(postId: number): Promise<number> {
+  const votes = await prisma.postVote.groupBy({
+    by: ['type'],
+    where: { postId },
+    _count: { type: true },
+  });
+
+  const up = votes.find(v => v.type === VoteType.UPVOTE)?._count.type ?? 0;
+  const down = votes.find(v => v.type === VoteType.DOWNVOTE)?._count.type ?? 0;
+  return up - down;
+},
   async setVote(
     postId: number,
     userId: number,

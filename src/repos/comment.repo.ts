@@ -177,13 +177,17 @@ console.log('findComment called with:', { postId, commentId });
   },
 
   async getVoteCount(commentId: number): Promise<number> {
-    const [up, down] = await Promise.all([
-      prisma.commentVote.count({ where: { commentId, type: VoteType.UPVOTE } }),
-      prisma.commentVote.count({ where: { commentId, type: VoteType.DOWNVOTE } }),
-    ]);
+    const votes = await prisma.commentVote.groupBy({
+      by: ['type'],
+      where: { commentId },
+      _count: { type: true },
+    });
+
+    const up = votes.find(v => v.type === VoteType.UPVOTE)?._count.type ?? 0;
+    const down = votes.find(v => v.type === VoteType.DOWNVOTE)?._count.type ?? 0;
     return up - down;
   },
-
+  
   async setVote(
     commentId: number,
     userId: number,
