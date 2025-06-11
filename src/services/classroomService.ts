@@ -119,11 +119,14 @@ const classroomProgress = async (classroomId: number, userId: number) => {
   const lessons = await ClassroomRepo.countLessons(classroomId)
   if (lessons === 0)
     throw new APIError('No lessons found in this classroom', 404)
-  const completedLessons = await ClassroomRepo.countCompletedLessons(userId)
+  const completedLessons = await ClassroomRepo.countCompletedLessons(
+    userId,
+    classroomId,
+  )
   if (completedLessons === 0)
     throw new APIError('No completed lessons found for this user', 404)
   if (lessons === 0 || completedLessons === 0) return 0
-  return (completedLessons / lessons) * 100
+  return Math.round((completedLessons / lessons) * 100)
 }
 
 export const ClassroomService = {
