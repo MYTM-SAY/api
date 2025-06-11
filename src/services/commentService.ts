@@ -3,29 +3,48 @@ import { CommunityRepo } from '../repos/community.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommentSchema } from '../utils/zod/commentSchemes'
-import { VoteType, CommentVote } from '@prisma/client';
+import { VoteType, CommentVote } from '@prisma/client'
 import { PostRepo } from '../repos/post.repo'
 
 const findAllComments = async (postId: number, userId: number) => {
-  const comments = await CommentRepo.findAll(postId);
-  if (!comments) throw new APIError('Comments not found', 404);
+  const post = await PostRepo.findById(postId)
+  if (!post) throw new APIError('Post not found', 404)
+  const comments = await CommentRepo.findAll(postId)
+  if (!comments) throw new APIError('Comments not found', 404)
 
   const commentsWithVotes = await Promise.all(
     comments.map(async (comment) => {
-      const voteCount = await CommentRepo.getVoteCount(comment.id);
-      const vote = await CommentRepo.votedBefore(comment.id, userId);
+      const voteCount = await CommentRepo.getVoteCount(comment.id)
+      const vote = await CommentRepo.votedBefore(comment.id, userId)
       return {
         ...comment,
         voteCount,
         voteType: vote?.type ?? 'NONE',
-      };
-    })
-  );
+      }
+    }),
+  )
 
-  return commentsWithVotes;
-};
+  return commentsWithVotes
+}
 
+async function getRepliesByParentId(parentId: number, userId: number) {
+  const comments = await CommentRepo.getReplies(parentId)
+  if (!comments) throw new APIError('Comments not found', 404)
 
+  const commentsWithVotes = await Promise.all(
+    comments.map(async (comment) => {
+      const voteCount = await CommentRepo.getVoteCount(comment.id)
+      const vote = await CommentRepo.votedBefore(comment.id, userId)
+      return {
+        ...comment,
+        voteCount,
+        voteType: vote?.type ?? 'NONE',
+      }
+    }),
+  )
+
+  return commentsWithVotes
+}
 
 async function findComment(postId: number, commentId: number) {
   const comment = await CommentRepo.findComment(postId, commentId)
@@ -51,8 +70,7 @@ async function updateComment(
   return CommentRepo.updateComment(commentId, data)
 }
 
-async function deleteComment( userId: number, commentId: number,) {
-
+async function deleteComment(userId: number, commentId: number) {
   const comment = await CommentRepo.findCommentById(commentId)
   if (!comment) throw new APIError('Comment not found', 404)
 
@@ -64,15 +82,14 @@ async function deleteComment( userId: number, commentId: number,) {
   // const post = await PostRepo.getRoleByCommunityIdAndUserId(userId,comment.postId,)
   // if(!post) throw new APIError('Post not found', 404)
 
-
-  if (comment.authorId !== userId && comment.Post.Forum.Community.id !== userId    ) {
+  if (
+    comment.authorId !== userId &&
+    comment.Post.Forum.Community.id !== userId
+  ) {
     throw new APIError('You are not allowed to delete this comment', 403)
-    
   }
 
-
   return CommentRepo.deleteComment(commentId)
-
 }
 
 async function getCommentsByUserIdAndCommunityId(
@@ -87,64 +104,63 @@ async function getCommentsByUserIdAndCommunityId(
 
   return CommentRepo.getCommentsByUserIdAndCommunityId(userId, communityId)
 }
- async function upVoteComment(
+async function upVoteComment(
   commentId: number,
-  userId: number
+  userId: number,
 ): Promise<{ vote: CommentVote; voteCount: number }> {
-  const existing = await CommentRepo.votedBefore(commentId, userId);
-  let newType: VoteType = VoteType.UPVOTE;
+  const existing = await CommentRepo.votedBefore(commentId, userId)
+  let newType: VoteType = VoteType.UPVOTE
 
   if (existing) {
     if (existing.type === VoteType.UPVOTE) {
-      newType = VoteType.NONE;
+      newType = VoteType.NONE
     } else if (existing.type === VoteType.DOWNVOTE) {
-      newType = VoteType.UPVOTE;
+      newType = VoteType.UPVOTE
     }
   }
 
-  const vote = await CommentRepo.setVote(commentId, userId, newType);
-  const voteCount = await CommentRepo.getVoteCount(commentId);
-  return { vote, voteCount };
+  const vote = await CommentRepo.setVote(commentId, userId, newType)
+  const voteCount = await CommentRepo.getVoteCount(commentId)
+  return { vote, voteCount }
 }
 
- async function downVoteComment(
+async function downVoteComment(
   commentId: number,
-  userId: number
+  userId: number,
 ): Promise<{ vote: CommentVote; voteCount: number }> {
-  const existing = await CommentRepo.votedBefore(commentId, userId);
-  let newType: VoteType = VoteType.DOWNVOTE;
+  const existing = await CommentRepo.votedBefore(commentId, userId)
+  let newType: VoteType = VoteType.DOWNVOTE
 
   if (existing) {
     if (existing.type === VoteType.DOWNVOTE) {
-      newType = VoteType.NONE;
+      newType = VoteType.NONE
     } else if (existing.type === VoteType.UPVOTE) {
-      newType = VoteType.DOWNVOTE;
+      newType = VoteType.DOWNVOTE
     }
   }
 
-  const vote = await CommentRepo.setVote(commentId, userId, newType);
-  const voteCount = await CommentRepo.getVoteCount(commentId);
-  return { vote, voteCount };
+  const vote = await CommentRepo.setVote(commentId, userId, newType)
+  const voteCount = await CommentRepo.getVoteCount(commentId)
+  return { vote, voteCount }
 }
 
-
 const getUserComments = async (userId: number) => {
-  const comments = await CommentRepo.getUserComments(userId);
+  const comments = await CommentRepo.getUserComments(userId)
 
   const commentsWithVotes = await Promise.all(
     comments.map(async (comment) => {
-      const voteCount = await CommentRepo.getVoteCount(comment.id);
-      const vote = await CommentRepo.votedBefore(comment.id, userId);
+      const voteCount = await CommentRepo.getVoteCount(comment.id)
+      const vote = await CommentRepo.votedBefore(comment.id, userId)
       return {
         ...comment,
         voteCount,
         voteType: vote?.type ?? 'NONE',
-      };
-    })
-  );
+      }
+    }),
+  )
 
-  return commentsWithVotes;
-};
+  return commentsWithVotes
+}
 export const CommentService = {
   findAllComments,
   findComment,
@@ -154,5 +170,6 @@ export const CommentService = {
   getCommentsByUserIdAndCommunityId,
   upVoteComment,
   downVoteComment,
-  getUserComments
+  getUserComments,
+  getRepliesByParentId,
 }

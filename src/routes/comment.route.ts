@@ -9,6 +9,7 @@ import {
   upVoteComment,
   downVoteComment,
   getUserComments,
+  getRepliesByParentId,
 } from '../controllers/commentController'
 import { isAuthenticated } from '../middlewares/authMiddleware'
 
@@ -131,7 +132,7 @@ router.get('/:postId', isAuthenticated, findAllComments)
 
 /**
  * @swagger
- * /comments/{postId}/{commentId}:
+ * /comments/{commentId}/posts/{postId}:
  *   get:
  *     summary: Get a specific comment
  *     description: Retrieves a specific comment from a post.
@@ -169,7 +170,7 @@ router.get('/:postId', isAuthenticated, findAllComments)
  *       500:
  *         description: Server error
  */
-router.get('/:postId/:commentId', findComment)
+router.get('/:commentId/posts/:postId/', findComment)
 
 /**
  * @swagger
@@ -349,7 +350,7 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.put('/upvote/:commentId', isAuthenticated, upVoteComment);
+router.put('/upvote/:commentId', isAuthenticated, upVoteComment)
 
 /**
  * @swagger
@@ -396,7 +397,58 @@ router.put('/upvote/:commentId', isAuthenticated, upVoteComment);
  *       500:
  *         description: Server error
  */
-router.put('/downvote/:commentId', isAuthenticated, downVoteComment);
-
+router.put('/downvote/:commentId', isAuthenticated, downVoteComment)
+/**
+ * @swagger
+ * /comments/get-children/{parentId}:
+ *   get:
+ *     summary: Get replies by parent comment ID
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: parentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the parent comment
+ *     responses:
+ *       200:
+ *         description: Replies fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Replies fetched successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       content:
+ *                         type: string
+ *                       parentId:
+ *                         type: integer
+ *                       authorId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *       400:
+ *         description: Invalid request parameters
+ *       404:
+ *         description: Parent comment not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/get-children/:parentId', isAuthenticated, getRepliesByParentId)
 
 export default router
