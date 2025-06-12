@@ -14,10 +14,11 @@ const getLessonsBySectionId = async (sectionId: number, userId: number) => {
   const isJoined = await isHasRole(userId, sectionExist.Classroom.communityId, [
     Role.MODERATOR,
     Role.OWNER,
+    Role.MEMBER,
   ])
 
   if (!isJoined) throw new APIError('You must be owner or mod', 403)
-  return LessonRepo.findBySectionId(sectionId)
+  return LessonRepo.findBySectionId(sectionId, userId)
 }
 
 const getLessonById = async (id: number, userId: number) => {
