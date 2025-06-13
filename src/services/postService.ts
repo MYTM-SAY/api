@@ -51,7 +51,7 @@ async function getPostById(postId: number, userId: number) {
     ...rest,
     commentsCount: _count.Comments,
     voteCounter,
-    voteType: voteType || 'NONE',
+    voteType: voteType,
   }
 
   return filiterdPost
