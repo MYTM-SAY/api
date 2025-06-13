@@ -5,13 +5,18 @@ import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchem
 import { toggleCompleted } from '../controllers/lessonController'
 
 export const LessonRepo = {
-  async findBySectionId(id: number) {
+  async findBySectionId(id: number, userId: number) {       
     const lessons = await prisma.lesson.findMany({
       where: {
         sectionId: id,
       },
       include: {
         Materials: true,
+        CompletedLessons: {
+          where: {
+            userId, // This should be replaced with the actual user ID from the context
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',

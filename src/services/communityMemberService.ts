@@ -25,18 +25,26 @@ async function getAllMods(communityId: number) {
 }
 
 async function LeaveFromCommunity(userId: number, communityId: number) {
-  console.log('LeaveFromCommunity called with:', userId, communityId)
-  const community = await CommunityRepo.findById(communityId)
-  if (!community) throw new APIError('Community not found', 404)
-  const role = await CommunityMembersRepo.getUserRoleInCommunity(
-    userId,
-    communityId,
-  )
-  if (role === Role.OWNER)
-    throw new APIError('You cannot leave a community if you are the owner', 403)
+  console.log('LeaveFromCommunity called with:', userId, communityId);
 
-  await CommunityMembersRepo.delete(userId, communityId)
-  return { message: 'You have left the community successfully' }
+  // Check if community exists
+  const community = await CommunityRepo.findById(communityId);
+  if (!community) throw new APIError('Community not found', 404);
+
+  // Check if user is a member and their role
+  const member = await CommunityMembersRepo.findByUserIdAndCommunityId(userId, communityId);
+  if (!member) {
+    return { message: 'You are not a member of this community' };
+  }
+
+  // Prevent owner from leaving
+  if (member.Role === Role.OWNER) {
+    throw new APIError('You cannot leave a community if you are the owner', 403);
+  }
+
+  // Delete the membership
+  await CommunityMembersRepo.delete(userId, communityId);
+  return { message: 'You have left the community successfully' };
 }
 export const CommunityMemberService = {
   getUserRoleInCommunity,

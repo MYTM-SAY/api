@@ -15,6 +15,7 @@ import favorites from './favoriteCommunities.route'
 import search from './search.route'
 import question from './question.route'
 import quiz from './quiz.route'
+import reminder from './reminder.route'
 const router = express.Router()
 
 router.use('/posts', post)
@@ -33,4 +34,5 @@ router.use('/favorites', favorites)
 router.use('/search', search)
 router.use('/questions', question)
 router.use('/quizzes', quiz)
+router.use('/reminders', reminder)
 export default router

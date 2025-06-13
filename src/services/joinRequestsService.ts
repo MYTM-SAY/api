@@ -52,31 +52,40 @@ async function updateJoinRequestStatus(
 ) {
   const { status } = updateJoinRequestType;
 
-  const existingRequest = await JoinRequestRepo.findById(id)
+  const existingRequest = await JoinRequestRepo.findById(id);
 
-  if (!existingRequest) throw new APIError('Join request not found', 404)
+  if (!existingRequest) throw new APIError('Join request not found', 404);
 
   const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,
     existingRequest.communityId,
   );
   if (userRole !== Role.MODERATOR && userRole !== Role.OWNER) {
-    throw new APIError('You do not have permission to update this request', 403)
-  };
-
-  const updatedRequest = await JoinRequestRepo.updateStatus(
-    id,
-    status,
-  )
-
-    if (status === 'APPROVED') {
-    await CommunityMembersRepo.addUserToCommunity({
-      userId: existingRequest.userId,
-      communityId: existingRequest.communityId,
-      Role: Role.MEMBER,
-    });
+    throw new APIError('You do not have permission to update this request', 403);
   }
-  return updatedRequest
+
+  const updatedRequest = await JoinRequestRepo.updateStatus(id, status);
+
+  if (status === 'APPROVED') {
+    // Check if the user is already a member of the community
+    const isAlreadyMember = await CommunityMembersRepo.getUserRoleInCommunity(
+      existingRequest.userId,
+      existingRequest.communityId,
+    );
+    if (isAlreadyMember) {
+      throw new APIError('User is already a member of this community', 400);
+    }
+    if (!isAlreadyMember) {
+      // Only add the user if they are not already a member
+      await CommunityMembersRepo.addUserToCommunity({
+        userId: existingRequest.userId,
+        communityId: existingRequest.communityId,
+        Role: Role.MEMBER,
+      });
+    }
+  }
+
+  return updatedRequest;
 }
 export const JoinRequestService = {
   getAllPendingJoinRequests,

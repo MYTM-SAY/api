@@ -4,7 +4,11 @@ export const schemas = {
     properties: {
       id: { type: 'integer' },
       name: { type: 'string' },
-      notes: { type: 'string', nullable: true },
+      notes: {
+        type: 'array',
+        items: { type: 'string' },
+        nullable: true,
+      },
       sectionId: { type: 'integer' },
       createdAt: { type: 'string', format: 'date-time' },
       updatedAt: { type: 'string', format: 'date-time' },
@@ -16,7 +20,7 @@ export const schemas = {
     example: {
       id: 1,
       name: 'Intro to Algebra',
-      notes: 'Basic concepts',
+      notes: ['Basic concepts', 'Bring textbook'],
       sectionId: 1,
       createdAt: '2025-04-03T12:24:27.161Z',
       updatedAt: '2025-04-03T12:24:27.161Z',
@@ -32,7 +36,6 @@ export const schemas = {
       ],
     },
   },
-
   Material: {
     type: 'object',
     properties: {
@@ -58,13 +61,17 @@ export const schemas = {
     type: 'object',
     properties: {
       name: { type: 'string', minLength: 1, maxLength: 100 },
-      notes: { type: 'string', maxLength: 5000, nullable: true },
+      notes: {
+        type: 'array',
+        items: { type: 'string' },
+        nullable: true,
+      },
       sectionId: { type: 'integer' },
     },
     required: ['name', 'sectionId'],
     example: {
       name: 'Intro to Algebra',
-      notes: 'Basic concepts',
+      notes: ['Basic concepts', 'Introductory topics'],
       sectionId: 1,
     },
   },
@@ -73,11 +80,15 @@ export const schemas = {
     type: 'object',
     properties: {
       name: { type: 'string', minLength: 1, maxLength: 100 },
-      notes: { type: 'string', maxLength: 5000, nullable: true },
+      notes: {
+        type: 'array',
+        items: { type: 'string' },
+        nullable: true,
+      },
     },
     example: {
       name: 'Updated Lesson Name',
-      notes: 'Updated notes for this lesson.',
+      notes: ['Updated notes for this lesson.', 'Additional explanations'],
     },
   },
 

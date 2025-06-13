@@ -1,4 +1,4 @@
-import express from 'express'
+import express from 'express';
 import {
   getLessonsBySectionId,
   getLessonById,
@@ -6,12 +6,30 @@ import {
   deleteLesson,
   updateLesson,
   toggleCompleted,
-} from '../controllers/lessonController'
-import { isAuthenticated } from '../middlewares/authMiddleware'
+} from '../controllers/lessonController';
+import { isAuthenticated } from '../middlewares/authMiddleware';
 
-const router = express.Router()
+const router = express.Router();
 
-router.use(isAuthenticated)
+router.use(isAuthenticated);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: false
+ *         notes:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Array of error messages or validation details
+ *           example: ["Invalid input", "Field is required"]
+ */
 
 /**
  * @swagger
@@ -48,10 +66,18 @@ router.use(isAuthenticated)
  *                     $ref: '#/components/schemas/Lesson'
  *       400:
  *         description: Invalid section ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/sections/:sectionId', getLessonsBySectionId)
+router.get('/sections/:sectionId', getLessonsBySectionId);
 
 /**
  * @swagger
@@ -86,12 +112,24 @@ router.get('/sections/:sectionId', getLessonsBySectionId)
  *                   $ref: '#/components/schemas/Lesson'
  *       400:
  *         description: Invalid lesson ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', getLessonById)
+router.get('/:id', getLessonById);
 
 /**
  * @swagger
@@ -132,10 +170,18 @@ router.get('/:id', getLessonById)
  *                   $ref: '#/components/schemas/Lesson'
  *       400:
  *         description: Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/', createLessonWithNewMaterial)
+router.post('/', createLessonWithNewMaterial);
 
 /**
  * @swagger
@@ -176,12 +222,24 @@ router.post('/', createLessonWithNewMaterial)
  *                   $ref: '#/components/schemas/Lesson'
  *       400:
  *         description: Invalid lesson ID or input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch('/:id', updateLesson)
+router.patch('/:id', updateLesson);
 
 /**
  * @swagger
@@ -217,12 +275,24 @@ router.patch('/:id', updateLesson)
  *                   example: null
  *       400:
  *         description: Invalid lesson ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete('/:id', deleteLesson)
+router.delete('/:id', deleteLesson);
 
 /**
  * @swagger
@@ -252,7 +322,7 @@ router.delete('/:id', deleteLesson)
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: Lesson completion status toggled
+ *                   example: "Lesson completion status toggled"
  *                 data:
  *                   type: object
  *                   properties:
@@ -264,29 +334,20 @@ router.delete('/:id', deleteLesson)
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: Invalid lesson ID
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Lesson not found
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: Lesson not found
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch('/:id/toggle-completed', toggleCompleted)
-export default router
+router.patch('/:id/toggle-completed', toggleCompleted);
+
+export default router;

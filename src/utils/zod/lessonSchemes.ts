@@ -7,10 +7,8 @@ const BaseLessonSchema = z.object({
     .min(1, 'Lesson name is required')
     .max(100, 'Lesson name must be at most 100 characters'),
   notes: z
-    .string()
-    .max(5000, 'Notes must be at most 5000 characters')
-    .nullable()
-    .optional(),
+    .array(z.string())
+     .optional(),
 })
 
 export const UpdateLessonSchema = BaseLessonSchema.strict().partial()

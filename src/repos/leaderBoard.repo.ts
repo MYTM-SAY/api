@@ -16,6 +16,11 @@ export const leaderBoardRepo = {
             id: true,
             username: true,
             fullname: true,
+            UserProfile: {
+              select: {
+                profilePictureURL: true,
+              },
+            }
           },
         },
       },
