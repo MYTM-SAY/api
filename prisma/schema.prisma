@@ -257,7 +257,6 @@ model Quiz {
   duration      Int // in minutes
   startDate     DateTime
   endDate       DateTime
-  questionCount Int
   grade         String
   classroomId   Int
   active        Boolean
@@ -273,7 +272,7 @@ model QuizQuestion {
   quizId      Int
   questionId  Int
   points      Int
-  Quiz        Quiz         @relation(fields: [quizId], references: [id])
+  Quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   Question    Question     @relation(fields: [questionId], references: [id])
   UserAnswers UserAnswer[]
 }
