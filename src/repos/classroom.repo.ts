@@ -16,6 +16,15 @@ export const ClassroomRepo = {
     return classrooms
   },
 
+  async getClassroomByIdForDelete(classroomId: number) {
+    const classroom = await prisma.classroom.findUnique({
+      where: { id: classroomId },
+      include: {
+        Sections: true,
+      },
+    })
+    return classroom
+  },
   async findbyId(classroomId: number, userId?: number, includes?: QuerySchema) {
     console.log('includes', includes)
     const classroom = await prisma.classroom.findUnique({

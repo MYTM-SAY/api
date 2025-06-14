@@ -68,13 +68,20 @@ export const createClassroom = async (data: any, userId: number) => {
 }
 
 const deleteClassroom = async (id: number, userId: number) => {
-  const existingClassroom = await ClassroomRepo.findbyId(id)
+  const existingClassroom = await ClassroomRepo.getClassroomByIdForDelete(id)
   if (!existingClassroom) throw new APIError('Classroom not found', 404)
 
   const isOwnerOrMod = await isHasRole(userId, existingClassroom.communityId, [
     Role.MODERATOR,
     Role.OWNER,
   ])
+
+  if (existingClassroom.Sections?.length > 0) {
+    throw new APIError(
+      'You must delete the sections before deleting the classroom',
+      409,
+    )
+  }
 
   if (!isOwnerOrMod) throw new APIError('You must be an owner or mod', 403)
   const classroom = await ClassroomRepo.delete(id)

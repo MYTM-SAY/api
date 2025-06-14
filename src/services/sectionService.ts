@@ -63,7 +63,6 @@ const deleteSection = async (id: number, userId: number) => {
     [Role.MODERATOR, Role.OWNER],
   )
 
-  console.log(sectionExists.Lessons)
   if (sectionExists.Lessons?.length !== 0) {
     throw new APIError('You must delete the lessons before delete section', 409)
   }
