@@ -64,7 +64,6 @@ const BaseQuizSchema = z
     duration: z.number().int().positive('Duration must be a positive integer'),
     startDate: z.string().transform((val) => new Date(val)),
     endDate: z.string().transform((val) => new Date(val)),
-    grade: z.string().min(1, 'Grade is required'),
     classroomId: z
       .number()
       .int()

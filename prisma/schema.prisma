@@ -259,7 +259,6 @@ model Quiz {
   duration      Int // in minutes
   startDate     DateTime
   endDate       DateTime
-  grade         String
   classroomId   Int
   active        Boolean
   createdAt     DateTime        @default(now())
