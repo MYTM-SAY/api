@@ -3,8 +3,9 @@ import { CommunityRepo } from '../repos/community.repo'
 import APIError from '../errors/APIError'
 import { z } from 'zod'
 import { CommentSchema } from '../utils/zod/commentSchemes'
-import { VoteType, CommentVote } from '@prisma/client'
+import { VoteType, CommentVote, Role } from '@prisma/client'
 import { PostRepo } from '../repos/post.repo'
+import { CommunityMembersRepo } from '../repos/communityMember.repo'
 
 const findAllComments = async (postId: number, userId: number) => {
   const post = await PostRepo.findById(postId)
@@ -64,9 +65,21 @@ async function createComment(data: z.infer<typeof CommentSchema>) {
 }
 
 async function updateComment(
+  userId: number,
   commentId: number,
   data: Partial<z.infer<typeof CommentSchema>>,
 ) {
+  const comment = await CommentRepo.findCommentById(commentId)
+  if (!comment) throw new APIError('Comment not found', 404)
+
+  if (data.parentId) {
+    const parentComment = await CommentRepo.findCommentById(data.parentId)
+    if (!parentComment) throw new APIError('Parent comment not found', 404)
+  }
+
+  if (comment.authorId !== userId) {
+    throw new APIError('You are not allowed to delete this comment', 403)
+  }
   return CommentRepo.updateComment(commentId, data)
 }
 
@@ -74,18 +87,11 @@ async function deleteComment(userId: number, commentId: number) {
   const comment = await CommentRepo.findCommentById(commentId)
   if (!comment) throw new APIError('Comment not found', 404)
 
-  // 3 types of users can delete a comment
-  // 1. The author of the comment
-  // 2. The Owner or moderator of the community
-  // 3. The owner of the post
-
-  // const post = await PostRepo.getRoleByCommunityIdAndUserId(userId,comment.postId,)
-  // if(!post) throw new APIError('Post not found', 404)
-
-  if (
-    comment.authorId !== userId &&
-    comment.Post.Forum.Community.id !== userId
-  ) {
+  const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    comment.Post.Forum.Community.id,
+  )
+  if (comment.authorId !== userId && userRole === Role.MEMBER) {
     throw new APIError('You are not allowed to delete this comment', 403)
   }
 

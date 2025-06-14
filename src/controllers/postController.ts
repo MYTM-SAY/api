@@ -6,11 +6,12 @@ import { asyncHandler } from '../utils/asyncHandler'
 import { PostSchema } from '../utils/zod/postSchemes'
 import { upsertUserContribution } from '../services/contributionService'
 
-
 export const getPostsByForumId = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-
-    const posts = await PostService.getPostsByForumId(+req.params.id, +req.claims!.id)
+    const posts = await PostService.getPostsByForumId(
+      +req.params.id,
+      +req.claims!.id,
+    )
     res
       .status(200)
       .json(ResponseHelper.success('Posts fetched successfully', posts))
@@ -24,7 +25,7 @@ export const createPost = asyncHandler(
       forumId: +req.params.forumId,
     })
 
-    await upsertUserContribution(+req.claims!.id);
+    await upsertUserContribution(+req.claims!.id)
 
     const post = await PostService.createPost(validatedData, req.claims!.id)
     res
@@ -33,53 +34,62 @@ export const createPost = asyncHandler(
   },
 )
 
-export const getPost = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const post = await PostService.getPostById(+req.params.id, +req.claims!.id)
-  res
-    .status(200)
-    .json(ResponseHelper.success('Post fetched successfully', post))
-})
+export const getPost = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const post = await PostService.getPostById(+req.params.id, +req.claims!.id)
+    res
+      .status(200)
+      .json(ResponseHelper.success('Post fetched successfully', post))
+  },
+)
 
 // in attachments, while testing add a complete url like http://localhost:3000/attachments/1234.png
-export const updatePost = asyncHandler(async (req: Request, res: Response) => {
-  const post = await PostService.updatePost(+req.params.id, req.body)
-  res
-    .status(200)
-    .json(ResponseHelper.success('Post updated successfully', post))
-})
+export const updatePost = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const post = await PostService.updatePost(
+      req.claims!.id,
+      +req.params.id,
+      req.body,
+    )
+    res
+      .status(200)
+      .json(ResponseHelper.success('Post updated successfully', post))
+  },
+)
 
 // TODO here we need to check if the user is the owner of the post or moderator, or owner of the communty
-export const deletePost = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const actualUserId = +req.claims!.id
-  const postId = +req.params.id
-  await PostService.deletePost( actualUserId, postId  )
-  res.status(204).json(ResponseHelper.success('Post deleted successfully'))
-})
+export const deletePost = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const actualUserId = +req.claims!.id
+    const postId = +req.params.id
+    await PostService.deletePost(actualUserId, postId)
+    res.status(204).json(ResponseHelper.success('Post deleted successfully'))
+  },
+)
 
 export const upVotePost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const postId = +req.params.postId;
-    const userId = +req.claims!.id;
-    const result = await PostService.upVotePost(postId, userId);
-    await upsertUserContribution(userId);
+    const postId = +req.params.postId
+    const userId = +req.claims!.id
+    const result = await PostService.upVotePost(postId, userId)
+    await upsertUserContribution(userId)
     res
       .status(200)
-      .json(ResponseHelper.success('Post upvoted successfully', result));
-  }
-);
+      .json(ResponseHelper.success('Post upvoted successfully', result))
+  },
+)
 
 export const downVotePost = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const postId = +req.params.postId;
-    const userId = +req.claims!.id;
-    const result = await PostService.downVotePost(postId, userId);
-    await upsertUserContribution(userId);
+    const postId = +req.params.postId
+    const userId = +req.claims!.id
+    const result = await PostService.downVotePost(postId, userId)
+    await upsertUserContribution(userId)
     res
       .status(200)
-      .json(ResponseHelper.success('Post downvoted successfully', result));
-  }
-);
-
+      .json(ResponseHelper.success('Post downvoted successfully', result))
+  },
+)
 
 export const getAllPostContribByUser = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -92,7 +102,9 @@ export const getAllPostContribByUser = asyncHandler(
 
 export const getAllPostsFromCommunitiesJoinedByUser = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const posts = await PostService.getAllPostsFromCommunitiesJoinedByUser(+req.claims!.id)
+    const posts = await PostService.getAllPostsFromCommunitiesJoinedByUser(
+      +req.claims!.id,
+    )
     res
       .status(200)
       .json(ResponseHelper.success('Posts fetched successfully', posts))
@@ -105,5 +117,5 @@ export const getUserPosts = asyncHandler(
     res
       .status(200)
       .json(ResponseHelper.success('Posts fetched successfully', posts))
-  }
+  },
 )
