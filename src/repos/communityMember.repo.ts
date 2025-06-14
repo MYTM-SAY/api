@@ -38,11 +38,11 @@ export const CommunityMembersRepo = {
     })
     return member
   },
-async findByUserIdAndCommunityId(userId: number, communityId: number) {
-  return await prisma.communityMembers.findUnique({
-    where: { communityId_userId: { communityId, userId } },
-  });
-},
+  async findByUserIdAndCommunityId(userId: number, communityId: number) {
+    return await prisma.communityMembers.findUnique({
+      where: { communityId_userId: { communityId, userId } },
+    })
+  },
   async getUserRoleInCommunity(userId: number, communityId: number) {
     const member = await prisma.communityMembers.findFirst({
       where: { communityId, userId },
@@ -89,5 +89,13 @@ async findByUserIdAndCommunityId(userId: number, communityId: number) {
       },
     })
     return modsCount
+  },
+
+  async updateRole(userId: number, communityId: number, role: Role) {
+    const updatedMember = await prisma.communityMembers.update({
+      where: { communityId_userId: { communityId, userId } },
+      data: { Role: role },
+    })
+    return updatedMember
   },
 }

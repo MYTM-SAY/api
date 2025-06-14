@@ -22,6 +22,8 @@ import {
   removeUserInCommunity,
   getUserRoleInCommunity,
   getAllMods,
+  promoteUserToMod,
+  demoteUserFromMod,
 } from '../controllers/communityMemberController'
 import { get } from 'http'
 
@@ -381,11 +383,7 @@ app.get('/:id/join-requests', isAuthenticated, getAllJoinRequests)
  *       500:
  *         description: Internal server error
  */
-app.patch(
-  '/join-requests/status/:id',
-  isAuthenticated,
-  updateJoinRequestStatus,
-);
+app.patch('/join-requests/status/:id', isAuthenticated, updateJoinRequestStatus)
 
 /**
  * @swagger
@@ -665,4 +663,68 @@ app.get('/:communityId/mods', getAllMods)
  *         description: Community not found or user not a member of the community.
  */
 app.delete('/:communityId/leave', isAuthenticated, LeaveFromCommunity)
+
+/**
+ * @swagger
+ * /communities/{communityId}/promote/{userId}:
+ *   patch:
+ *     summary: Promote a user to moderator
+ *     description: Allows an authorized user (admin or higher) to promote another member to a moderator role in the specified community.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community.
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user to be promoted.
+ *     responses:
+ *       200:
+ *         description: User promoted successfully.
+ *       403:
+ *         description: Access denied.
+ *       404:
+ *         description: Community or user not found.
+ */
+
+app.patch('/:communityId/promote/:userId', isAuthenticated, promoteUserToMod)
+
+/**
+ * @swagger
+ * /communities/{communityId}/demote/{userId}:
+ *   patch:
+ *     summary: Demote a moderator to member
+ *     description: Allows an authorized user (admin or higher) to demote a moderator back to a regular member in the specified community.
+ *     tags: [Communities]
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the community.
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user to be demoted.
+ *     responses:
+ *       200:
+ *         description: User demoted successfully.
+ *       400:
+ *         description: User is not a moderator.
+ *       403:
+ *         description: Access denied.
+ *       404:
+ *         description: Community or user not found.
+ */
+
+app.patch('/:communityId/demote/:userId', isAuthenticated, demoteUserFromMod)
 export default app

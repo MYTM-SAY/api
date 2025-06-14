@@ -75,3 +75,46 @@ export const getAllMods = asyncHandler(async (req: Request, res: Response) => {
       ResponseHelper.success('retrieved all moderators Successfully', count),
     )
 })
+
+export const promoteUserToMod = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = +req.claims!.id
+    const communityId = +req.params.communityId
+    const userToBePromoted = +req.params.userId
+
+    const updated = await CommunityMemberService.promoteUserToMod(
+      userId,
+      userToBePromoted,
+      communityId,
+    )
+
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success(
+          'User promoted to moderator successfully',
+          updated,
+        ),
+      )
+  },
+)
+
+export const demoteUserFromMod = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = +req.claims!.id
+    const communityId = +req.params.communityId
+    const userToBeDemoted = +req.params.userId
+
+    const updated = await CommunityMemberService.demoteUserFromMod(
+      userId,
+      userToBeDemoted,
+      communityId,
+    )
+
+    res
+      .status(200)
+      .json(
+        ResponseHelper.success('User demoted to member successfully', updated),
+      )
+  },
+)
