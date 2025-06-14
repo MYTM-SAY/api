@@ -240,13 +240,15 @@ model CompletedLessons {
 }
 
 model Question {
-  id             Int            @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
+  classroomId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   questionHeader String?
-  options        String[]
-  answer         String
-  classroomId    Int
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  options        String[] // still supports T/F or any custom options
+  answer         String[] // array supports 1 or more answers
+  type           QuestionType // now includes TRUE_FALSE
   QuizQuestions  QuizQuestion[]
   Classroom      Classroom?     @relation(fields: [classroomId], references: [id])
 }
@@ -317,6 +319,12 @@ model File {
   url       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum QuestionType {
+  SINGLE
+  MULTI
+  TRUE_FALSE
 }
 
 enum IsCorrect {

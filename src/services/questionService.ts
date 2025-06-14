@@ -4,7 +4,8 @@ import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { QuestionRepo } from '../repos/question.repo.'
 import { QuestionInput, questionSchema } from '../utils/zod/questionSchemes'
 import { ClassroomRepo } from '../repos/classroom.repo'
-
+import fs from 'fs'
+import { parserService } from './parserService'
 async function createQuestion(data: QuestionInput, userId: number) {
   const validatedData = await questionSchema.parseAsync(data)
   const existingClassroom = await ClassroomRepo.findbyId(
@@ -77,9 +78,57 @@ async function deleteQuestion(questionId: number, userId: number) {
   await QuestionRepo.delete(questionId)
   return { message: 'Question deleted successfully' }
 }
+
+export async function parseQuestionFileFile(
+  userId: number,
+  classroomId: number,
+  file: Express.Multer.File,
+) {
+  const existingClassroom = await ClassroomRepo.findbyId(classroomId)
+
+  if (!existingClassroom) throw new APIError('Classroom not found', 404)
+  const role = await CommunityMembersRepo.getUserRoleInCommunity(
+    userId,
+    existingClassroom.communityId,
+  )
+
+  if (role != Role.OWNER)
+    throw new APIError('You must be an Owner to edit it', 403)
+  const content = await fs.readFileSync(file.path, 'utf-8')
+  fs.unlinkSync(file.path)
+  return parseTextToQuestionInputs(content, classroomId)
+}
+
+export async function parseTextToQuestionInputs(
+  text: string,
+  classroomId: number,
+) {
+  const blocks = parserService.splitTextIntoBlocks(text)
+  const questions: QuestionInput[] = []
+
+  for (const block of blocks) {
+    const parts = parserService.extractPartsFromBlock(block)
+
+    if (!parts) continue
+    const { questionHeader, options, answer } = parts
+    const type = parserService.getTypeOfQuestion(options, answer)
+    const isValidQuestion = await parserService.validateQuestion({
+      questionHeader,
+      options,
+      answer,
+      classroomId,
+      type,
+    })
+
+    if (isValidQuestion) questions.push(isValidQuestion)
+  }
+
+  return questions
+}
 export const QuestionService = {
   createQuestion,
   getAllQuestions,
   updateQuestion,
   deleteQuestion,
+  parseQuestionFileFile,
 }

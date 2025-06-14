@@ -51,3 +51,19 @@ export const DeleteQuestion = asyncHandler(
       .json(ResponseHelper.success('Question deleted successfully', null))
   },
 )
+
+export const ParseQuestionFile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.file)
+      return res.status(400).json(ResponseHelper.error('No file uploaded'))
+
+    const questions = await QuestionService.parseQuestionFileFile(
+      parseInt(req.params.classroomId),
+      req.claims!.id,
+      req.file!,
+    )
+    return res
+      .status(200)
+      .json(ResponseHelper.success('Questions parsed successfully', questions))
+  },
+)
