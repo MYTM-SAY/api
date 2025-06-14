@@ -60,13 +60,7 @@ export const PostRepo = {
     const postsWithVoteScore = posts.map((post) => ({
       ...post,
       voteCounter: voteMap.get(post.id) || 0,
-      commentCount: post._count.Comments,
-      author: {
-        id: post.Author.id,
-        username: post.Author.username,
-        fullname: post.Author.fullname,
-        profilePictureURL: post.Author.UserProfile?.profilePictureURL || '',
-      },
+      commentsCount: post._count.Comments,
     }))
 
     return postsWithVoteScore
@@ -147,17 +141,18 @@ export const PostRepo = {
       where: { userId_postId: { userId, postId } },
     })
   },
-async getVoteCount(postId: number): Promise<number> {
-  const votes = await prisma.postVote.groupBy({
-    by: ['type'],
-    where: { postId },
-    _count: { type: true },
-  });
+  async getVoteCount(postId: number): Promise<number> {
+    const votes = await prisma.postVote.groupBy({
+      by: ['type'],
+      where: { postId },
+      _count: { type: true },
+    })
 
-  const up = votes.find(v => v.type === VoteType.UPVOTE)?._count.type ?? 0;
-  const down = votes.find(v => v.type === VoteType.DOWNVOTE)?._count.type ?? 0;
-  return up - down;
-},
+    const up = votes.find((v) => v.type === VoteType.UPVOTE)?._count.type ?? 0
+    const down =
+      votes.find((v) => v.type === VoteType.DOWNVOTE)?._count.type ?? 0
+    return up - down
+  },
   async setVote(
     postId: number,
     userId: number,
@@ -297,7 +292,7 @@ async getVoteCount(postId: number): Promise<number> {
   async getPostsByUserId(userId: number) {
     return prisma.post.findMany({
       where: {
-       authorId: userId,
+        authorId: userId,
       },
       orderBy: { createdAt: 'desc' },
       select: {
