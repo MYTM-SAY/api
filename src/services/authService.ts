@@ -38,7 +38,7 @@ const login = async (email: string, password: string) => {
   if (!user) throw new APIError('User not found', 404)
   const isPasswordValid = await bcrypt.compare(password, user.hashedPassword)
 
-  if (!isPasswordValid) throw new Error('Invalid password')
+  if (!isPasswordValid) throw new APIError('Invalid password', 401)
   return {
     accessToken: JwtService.generateAccessToken(user),
     refreshToken: JwtService.generateRefreshToken(user),
@@ -49,10 +49,10 @@ const register = async (
   user: Prisma.UserCreateInput & { password: string },
 ) => {
   const existingEmail = await UserRepo.findByEmail(user.email)
-  if (existingEmail) throw new Error('username already in use')
+  if (existingEmail) throw new APIError('email already in use', 409)
   const existingUsername = await UserRepo.findByUsername(user.username)
 
-  if (existingUsername) throw new Error('username already in use')
+  if (existingUsername) throw new APIError('username already in use', 409)
   const hashedPassword = await bcrypt.hash(user.password, 10)
 
   user.hashedPassword = hashedPassword

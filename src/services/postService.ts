@@ -171,12 +171,12 @@ async function getAllPostsFromCommunitiesJoinedByUser(userId: number) {
     forumId: post.forumId,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
-    commentCount: post._count.Comments,
-    author: {
+    commentsCount: post._count.Comments,
+    Author: {
       id: post.Author.id,
       username: post.Author.username,
       fullname: post.Author.fullname,
-      profilePictureURL: post.Author.UserProfile?.profilePictureURL ?? null,
+      UserProfile: post.Author.UserProfile,
     },
     voteType: getPostVoteTypeForAUser[posts.indexOf(post)],
   }))
