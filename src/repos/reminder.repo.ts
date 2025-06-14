@@ -12,6 +12,7 @@ async findRemindersForJoinedCommunities(userId: number) {
             Community: {
                select: {
                   name: true,
+                  id: true,
                   Classrooms: {
                      select: {
                         Quiz: {
