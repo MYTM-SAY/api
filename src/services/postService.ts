@@ -207,12 +207,14 @@ async function getUserPosts(userId: number) {
     forumId: post.forumId,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
-    commentCount: post._count.Comments,
+    commentsCount: post._count.Comments,
     Author: {
       id: post.Author.id,
       username: post.Author.username,
       fullname: post.Author.fullname,
-      profilePictureURL: post.Author.UserProfile?.profilePictureURL ?? null,
+      UserProfile: {
+        profilePictureURL: post.Author.UserProfile?.profilePictureURL ?? null,
+      },
     },
     voteType: getPostVoteTypeForAUser[posts.indexOf(post)],
   }))
