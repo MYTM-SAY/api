@@ -63,7 +63,7 @@ async function getCommunityById(communityId: number, userId: number) {
     role,
   }
   let isPendingRequest = false
-  if (role === null) {
+  if (role === null && !community.isPublic) {
     const joinRequest = await JoinRequestRepo.findByCommunityAndUser(
       communityId,
       userId,

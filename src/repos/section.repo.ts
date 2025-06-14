@@ -23,6 +23,7 @@ export const SectionRepo = {
       where: { id },
       include: {
         Classroom: true,
+        Lessons: true,
       },
     })
     return section
