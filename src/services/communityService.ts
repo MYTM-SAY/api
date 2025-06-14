@@ -5,7 +5,8 @@ import { z } from 'zod'
 import { CommunitySchema } from '../utils/zod/communitySchemes'
 import { ForumRepo } from '../repos/forum.repo'
 import { CommunityMembersRepo } from '../repos/communityMember.repo'
-import { Role } from '@prisma/client'
+import { JoinRequestStatus, Role } from '@prisma/client'
+import { JoinRequestRepo } from '../repos/JoinRequestRepo '
 
 async function getAllCommunities() {
   return CommunityRepo.findAll()
@@ -40,17 +41,12 @@ async function discoverCommunities(
 }
 
 async function getCommunityById(communityId: number, userId: number) {
-  if (!communityId || isNaN(communityId))
-    throw new APIError('Invalid Community ID', 400)
-  const community = await CommunityRepo.findById(communityId)
+  validateCommunityId(communityId)
 
+  const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
 
-  //hassan
-  const forumId = community.Forums?.[0]?.id ?? null
-  // Use object destructuring to exclude Forums
-  const { Forums, ...restOfCommunity } = community
-
+  const forumId = getForumId(community)
   const membersCount = await CommunityRepo.getAllUsersInACommunity(communityId)
   const onlineMembers =
     await CommunityRepo.getAllOnlineUsersInACommunity(communityId)
@@ -58,13 +54,39 @@ async function getCommunityById(communityId: number, userId: number) {
     userId,
     communityId,
   )
-  return {
-    ...restOfCommunity,
+
+  const response = {
+    ...omitForums(community),
     forumId,
     membersCount,
     onlineMembers,
     role,
   }
+  let isPendingRequest = false
+  if (role === null) {
+    const joinRequest = await JoinRequestRepo.findByCommunityAndUser(
+      communityId,
+      userId,
+    )
+    if (joinRequest?.status === JoinRequestStatus.PENDING) {
+      isPendingRequest = true
+    }
+  }
+
+  return { ...response, isPendingRequest }
+}
+
+function validateCommunityId(id: number) {
+  if (!id || isNaN(id)) throw new APIError('Invalid Community ID', 400)
+}
+
+function getForumId(community: any) {
+  return community.Forums?.[0]?.id ?? null
+}
+
+function omitForums(community: any) {
+  const { Forums, ...rest } = community
+  return rest
 }
 
 async function createDefaultForumForCommuinity(communityId: number) {
