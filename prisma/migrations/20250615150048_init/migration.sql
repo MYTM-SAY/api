@@ -1,4 +1,13 @@
 -- CreateEnum
+CREATE TYPE "QuestionType" AS ENUM ('SINGLE', 'MULTI', 'TRUE_FALSE');
+
+-- CreateEnum
+CREATE TYPE "IsCorrect" AS ENUM ('true', 'false', 'nothing');
+
+-- CreateEnum
+CREATE TYPE "QuizStatus" AS ENUM ('InProgress', 'Completed', 'TimedOut');
+
+-- CreateEnum
 CREATE TYPE "MaterialType" AS ENUM ('VIDEO', 'AUDIO', 'IMG', 'DOC', 'FILE');
 
 -- CreateEnum
@@ -6,6 +15,9 @@ CREATE TYPE "Role" AS ENUM ('OWNER', 'MODERATOR', 'MEMBER');
 
 -- CreateEnum
 CREATE TYPE "JoinRequestStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
+CREATE TYPE "VoteType" AS ENUM ('DOWNVOTE', 'UPVOTE', 'NONE');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -98,10 +110,20 @@ CREATE TABLE "CommunityMembers" (
 );
 
 -- CreateTable
+CREATE TABLE "favoriteCommunities" (
+    "userId" INTEGER NOT NULL,
+    "communityId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "favoriteCommunities_pkey" PRIMARY KEY ("userId","communityId")
+);
+
+-- CreateTable
 CREATE TABLE "Material" (
     "id" SERIAL NOT NULL,
     "materialType" "MaterialType" NOT NULL,
     "fileUrl" TEXT,
+    "duration" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "lessonId" INTEGER NOT NULL,
@@ -126,7 +148,6 @@ CREATE TABLE "Post" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT,
-    "voteCounter" INTEGER NOT NULL DEFAULT 0,
     "attachments" TEXT[],
     "forumId" INTEGER NOT NULL,
     "authorId" INTEGER NOT NULL,
@@ -140,7 +161,6 @@ CREATE TABLE "Post" (
 CREATE TABLE "Comment" (
     "id" SERIAL NOT NULL,
     "content" TEXT,
-    "voteCounter" INTEGER NOT NULL DEFAULT 0,
     "parentId" INTEGER,
     "postId" INTEGER NOT NULL,
     "authorId" INTEGER NOT NULL,
@@ -152,18 +172,18 @@ CREATE TABLE "Comment" (
 
 -- CreateTable
 CREATE TABLE "PostVote" (
-    "count" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
     "postId" INTEGER NOT NULL,
+    "type" "VoteType" NOT NULL DEFAULT 'NONE',
 
     CONSTRAINT "PostVote_pkey" PRIMARY KEY ("userId","postId")
 );
 
 -- CreateTable
 CREATE TABLE "CommentVote" (
-    "count" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
     "commentId" INTEGER NOT NULL,
+    "type" "VoteType" NOT NULL DEFAULT 'NONE',
 
     CONSTRAINT "CommentVote_pkey" PRIMARY KEY ("userId","commentId")
 );
@@ -177,7 +197,6 @@ CREATE TABLE "Classroom" (
     "communityId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "progress" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Classroom_pkey" PRIMARY KEY ("id")
 );
@@ -198,7 +217,7 @@ CREATE TABLE "Section" (
 CREATE TABLE "Lesson" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "notes" TEXT,
+    "notes" TEXT[],
     "sectionId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -209,27 +228,19 @@ CREATE TABLE "Lesson" (
 -- CreateTable
 CREATE TABLE "CompletedLessons" (
     "userId" INTEGER NOT NULL,
-    "lessonId" INTEGER NOT NULL,
-    "communityId" INTEGER NOT NULL,
-    "classroomId" INTEGER NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "Progress" (
-    "userId" INTEGER NOT NULL,
-    "classroomId" INTEGER NOT NULL,
-    "progress" INTEGER NOT NULL
+    "lessonId" INTEGER NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "Question" (
     "id" SERIAL NOT NULL,
-    "text" TEXT,
-    "options" TEXT[],
-    "answers" TEXT[],
-    "sectionId" INTEGER NOT NULL,
+    "classroomId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "questionHeader" TEXT,
+    "options" TEXT[],
+    "answer" TEXT[],
+    "type" "QuestionType" NOT NULL,
 
     CONSTRAINT "Question_pkey" PRIMARY KEY ("id")
 );
@@ -239,10 +250,10 @@ CREATE TABLE "Quiz" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "duration" INTEGER NOT NULL,
-    "active" BOOLEAN NOT NULL,
-    "classroomId" INTEGER NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
+    "classroomId" INTEGER NOT NULL,
+    "active" BOOLEAN NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -250,15 +261,39 @@ CREATE TABLE "Quiz" (
 );
 
 -- CreateTable
-CREATE TABLE "QuizScore" (
+CREATE TABLE "QuizQuestion" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
     "quizId" INTEGER NOT NULL,
-    "score" INTEGER NOT NULL,
+    "questionId" INTEGER NOT NULL,
+    "points" INTEGER NOT NULL,
+
+    CONSTRAINT "QuizQuestion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserAnswer" (
+    "id" SERIAL NOT NULL,
+    "quizQuestionId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "choosedAnswer" TEXT NOT NULL,
+    "isCorrect" "IsCorrect",
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "QuizScore_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "UserAnswer_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "QuizAttempted" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "quizId" INTEGER NOT NULL,
+    "startDate" TIMESTAMP(3) NOT NULL,
+    "endDate" TIMESTAMP(3) NOT NULL,
+    "status" "QuizStatus" NOT NULL,
+    "score" INTEGER NOT NULL,
+
+    CONSTRAINT "QuizAttempted_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -291,27 +326,11 @@ CREATE TABLE "_TagToUserProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "_CommunityMembers" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
-
-    CONSTRAINT "_CommunityMembers_AB_pkey" PRIMARY KEY ("A","B")
-);
-
--- CreateTable
 CREATE TABLE "_CommunityToTag" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL,
 
     CONSTRAINT "_CommunityToTag_AB_pkey" PRIMARY KEY ("A","B")
-);
-
--- CreateTable
-CREATE TABLE "_QuestionToQuiz" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
-
-    CONSTRAINT "_QuestionToQuiz_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -330,10 +349,7 @@ CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
 CREATE UNIQUE INDEX "JoinRequest_userId_communityId_key" ON "JoinRequest"("userId", "communityId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CompletedLessons_userId_lessonId_communityId_classroomId_key" ON "CompletedLessons"("userId", "lessonId", "communityId", "classroomId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Progress_userId_classroomId_key" ON "Progress"("userId", "classroomId");
+CREATE UNIQUE INDEX "CompletedLessons_userId_lessonId_key" ON "CompletedLessons"("userId", "lessonId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserContributions_userId_dateOnly_key" ON "UserContributions"("userId", "dateOnly");
@@ -345,13 +361,7 @@ CREATE UNIQUE INDEX "File_url_key" ON "File"("url");
 CREATE INDEX "_TagToUserProfile_B_index" ON "_TagToUserProfile"("B");
 
 -- CreateIndex
-CREATE INDEX "_CommunityMembers_B_index" ON "_CommunityMembers"("B");
-
--- CreateIndex
 CREATE INDEX "_CommunityToTag_B_index" ON "_CommunityToTag"("B");
-
--- CreateIndex
-CREATE INDEX "_QuestionToQuiz_B_index" ON "_QuestionToQuiz"("B");
 
 -- AddForeignKey
 ALTER TABLE "UserProfile" ADD CONSTRAINT "UserProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -363,46 +373,52 @@ ALTER TABLE "InstructorProfile" ADD CONSTRAINT "InstructorProfile_userId_fkey" F
 ALTER TABLE "Community" ADD CONSTRAINT "Community_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JoinRequest" ADD CONSTRAINT "JoinRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "JoinRequest" ADD CONSTRAINT "JoinRequest_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CommunityMembers" ADD CONSTRAINT "CommunityMembers_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "JoinRequest" ADD CONSTRAINT "JoinRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CommunityMembers" ADD CONSTRAINT "CommunityMembers_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CommunityMembers" ADD CONSTRAINT "CommunityMembers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "favoriteCommunities" ADD CONSTRAINT "favoriteCommunities_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favoriteCommunities" ADD CONSTRAINT "favoriteCommunities_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Material" ADD CONSTRAINT "Material_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Forum" ADD CONSTRAINT "Forum_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Forum" ADD CONSTRAINT "Forum_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Post" ADD CONSTRAINT "Post_forumId_fkey" FOREIGN KEY ("forumId") REFERENCES "Forum"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Post" ADD CONSTRAINT "Post_forumId_fkey" FOREIGN KEY ("forumId") REFERENCES "Forum"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Comment"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Comment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PostVote" ADD CONSTRAINT "PostVote_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PostVote" ADD CONSTRAINT "PostVote_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PostVote" ADD CONSTRAINT "PostVote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CommentVote" ADD CONSTRAINT "CommentVote_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "Comment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "CommentVote" ADD CONSTRAINT "CommentVote_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "Comment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CommentVote" ADD CONSTRAINT "CommentVote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -423,28 +439,28 @@ ALTER TABLE "CompletedLessons" ADD CONSTRAINT "CompletedLessons_lessonId_fkey" F
 ALTER TABLE "CompletedLessons" ADD CONSTRAINT "CompletedLessons_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CompletedLessons" ADD CONSTRAINT "CompletedLessons_communityId_fkey" FOREIGN KEY ("communityId") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "CompletedLessons" ADD CONSTRAINT "CompletedLessons_classroomId_fkey" FOREIGN KEY ("classroomId") REFERENCES "Classroom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Progress" ADD CONSTRAINT "Progress_classroomId_fkey" FOREIGN KEY ("classroomId") REFERENCES "Classroom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Progress" ADD CONSTRAINT "Progress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Question" ADD CONSTRAINT "Question_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "Section"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Question" ADD CONSTRAINT "Question_classroomId_fkey" FOREIGN KEY ("classroomId") REFERENCES "Classroom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Quiz" ADD CONSTRAINT "Quiz_classroomId_fkey" FOREIGN KEY ("classroomId") REFERENCES "Classroom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QuizScore" ADD CONSTRAINT "QuizScore_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QuizQuestion" ADD CONSTRAINT "QuizQuestion_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QuizScore" ADD CONSTRAINT "QuizScore_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QuizQuestion" ADD CONSTRAINT "QuizQuestion_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserAnswer" ADD CONSTRAINT "UserAnswer_quizQuestionId_fkey" FOREIGN KEY ("quizQuestionId") REFERENCES "QuizQuestion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserAnswer" ADD CONSTRAINT "UserAnswer_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QuizAttempted" ADD CONSTRAINT "QuizAttempted_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QuizAttempted" ADD CONSTRAINT "QuizAttempted_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserContributions" ADD CONSTRAINT "UserContributions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -456,19 +472,7 @@ ALTER TABLE "_TagToUserProfile" ADD CONSTRAINT "_TagToUserProfile_A_fkey" FOREIG
 ALTER TABLE "_TagToUserProfile" ADD CONSTRAINT "_TagToUserProfile_B_fkey" FOREIGN KEY ("B") REFERENCES "UserProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_CommunityMembers" ADD CONSTRAINT "_CommunityMembers_A_fkey" FOREIGN KEY ("A") REFERENCES "Community"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_CommunityMembers" ADD CONSTRAINT "_CommunityMembers_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "_CommunityToTag" ADD CONSTRAINT "_CommunityToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "Community"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CommunityToTag" ADD CONSTRAINT "_CommunityToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_QuestionToQuiz" ADD CONSTRAINT "_QuestionToQuiz_A_fkey" FOREIGN KEY ("A") REFERENCES "Question"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_QuestionToQuiz" ADD CONSTRAINT "_QuestionToQuiz_B_fkey" FOREIGN KEY ("B") REFERENCES "Quiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
