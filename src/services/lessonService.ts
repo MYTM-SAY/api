@@ -103,13 +103,13 @@ const toggleCompleted = async (lessonId: number, userId: number) => {
   const isAlreadyCompleted = await LessonRepo.findCompletedLessonForUser(
     lessonId,
     userId,
-  );
+  )
   if (isAlreadyCompleted) {
-     await LessonRepo.toggleUnCompleted(lessonId, userId);
-     return false;
+    await LessonRepo.toggleUnCompleted(lessonId, userId)
+    return false
   } else {
-     LessonRepo.toggleCompleted(lessonId, userId);
-     return true;
+    LessonRepo.toggleCompleted(lessonId, userId)
+    return true
   }
 }
 
