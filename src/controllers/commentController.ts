@@ -71,6 +71,7 @@ export const updateComment = asyncHandler(
     const validatedData = CommentSchema.partial().parse(req.body)
 
     const comment = await CommentService.updateComment(
+      +req.claims!.id,
       +req.params.id,
       validatedData,
     )

@@ -58,13 +58,19 @@ async function getPostById(postId: number, userId: number) {
 }
 
 async function updatePost(
+  userId: number,
   postId: number,
   data: z.infer<typeof PostUpdateSchema>,
 ) {
   const validatedData = await PostUpdateSchema.parseAsync(data)
   const postExist = await PostRepo.findById(postId)
+
+  if (!postExist) throw new APIError('Post not found', 404)
+  if (postExist.Author.id !== userId)
+    throw new APIError('You are not allowed to update this post', 403)
   if (!postExist) throw new APIError('Post not found', 404)
   validatedData.updatedAt = new Date()
+
   return await PostRepo.update(postId, validatedData)
 }
 
@@ -74,14 +80,12 @@ async function deletePost(userId: number, postId: number) {
   const post = await PostRepo.findById(postId)
   if (!post) throw new APIError('Post not found', 404)
 
-  const AccessAndCommunity = await PostRepo.getPostAuthorAndCommunity(
+  const userRole = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,
-    postId,
+    post.Forum.Community.id,
   )
-  if (!AccessAndCommunity)
-    throw new APIError('Can not get the Access Info for this post', 404)
 
-  if (AccessAndCommunity.Author.id !== userId)
+  if (post.Author.id !== userId && userRole === Role.MEMBER)
     throw new APIError('You are not allowed to delete this post', 403)
   await PostRepo.delete(postId)
   return post
