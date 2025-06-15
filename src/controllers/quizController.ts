@@ -71,4 +71,23 @@ export const quizController = {
         .json(ResponseHelper.success('Quizzes retrieved successfully', quizzes))
     },
   ),
+
+  getQuizzesByCommunity: asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.claims!.id
+      const communityId = +req.params.communityId
+      if (isNaN(communityId)) {
+        return res
+          .status(400)
+          .json(ResponseHelper.error('Invalid community ID'))
+      }
+      const quizzes = await QuizService.getQuizzesByCommunity(
+        userId,
+        communityId,
+      )
+      return res
+        .status(200)
+        .json(ResponseHelper.success('Quizzes retrieved successfully', quizzes))
+    },
+  ),
 }

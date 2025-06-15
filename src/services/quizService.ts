@@ -82,7 +82,13 @@ export const QuizService = {
     await QuizValidationService.validateViewPermissions(userId, classroomId)
     return QuizRepo.getQuizzesByClassroom(classroomId)
   },
-
+    async   getQuizzesByCommunity(
+    userId: number,
+    communityId: number,
+  ) {
+    await QuizValidationService.validateViewPermissions(userId, communityId)
+    return QuizRepo.getQuizzesByCommunity(communityId)
+  },
   async getQuizById(userId: number, id: number) {
     const quiz = await QuizValidationService.validateQuizExists(id)
     await QuizValidationService.validateViewPermissions(
@@ -91,4 +97,4 @@ export const QuizService = {
     )
     return { ...quiz, questionCount: quiz.QuizQuestions.length }
   },
-}
+  }

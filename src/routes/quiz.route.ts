@@ -5,6 +5,7 @@ import validate from '../middlewares/validation'
 import {
   CreateQuizWithQuestionsSchema,
   UpdateQuizSchema,
+
 } from '../utils/zod/quizSchemes'
 
 const router = express.Router()
@@ -488,4 +489,41 @@ router.delete('/:id', quizController.deleteQuiz)
  */
 router.get('/classroom/:classroomId', quizController.getQuizzesByClassroom)
 
+/**
+ * @swagger
+ * /quizzes/community/{communityId}:
+ *   get:
+ *     summary: Get all quizzes for a community
+ *     description: Retrieves all quizzes associated with a specific community, ordered by start date. Does not include associated questions. Requires user to be a member of the community.
+ *     tags: [Quizzes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: communityId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: The ID of the community to retrieve quizzes for
+ *     responses:
+ *       200:
+ *         description: Quizzes retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Quizzes retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/QuizWithoutQuestions'
+ */
+router.get('/community/:communityId', quizController.getQuizzesByCommunity)
 export default router

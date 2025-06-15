@@ -89,7 +89,17 @@ export const QuizRepo = {
       orderBy: { startDate: 'asc' },
     })
   },
-
+  async getQuizzesByCommunity(communityId: number) {
+    return prisma.quiz.findMany({
+      where: {
+        Classroom: {
+          communityId,
+        },
+      },
+      orderBy: { startDate: 'asc' },
+    })
+  },
+      
   async hasOverlappingQuiz(
     classroomId: number,
     startDate: Date,
