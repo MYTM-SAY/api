@@ -126,6 +126,7 @@ model Material {
   id           Int          @id @default(autoincrement())
   materialType MaterialType
   fileUrl      String?
+  duration     Int?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   lessonId     Int

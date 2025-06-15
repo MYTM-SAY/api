@@ -6,6 +6,7 @@ export const CreateMaterialSchema = z
   .object({
     materialType: MaterialTypeEnum,
     fileUrl: z.string().url().nullable(),
+    duration: z.number().int().positive().nullable().optional(),
   })
   .strict()
 

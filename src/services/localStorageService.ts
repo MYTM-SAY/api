@@ -97,6 +97,7 @@ export class LocalStorageService implements StorageService {
     filePath: string,
     fileName: string,
     contentType: string,
+    duration?: number,
   ): Promise<string> {
     try {
       // Determine folder based on content type
@@ -106,7 +107,7 @@ export class LocalStorageService implements StorageService {
       else if (contentType.startsWith('application/')) folder = 'documents'
 
       // Generate a unique filename to avoid collisions
-      const uniqueFileName = `${Date.now()}-${fileName}`
+      const uniqueFileName = `${Date.now()}-${fileName}-${duration ? duration : ''}`
       const destinationPath = path.join(
         this.storagePath,
         folder,

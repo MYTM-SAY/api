@@ -11,6 +11,7 @@ export interface StorageService {
     filePath: string,
     fileName: string,
     contentType: string,
+    duration?: number,
   ): Promise<string>
   getFile(key: string): Promise<Readable>
   deleteFile(key: string): Promise<boolean>

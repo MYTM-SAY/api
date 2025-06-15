@@ -5,7 +5,7 @@ import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
 import { SectionRepo } from '../repos/section.repo'
 import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
 import { CommunityMembersRepo } from '../repos/communityMember.repo'
-import { Role } from '@prisma/client'
+import { MaterialType, Role } from '@prisma/client'
 
 const getLessonsBySectionId = async (sectionId: number, userId: number) => {
   const sectionExist = await SectionRepo.findById(sectionId)
@@ -46,9 +46,26 @@ const createLessonWithNewMaterial = async (
     sectionExist.Classroom.communityId,
     [Role.MODERATOR, Role.OWNER],
   )
-
   if (!isOwnerMod) throw new APIError('You must be owner or mod', 403)
-  return LessonRepo.createWithMaterial(data)
+
+  const newData = {
+    ...data,
+    materials: data.materials.map((mat) => {
+      if (
+        (mat.materialType === MaterialType.VIDEO ||
+          mat.materialType === MaterialType.AUDIO) &&
+        mat.fileUrl
+      ) {
+        const durationStr = mat.fileUrl.split('-').at(-1)
+        return {
+          ...mat,
+          duration: durationStr ? Number(durationStr) : null,
+        }
+      }
+      return mat
+    }),
+  }
+  return LessonRepo.createWithMaterial(newData)
 }
 
 const deleteLesson = async (id: number, userId: number) => {
@@ -77,7 +94,6 @@ const updateLesson = async (
     lessonExists.Section.Classroom.communityId,
     [Role.MODERATOR, Role.OWNER],
   )
-
   if (!isOwnerMod) throw new APIError('You must be owner or mod', 403)
   const updatedLesson = await LessonRepo.update(id, data)
   return updatedLesson
@@ -103,13 +119,13 @@ const toggleCompleted = async (lessonId: number, userId: number) => {
   const isAlreadyCompleted = await LessonRepo.findCompletedLessonForUser(
     lessonId,
     userId,
-  );
+  )
   if (isAlreadyCompleted) {
-     await LessonRepo.toggleUnCompleted(lessonId, userId);
-     return false;
+    await LessonRepo.toggleUnCompleted(lessonId, userId)
+    return false
   } else {
-     LessonRepo.toggleCompleted(lessonId, userId);
-     return true;
+    LessonRepo.toggleCompleted(lessonId, userId)
+    return true
   }
 }
 

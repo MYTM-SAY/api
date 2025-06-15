@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import fs from 'fs'
 import StorageFactory from '../services/storageFactory'
-
+import { getVideoDurationInSeconds } from 'get-video-duration'
 // Get the appropriate storage service
 const storageService = StorageFactory.getStorageService()
 
@@ -68,15 +68,14 @@ export const uploadVideoToStorage = async (req: Request, res: Response) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No video uploaded' })
     }
-
+    const duration = await getVideoDurationInSeconds(req.file.path)
+    console.log('Video duration:', duration)
     const fileUrl = await storageService.uploadLargeFile(
       req.file.path,
       req.file.originalname,
       req.file.mimetype,
+      Math.floor(duration),
     )
-
-    // Clean up temp file after upload
-    fs.unlinkSync(req.file.path)
 
     return res.status(201).json({
       message: 'Video uploaded successfully',
