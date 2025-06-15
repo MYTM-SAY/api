@@ -105,8 +105,6 @@ export class LocalStorageService implements StorageService {
       if (contentType.startsWith('image/')) folder = 'images'
       else if (contentType.startsWith('video/')) folder = 'videos'
       else if (contentType.startsWith('application/')) folder = 'documents'
-
-      // Generate a unique filename to avoid collisions
       const uniqueFileName = `${Date.now()}-${duration ? duration : ''}-${fileName}`
       const destinationPath = path.join(
         this.storagePath,
