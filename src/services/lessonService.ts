@@ -56,7 +56,7 @@ const createLessonWithNewMaterial = async (
           mat.materialType === MaterialType.AUDIO) &&
         mat.fileUrl
       ) {
-        const durationStr = mat.fileUrl.split('-').at(-1)
+        const durationStr = mat.fileUrl.split('-').at(1)
         return {
           ...mat,
           duration: durationStr ? Number(durationStr) : null,

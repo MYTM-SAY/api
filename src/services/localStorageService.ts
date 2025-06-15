@@ -107,7 +107,7 @@ export class LocalStorageService implements StorageService {
       else if (contentType.startsWith('application/')) folder = 'documents'
 
       // Generate a unique filename to avoid collisions
-      const uniqueFileName = `${Date.now()}-${fileName}-${duration ? duration : ''}`
+      const uniqueFileName = `${Date.now()}-${duration ? duration : ''}-${fileName}`
       const destinationPath = path.join(
         this.storagePath,
         folder,
