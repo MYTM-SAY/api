@@ -2,10 +2,9 @@ import { z } from 'zod'
 import { prisma } from '../db/PrismaClient'
 import { UpdateLessonSchema } from '../utils/zod/lessonSchemes'
 import { CreateLessonWithMaterialSchema } from '../utils/zod/lessonMaterialSchemes'
-import { toggleCompleted } from '../controllers/lessonController'
 
 export const LessonRepo = {
-  async findBySectionId(id: number, userId: number) {       
+  async findBySectionId(id: number, userId: number) {
     const lessons = await prisma.lesson.findMany({
       where: {
         sectionId: id,
@@ -56,6 +55,11 @@ export const LessonRepo = {
   },
 
   async delete(id: number) {
+    await prisma.completedLessons.deleteMany({
+      where: {
+        lessonId: id,
+      },
+    })
     const lesson = await prisma.lesson.delete({
       where: {
         id,
@@ -73,7 +77,6 @@ export const LessonRepo = {
     return updatedlesson
   },
 
-
   async findCompletedLessonForUser(lessonId: number, userId: number) {
     const completedLesson = await prisma.completedLessons.findFirst({
       where: {
@@ -84,7 +87,7 @@ export const LessonRepo = {
     return completedLesson
   },
 
-async toggleUnCompleted(lessonId: number, userId: number) {
+  async toggleUnCompleted(lessonId: number, userId: number) {
     await prisma.completedLessons.delete({
       where: {
         userId_lessonId: {
@@ -92,16 +95,15 @@ async toggleUnCompleted(lessonId: number, userId: number) {
           userId,
         },
       },
-    });
-},
+    })
+  },
 
-async toggleCompleted(lessonId: number, userId: number) {
-  await prisma.completedLessons.create({
+  async toggleCompleted(lessonId: number, userId: number) {
+    await prisma.completedLessons.create({
       data: {
         lessonId,
         userId,
       },
-    });
-  }
+    })
+  },
 }
-
