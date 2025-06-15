@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import fs from 'fs'
 import StorageFactory from '../services/storageFactory'
 import { getVideoDurationInSeconds } from 'get-video-duration'
+import { unlink } from 'fs/promises'
 // Get the appropriate storage service
 const storageService = StorageFactory.getStorageService()
 
@@ -11,10 +12,13 @@ export const uploadFileToStorage = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'No file uploaded' })
     }
 
-    console.log({
-      file: req.file,
-    })
-
+    let duration = 0
+    try {
+      duration = await getVideoDurationInSeconds(req.file.path)
+      console.log('Video duration:', duration)
+    } catch (err) {
+      duration = 0 // fallback if duration can't be determined
+    }
     // For smaller files, use buffer upload
     if (req.file.size <= 5 * 1024 * 1024) {
       // TODO: for now we are using the large file upload for all files
@@ -30,9 +34,10 @@ export const uploadFileToStorage = async (req: Request, res: Response) => {
         req.file.path,
         req.file.originalname,
         req.file.mimetype,
+        duration ? Math.floor(duration) : 0,
       )
 
-      fs.unlinkSync(req.file.path)
+      await fs.promises.unlink(req.file.path)
 
       return res.status(201).json({
         message: 'File uploaded successfully',
@@ -47,7 +52,7 @@ export const uploadFileToStorage = async (req: Request, res: Response) => {
       )
 
       // Clean up temp file after upload
-      fs.unlinkSync(req.file.path)
+      await fs.promises.unlink(req.file.path)
 
       return res.status(201).json({
         message: 'File uploaded successfully',
@@ -69,7 +74,7 @@ export const uploadVideoToStorage = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'No video uploaded' })
     }
     const duration = await getVideoDurationInSeconds(req.file.path)
-    console.log('Video duration:', duration)
+
     const fileUrl = await storageService.uploadLargeFile(
       req.file.path,
       req.file.originalname,
