@@ -20,17 +20,17 @@ model User {
   Comment             Comment[]
   CommentVote         CommentVote[]
   OwnedCommunities    Community[]           @relation("CommunityOwner")
-  InstructorProfile   InstructorProfile[]
   CommunityMembers    CommunityMembers[]
+  CompletedLessons    CompletedLessons[]
+  InstructorProfile   InstructorProfile[]
+  JoinRequests        JoinRequest[]
   Post                Post[]
   PostVote            PostVote[]
-  UserProfile         UserProfile?
-  JoinRequests        JoinRequest[]
-  CompletedLessons    CompletedLessons[]
-  UserContributions   UserContributions[]
-  favoriteCommunities favoriteCommunities[]
   QuizAttempted       QuizAttempted[]
   UserAnswers         UserAnswer[]
+  UserContributions   UserContributions[]
+  UserProfile         UserProfile?
+  favoriteCommunities favoriteCommunities[]
 }
 
 model UserProfile {
@@ -78,11 +78,11 @@ model Community {
   isPublic            Boolean               @default(true)
   Classrooms          Classroom[]
   Owner               User                  @relation("CommunityOwner", fields: [ownerId], references: [id])
-  Forums              Forum[]
   CommunityMembers    CommunityMembers[]
-  Tags                Tag[]                 @relation("CommunityToTag")
-  JoinRequests        JoinRequest[] // Removed incorrect `map` argument
+  Forums              Forum[]
+  JoinRequests        JoinRequest[]
   favoriteCommunities favoriteCommunities[]
+  Tags                Tag[]                 @relation("CommunityToTag")
 }
 
 model JoinRequest {
@@ -114,10 +114,9 @@ model CommunityMembers {
 model favoriteCommunities {
   userId      Int
   communityId Int
-  createdAt   DateTime @default(now())
-
-  User      User      @relation(fields: [userId], references: [id])
-  Community Community @relation(fields: [communityId], references: [id])
+  createdAt   DateTime  @default(now())
+  Community   Community @relation(fields: [communityId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
 
   @@id([userId, communityId])
 }
@@ -203,9 +202,9 @@ model Classroom {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Community   Community  @relation(fields: [communityId], references: [id])
+  Questions   Question[]
   Quiz        Quiz[]
   Sections    Section[]
-  Questions   Question[]
 }
 
 model Section {
@@ -241,32 +240,31 @@ model CompletedLessons {
 }
 
 model Question {
-  id          Int      @id @default(autoincrement())
-  classroomId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  id             Int            @id @default(autoincrement())
+  classroomId    Int
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   questionHeader String?
-  options        String[] // still supports T/F or any custom options
-  answer         String[] // array supports 1 or more answers
-  type           QuestionType // now includes TRUE_FALSE
+  options        String[]
+  answer         String[]
+  type           QuestionType
+  Classroom      Classroom      @relation(fields: [classroomId], references: [id])
   QuizQuestions  QuizQuestion[]
-  Classroom      Classroom?     @relation(fields: [classroomId], references: [id])
 }
 
 model Quiz {
   id            Int             @id @default(autoincrement())
   name          String
-  duration      Int // in minutes
+  duration      Int
   startDate     DateTime
   endDate       DateTime
   classroomId   Int
   active        Boolean
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  Classroom     Classroom?      @relation(fields: [classroomId], references: [id])
-  QuizQuestions QuizQuestion[]
+  Classroom     Classroom       @relation(fields: [classroomId], references: [id])
   QuizAttempted QuizAttempted[]
+  QuizQuestions QuizQuestion[]
 }
 
 model QuizQuestion {
@@ -274,8 +272,8 @@ model QuizQuestion {
   quizId      Int
   questionId  Int
   points      Int
-  Quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   Question    Question     @relation(fields: [questionId], references: [id])
+  Quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   UserAnswers UserAnswer[]
 }
 
@@ -299,8 +297,8 @@ model QuizAttempted {
   endDate   DateTime
   status    QuizStatus
   score     Int
-  User      User       @relation(fields: [userId], references: [id])
   Quiz      Quiz       @relation(fields: [quizId], references: [id])
+  User      User       @relation(fields: [userId], references: [id])
 }
 
 model UserContributions {

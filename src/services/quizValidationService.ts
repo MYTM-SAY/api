@@ -88,13 +88,13 @@ export const QuizValidationService = {
       throw new APIError('Classroom not found', 404)
     }
 
-    const isAuthorized = await CommunityMembersRepo.getUserRoleInCommunity(
-      userId,
-      classroom.Community.id,
-    )
-    if (!isAuthorized) {
-      throw new APIError('Unauthorized to view quizzes in this classroom', 403)
-    }
+    // const isAuthorized = await CommunityMembersRepo.getUserRoleInCommunity(
+    //   userId,
+    //   classroom.Community.id,
+    // )
+    // if (!isAuthorized) {
+    //   throw new APIError('Unauthorized to view quizzes in this classroom', 403)
+    // }
 
     return classroom
   },
