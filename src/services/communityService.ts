@@ -47,31 +47,29 @@ async function getCommunityById(communityId: number, userId: number) {
   if (!community) throw new APIError('Community not found', 404)
 
   const forumId = getForumId(community)
-  const membersCount = await CommunityRepo.getAllUsersInACommunity(communityId)
-  const onlineMembers =
-    await CommunityRepo.getAllOnlineUsersInACommunity(communityId)
-  const role = await CommunityMembersRepo.getUserRoleInCommunity(
-    userId,
-    communityId,
-  )
 
-  const response = {
+  // Fetch data in parallel
+  const [membersCount, onlineMembers, role, joinRequest] = await Promise.all([
+    CommunityRepo.getAllUsersInACommunity(communityId),
+    CommunityRepo.getAllOnlineUsersInACommunity(communityId),
+    CommunityMembersRepo.getUserRoleInCommunity(userId, communityId),
+    community.isPublic
+      ? Promise.resolve(null)
+      : JoinRequestRepo.findByCommunityAndUser(communityId, userId),
+  ])
+
+  const response = {  
     ...omitForums(community),
     forumId,
     membersCount,
     onlineMembers,
     role,
   }
-  let isPendingRequest = false
-  if (role === null && !community.isPublic) {
-    const joinRequest = await JoinRequestRepo.findByCommunityAndUser(
-      communityId,
-      userId,
-    )
-    if (joinRequest?.status === JoinRequestStatus.PENDING) {
-      isPendingRequest = true
-    }
-  }
+
+  const isPendingRequest =
+    role === null &&
+    !community.isPublic &&
+    joinRequest?.status === JoinRequestStatus.PENDING
 
   return { ...response, isPendingRequest }
 }

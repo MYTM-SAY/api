@@ -16,17 +16,20 @@ async function getPostsByForumId(forumId: number, userId: number) {
   const forum = await ForumRepo.findById(forumId)
   if (!forum) throw new APIError('Forum not found', 404)
 
-  let posts = await PostRepo.findPostsByForumId(forumId)
+  const posts = await PostRepo.findPostsByForumId(forumId)
 
-  const enrichedPosts = await Promise.all(
-    posts.map(async (post) => {
-      const voteType = await PostRepo.getPostVoteTypeForAUser(post.id, userId)
-      return {
-        ...post,
-        voteType: voteType || 'NONE',
-      }
-    }),
-  )
+  if (posts.length === 0) return []
+
+  const postIds = posts.map((post) => post.id)
+
+  // Fetch all user votes in one go
+  const userVotes = await PostRepo.getVoteTypesForUserOnPosts(postIds, userId)
+  const voteMap = new Map(userVotes.map((v) => [v.postId, v.type]))
+
+  const enrichedPosts = posts.map((post) => ({
+    ...post,
+    voteType: voteMap.get(post.id) || 'NONE',
+  }))
 
   return enrichedPosts
 }

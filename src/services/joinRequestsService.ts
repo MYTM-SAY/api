@@ -28,6 +28,7 @@ async function createJoinRequest(data: JoinRequestType) {
       data.userId,
       data.communityId,
     )
+
     if (isMember) throw new APIError('Already a member of this community', 409)
     const CommunityMembers = await CommunityMembersRepo.addUserToCommunity({
       userId: data.userId,
@@ -40,6 +41,8 @@ async function createJoinRequest(data: JoinRequestType) {
     data.userId,
     data.communityId,
   )
+  if (isSentRequest?.status === JoinRequestStatus.REJECTED)
+    throw new APIError('Join request already rejected', 400)
   if (isSentRequest) throw new APIError('Join request already sent', 400)
 
   return JoinRequestRepo.create(data)

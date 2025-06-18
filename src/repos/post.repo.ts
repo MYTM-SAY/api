@@ -113,6 +113,18 @@ export const PostRepo = {
 
     return result
   },
+  async getVoteTypesForUserOnPosts(postIds: number[], userId: number) {
+    return prisma.postVote.findMany({
+      where: {
+        userId,
+        postId: { in: postIds },
+      },
+      select: {
+        postId: true,
+        type: true,
+      },
+    })
+  },
 
   async create(post: z.infer<typeof PostSchema>, authorId: number) {
     const result = await prisma.post.create({
