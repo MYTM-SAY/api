@@ -1,4 +1,5 @@
 import { prisma } from '../db/PrismaClient'
+import { getQuestionsByQuizId } from '../services/questionService'
 import { QuestionInput } from '../utils/zod/questionSchemes'
 
 export const QuestionRepo = {
@@ -26,6 +27,15 @@ export const QuestionRepo = {
   async delete(id: number) {
     return await prisma.question.delete({
       where: { id },
+    })
+  },
+
+  async getQuestionsByQuizId(quizId: number) {
+    return await prisma.quizQuestion.findMany({
+      where: { quizId },
+      include: {
+        Question: true,
+      },
     })
   },
 }

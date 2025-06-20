@@ -5,8 +5,16 @@ import validate from '../middlewares/validation'
 import {
   CreateQuizWithQuestionsSchema,
   UpdateQuizSchema,
-
 } from '../utils/zod/quizSchemes'
+import {
+  endQuizAttempt,
+  getQuestionsByQuizId,
+  startQuizAttempt,
+} from '../controllers/quizAttemptController'
+import {
+  EndQuizAttemptSchema,
+  QuizAttemptedSchema,
+} from '../utils/zod/quizAttemptSchemes'
 
 const router = express.Router()
 
@@ -526,4 +534,133 @@ router.get('/classroom/:classroomId', quizController.getQuizzesByClassroom)
  *                     $ref: '#/components/schemas/QuizWithoutQuestions'
  */
 router.get('/community/:communityId', quizController.getQuizzesByCommunity)
+/**
+ * @swagger
+ * /quizzes/{quizId}/quiz-questions:
+ *   get:
+ *     summary: Get quiz questions by quiz ID
+ *     description: Returns the list of questions for a quiz along with an "attempted" flag to indicate if the user has already started it.
+ *     tags: [Quizzes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: quizId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: The ID of the quiz to retrieve questions for
+ *     responses:
+ *       200:
+ *         description: Quiz questions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Quiz questions retrieved successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     attempted:
+ *                       type: boolean
+ *                       example: false
+ *                     questions:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           questionHeader:
+ *                             type: string
+ *                             nullable: true
+ *                           options:
+ *                             type: array
+ *                             items:
+ *                               type: string
+ *                           type:
+ *                             type: string
+ *                             enum: [SINGLE, MULTI, TRUE_FALSE]
+ *                           quizQuestionId:
+ *                             type: integer
+ *                           points:
+ *                             type: integer
+ */
+
+router.get('/:quizId/quiz-questions', isAuthenticated, getQuestionsByQuizId)
+/**
+ * @swagger
+ * /quizzes/{quizId}/start:
+ *   post:
+ *     summary: Start a quiz attempt
+ *     tags: [Quiz]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: quizId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the quiz to start
+ *     responses:
+ *       201:
+ *         description: Quiz attempt started
+ *       403:
+ *         description: Quiz cannot be started (already started or out of time)
+ *       404:
+ *         description: Quiz not found
+ */
+router.post('/:quizId/start', isAuthenticated, startQuizAttempt)
+/**
+ * @swagger
+ * /quizzes/{quizId}/submit:
+ *   post:
+ *     summary: End a quiz attempt
+ *     tags: [Quiz]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: quizId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the quiz to end
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               answers:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     questionId:
+ *                       type: integer
+ *                       example: 42
+ *                     answer:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: ["A", "C"]
+ *     responses:
+ *       200:
+ *         description: Quiz attempt ended
+ *       403:
+ *         description: Cannot end quiz (not in progress or time expired)
+ *       404:
+ *         description: Attempt not found
+ */
+router.post('/:quizId/submit', isAuthenticated, endQuizAttempt)
 export default router

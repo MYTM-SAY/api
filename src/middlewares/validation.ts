@@ -15,7 +15,6 @@ const validate =
           .json(ResponseHelper.error(message, 400, ex.errors))
       }
 
-      // fallback for unexpected errors
       return res
         .status(500)
         .json(ResponseHelper.error('Unexpected validation error', 500, ex))

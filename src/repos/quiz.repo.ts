@@ -4,6 +4,8 @@ import {
   CreateQuizWithQuestionsSchema,
   UpdateQuizSchema,
 } from '../utils/zod/quizSchemes'
+import { SaveUserAnswerInput } from '../utils/zod/SaveUserAnswerSchema '
+import { IsCorrect } from '@prisma/client'
 
 export const QuizRepo = {
   async createQuizWithQuestions(
@@ -99,7 +101,7 @@ export const QuizRepo = {
       orderBy: { startDate: 'asc' },
     })
   },
-      
+
   async hasOverlappingQuiz(
     classroomId: number,
     startDate: Date,
@@ -114,5 +116,25 @@ export const QuizRepo = {
     }
     const count = await prisma.quiz.count({ where })
     return count > 0
+  },
+
+  async hasUserAnswered(userId: number, quizQuestionId: number) {
+    return prisma.userAnswer.findFirst({
+      where: { userId, quizQuestionId },
+    })
+  },
+
+  async saveUserAnswer(
+    data: SaveUserAnswerInput,
+    userId: number,
+    isCorrect: IsCorrect,
+  ) {
+    return prisma.userAnswer.create({
+      data: {
+        userId,
+        ...data,
+        isCorrect: isCorrect,
+      },
+    })
   },
 }

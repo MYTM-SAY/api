@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client'
+import { QuizStatus, Role } from '@prisma/client'
 import APIError from '../errors/APIError'
 import { CommunityMembersRepo } from '../repos/communityMember.repo'
 import { QuestionRepo } from '../repos/question.repo.'
@@ -6,6 +6,8 @@ import { QuestionInput, questionSchema } from '../utils/zod/questionSchemes'
 import { ClassroomRepo } from '../repos/classroom.repo'
 import fs from 'fs'
 import { parserService } from './parserService'
+import { QuizRepo } from '../repos/quiz.repo'
+import { QuizAttemptRepo } from '../repos/quizAttempt.repo'
 async function createQuestion(data: QuestionInput, userId: number) {
   const validatedData = await questionSchema.parseAsync(data)
   const existingClassroom = await ClassroomRepo.findbyId(
@@ -125,10 +127,34 @@ export async function parseTextToQuestionInputs(
 
   return questions
 }
+
+export async function getQuestionsByQuizId(quizId: number, userId: number) {
+  const quiz = await QuizRepo.getQuizById(quizId)
+
+  if (!quiz) throw new APIError('Quiz not found', 404)
+  const now = new Date()
+
+  if (now < quiz.startDate) throw new APIError('Quiz has not started yet', 409)
+  if (now > quiz.endDate) throw new APIError('Quiz has already ended', 409)
+
+  const attempt = await QuizAttemptRepo.findAttempt(userId, quizId)
+
+  if (!attempt || attempt.status !== QuizStatus.InProgress)
+    throw new APIError('you must be attempt again', 409)
+
+  const quizQuestions = await QuestionRepo.getQuestionsByQuizId(quizId)
+  console.log('quizQuestions', quizQuestions)
+  const questions = quizQuestions.map((q) => ({
+    ...q.Question,
+  }))
+
+  return questions
+}
 export const QuestionService = {
   createQuestion,
   getAllQuestions,
   updateQuestion,
   deleteQuestion,
   parseQuestionFileFile,
+  getQuestionsByQuizId,
 }
