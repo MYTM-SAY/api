@@ -1,4 +1,4 @@
-import { QuizStatus } from '@prisma/client'
+import { QuizAttempted, QuizStatus } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
 import { UpdateQuizAttemptedInput } from '../utils/zod/quizAttemptSchemes'
 

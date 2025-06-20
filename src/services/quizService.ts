@@ -7,7 +7,7 @@ import {
 } from '../utils/zod/quizSchemes'
 import { QuizAttemptRepo } from '../repos/quizAttempt.repo'
 import APIError from '../errors/APIError'
-import { QuizStatus } from '@prisma/client'
+import { Question, QuizQuestion, QuizStatus } from '@prisma/client'
 import { EndQuizAttemptInput } from '../utils/zod/quizAttemptSchemes'
 import { QuestionRepo } from '../repos/question.repo.'
 type CorrectAnswerEntry = {
@@ -101,7 +101,17 @@ export const QuizService = {
       userId,
       quiz.classroomId,
     )
-    return { ...quiz, questionCount: quiz.QuizQuestions.length }
+    const attempt = await QuizAttemptRepo.findAttempt(userId, id)
+    const finalScore = getfinalScore(quiz.QuizQuestions)
+    const isAttempted =
+      attempt && attempt.status != QuizStatus.InProgress ? true : false
+
+    return {
+      ...quiz,
+      questionCount: quiz.QuizQuestions.length,
+      finalScore,
+      isAttempted,
+    }
   },
 
   async startAttempt(userId: number, quizId: number) {
@@ -113,7 +123,7 @@ export const QuizService = {
     if (now > quiz.endDate) throw new APIError('Quiz has already ended', 403)
 
     const existingAttempt = await QuizAttemptRepo.findAttempt(userId, quizId)
-    if (!existingAttempt || existingAttempt.status === QuizStatus.InProgress)
+    if (existingAttempt && existingAttempt.status === QuizStatus.InProgress)
       throw new APIError('You have already started this quiz', 409)
     if (existingAttempt)
       throw new APIError('You have already started or completed this quiz', 403)
@@ -137,6 +147,7 @@ export const QuizService = {
     const questions = await QuestionRepo.getQuestionsByQuizId(quizId)
     const correctAnswersMap = buildCorrectAnswersMap(questions)
     const score = calculateScore(data.answers, correctAnswersMap)
+    const finalScore = getfinalScore(questions)
 
     const updatedAttempt = await QuizAttemptRepo.updateQuizAttempt(attempt.id, {
       endDate: new Date(),
@@ -144,12 +155,20 @@ export const QuizService = {
       score,
     })
 
-    return updatedAttempt
+    return {
+      id: updatedAttempt.id,
+      score: updatedAttempt.score,
+      finalScore,
+      studySuggestions: 'KYS',
+    }
   },
 }
 
 //the final day to work on this project so i tired for a long time to make it into seperated files
 // ──────────── Helpers ───────────── //
+function getfinalScore(questions: QuizQuestion[]): number {
+  return questions.reduce((total, q) => total + (q.points ?? 0), 0)
+}
 
 function buildCorrectAnswersMap(
   quizQuestions: any[],
