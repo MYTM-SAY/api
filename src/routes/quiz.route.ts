@@ -10,10 +10,12 @@ import {
   endQuizAttempt,
   getQuestionsByQuizId,
   startQuizAttempt,
+  submitQuiz,
 } from '../controllers/quizAttemptController'
 import {
   EndQuizAttemptSchema,
   QuizAttemptedSchema,
+  submitQuizSchema,
 } from '../utils/zod/quizAttemptSchemes'
 
 const router = express.Router()
@@ -663,4 +665,52 @@ router.post('/:quizId/start', isAuthenticated, startQuizAttempt)
  *         description: Attempt not found
  */
 router.post('/:quizId/submit', isAuthenticated, endQuizAttempt)
+
+/**
+ * @swagger
+ * /quizzes/{quizId}/submit-quiz:
+ *   post:
+ *     summary: Submit a completed quiz (validate + store answers)
+ *     tags: [Quiz]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: quizId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the quiz to submit
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               answers:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     questionId:
+ *                       type: integer
+ *                     answer:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *     responses:
+ *       200:
+ *         description: Quiz submitted successfully
+ *       400:
+ *         description: Validation error
+ *       403:
+ *         description: Unauthorized or forbidden
+ */
+router.post(
+  '/:quizId/submit-quiz',
+  validate(submitQuizSchema),
+  isAuthenticated,
+  submitQuiz,
+)
 export default router

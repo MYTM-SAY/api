@@ -1,4 +1,5 @@
 import { QuizStatus } from '@prisma/client'
+import { stat } from 'fs'
 import { z } from 'zod'
 
 // Output type for reference
@@ -10,9 +11,9 @@ export const QuizAttemptedSchema = z.object({
   ]),
 })
 
-export const UpdateQuizAttemptedSchema = z.object({
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
+export const submitQuizSchema = z.object({
+  startDate: z.date(),
+  endDate: z.date(),
   status: z
     .enum([QuizStatus.InProgress, QuizStatus.Completed, QuizStatus.TimedOut])
     .optional(),
@@ -29,4 +30,4 @@ export const EndQuizAttemptSchema = z.object({
 })
 
 export type EndQuizAttemptInput = z.infer<typeof EndQuizAttemptSchema>
-export type UpdateQuizAttemptedInput = z.infer<typeof UpdateQuizAttemptedSchema>
+export type submitQuizInput = z.infer<typeof submitQuizSchema>

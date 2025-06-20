@@ -44,3 +44,16 @@ export const endQuizAttempt = asyncHandler(
       .json(ResponseHelper.success('Quiz attempt ended', result))
   },
 )
+
+export const submitQuiz = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.claims!.id
+    const quizId = Number(req.params.quizId)
+
+    const result = await QuizService.submitQuiz(req.body, userId, quizId)
+
+    return res
+      .status(200)
+      .json(ResponseHelper.success('Quiz attempt retrieved', result))
+  },
+)

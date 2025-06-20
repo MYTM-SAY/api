@@ -8,7 +8,10 @@ import {
 import { QuizAttemptRepo } from '../repos/quizAttempt.repo'
 import APIError from '../errors/APIError'
 import { Question, QuizQuestion, QuizStatus } from '@prisma/client'
-import { EndQuizAttemptInput } from '../utils/zod/quizAttemptSchemes'
+import {
+  EndQuizAttemptInput,
+  submitQuizInput,
+} from '../utils/zod/quizAttemptSchemes'
 import { QuestionRepo } from '../repos/question.repo.'
 type CorrectAnswerEntry = {
   correctAnswers: string[]
@@ -142,7 +145,30 @@ export const QuizService = {
     return attempt
   },
 
-  async endAttempt(data: EndQuizAttemptInput, userId: number, quizId: number) {
+  async endAttempt(data: submitQuizInput, userId: number, quizId: number) {
+    const quiz = await QuizValidationService.validateQuizExists(quizId)
+    const attempt = await QuizAttemptRepo.findAttempt(userId, quizId)
+
+    if (attempt) throw new APIError('You attempted the quiz before', 404)
+    const questions = await QuestionRepo.getQuestionsByQuizId(quizId)
+    const finalScore = getfinalScore(questions)
+    const endAttempt = await QuizAttemptRepo.startQuiz(
+      userId,
+      quizId,
+      data.startDate,
+      data.endDate,
+      QuizStatus.Completed,
+    )
+
+    return {
+      id: endAttempt.id,
+      score: endAttempt.score,
+      finalScore,
+      studySuggestions: 'KYS',
+    }
+  },
+
+  async submitQuiz(data: EndQuizAttemptInput, userId: number, quizId: number) {
     const attempt = await validateActiveAttempt(userId, quizId)
     const questions = await QuestionRepo.getQuestionsByQuizId(quizId)
     const correctAnswersMap = buildCorrectAnswersMap(questions)

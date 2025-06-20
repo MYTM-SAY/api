@@ -1,6 +1,6 @@
 import { QuizAttempted, QuizStatus } from '@prisma/client'
 import { prisma } from '../db/PrismaClient'
-import { UpdateQuizAttemptedInput } from '../utils/zod/quizAttemptSchemes'
+import { submitQuizInput } from '../utils/zod/quizAttemptSchemes'
 
 export const QuizAttemptRepo = {
   // ...existing methods...
@@ -33,7 +33,7 @@ export const QuizAttemptRepo = {
 
   async updateQuizAttempt(
     QuizAttemptedId: number,
-    data: Partial<UpdateQuizAttemptedInput>,
+    data: Partial<submitQuizInput>,
   ) {
     return prisma.quizAttempted.update({
       where: { id: QuizAttemptedId },
