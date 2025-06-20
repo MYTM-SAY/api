@@ -262,7 +262,7 @@ model Quiz {
   active        Boolean
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  Classroom     Classroom       @relation(fields: [classroomId], references: [id])
+  Classroom     Classroom       @relation(fields: [classroomId], references: [id], onDelete: Cascade)
   QuizAttempted QuizAttempted[]
   QuizQuestions QuizQuestion[]
 }
@@ -272,7 +272,7 @@ model QuizQuestion {
   quizId      Int
   questionId  Int
   points      Int
-  Question    Question     @relation(fields: [questionId], references: [id])
+  Question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
   Quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   UserAnswers UserAnswer[]
 }
@@ -285,8 +285,8 @@ model UserAnswer {
   isCorrect      IsCorrect?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  QuizQuestion   QuizQuestion @relation(fields: [quizQuestionId], references: [id])
-  User           User         @relation(fields: [userId], references: [id])
+  QuizQuestion   QuizQuestion @relation(fields: [quizQuestionId], references: [id], onDelete: Cascade)
+  User           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model QuizAttempted {
@@ -297,8 +297,8 @@ model QuizAttempted {
   endDate   DateTime
   status    QuizStatus
   score     Int
-  Quiz      Quiz       @relation(fields: [quizId], references: [id])
-  User      User       @relation(fields: [userId], references: [id])
+  Quiz      Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  User      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserContributions {
@@ -311,18 +311,18 @@ model UserContributions {
   @@unique([userId, dateOnly])
 }
 
+enum QuestionType {
+  SINGLE
+  MULTI
+  TRUE_FALSE
+}
+
 model File {
   id        Int      @id @default(autoincrement())
   name      String
   url       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-enum QuestionType {
-  SINGLE
-  MULTI
-  TRUE_FALSE
 }
 
 enum IsCorrect {
