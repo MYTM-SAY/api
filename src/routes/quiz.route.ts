@@ -670,7 +670,7 @@ router.post('/:quizId/submit', isAuthenticated, endQuizAttempt)
  * @swagger
  * /quizzes/{quizId}/submit-quiz:
  *   post:
- *     summary: Submit a completed quiz (validate + store answers)
+ *     summary: Submit a completed quiz (validate + store meta info)
  *     tags: [Quiz]
  *     security:
  *       - bearerAuth: []
@@ -687,21 +687,47 @@ router.post('/:quizId/submit', isAuthenticated, endQuizAttempt)
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - startDate
+ *               - endDate
  *             properties:
- *               answers:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     questionId:
- *                       type: integer
- *                     answer:
- *                       type: array
- *                       items:
- *                         type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2025-06-20T10:00:00.000Z"
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2025-06-20T10:20:00.000Z"
+ *               score:
+ *                 type: integer
+ *                 example: 20
  *     responses:
  *       200:
  *         description: Quiz submitted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Quiz attempt submitted
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 5
+ *                     score:
+ *                       type: integer
+ *                       example: 20
+ *                     finalScore:
+ *                       type: integer
+ *                       example: 25
  *       400:
  *         description: Validation error
  *       403:
