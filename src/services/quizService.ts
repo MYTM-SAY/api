@@ -168,18 +168,27 @@ export const QuizService = {
     }
   },
 
-  async submitQuiz(data: EndQuizAttemptInput, userId: number, quizId: number) {
-    const attempt = await validateActiveAttempt(userId, quizId)
+  async submitQuiz(data: submitQuizInput, userId: number, quizId: number) {
+    const quiz = await QuizValidationService.validateQuizExists(quizId)
+    const attempt = await QuizAttemptRepo.findAttempt(userId, quizId)
+
+    if (attempt) throw new APIError('You attempted the quiz before', 409)
     const questions = await QuestionRepo.getQuestionsByQuizId(quizId)
-    const correctAnswersMap = buildCorrectAnswersMap(questions)
-    const score = calculateScore(data.answers, correctAnswersMap)
     const finalScore = getfinalScore(questions)
 
-    const updatedAttempt = await QuizAttemptRepo.updateQuizAttempt(attempt.id, {
-      endDate: new Date(),
-      status: QuizStatus.Completed,
-      score,
-    })
+    if (data.score > finalScore)
+      throw new APIError(
+        `Score cannot be greater than the final score of ${finalScore}`,
+        400,
+      )
+
+    const updatedAttempt = await QuizAttemptRepo.startQuiz(
+      quizId,
+      userId,
+      data.startDate,
+      data.endDate,
+      QuizStatus.Completed,
+    )
 
     return {
       id: updatedAttempt.id,

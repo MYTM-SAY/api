@@ -17,7 +17,7 @@ export const submitQuizSchema = z.object({
   status: z
     .enum([QuizStatus.InProgress, QuizStatus.Completed, QuizStatus.TimedOut])
     .optional(),
-  score: z.number().int().nonnegative().optional(),
+  score: z.number().int().nonnegative(),
 })
 
 export const EndQuizAttemptSchema = z.object({
