@@ -12,8 +12,8 @@ export const QuizAttemptedSchema = z.object({
 })
 
 export const submitQuizSchema = z.object({
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.preprocess((arg) => new Date(arg as string), z.date()),
+  endDate: z.preprocess((arg) => new Date(arg as string), z.date()),
   status: z
     .enum([QuizStatus.InProgress, QuizStatus.Completed, QuizStatus.TimedOut])
     .optional(),
