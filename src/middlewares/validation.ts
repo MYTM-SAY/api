@@ -7,10 +7,18 @@ const validate =
     try {
       req.body = schema.parse(req.body)
       next()
-    } catch (ex: any) {
+    } catch (ex) {
+      if (ex instanceof ZodError) {
+        const message = ex.errors.map((e) => e.message).join(', ')
+        return res
+          .status(400)
+          .json(ResponseHelper.error(message, 400, ex.errors))
+      }
+
+      // fallback for unexpected errors
       return res
-        .status(400)
-        .json(ResponseHelper.error('Validation error', 400, ex.errors || ex))
+        .status(500)
+        .json(ResponseHelper.error('Unexpected validation error', 500, ex))
     }
   }
 
