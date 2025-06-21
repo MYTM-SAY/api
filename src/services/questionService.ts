@@ -114,6 +114,7 @@ export async function parseTextToQuestionInputs(
     if (!parts) continue
     const { questionHeader, options, answer } = parts
     const type = parserService.getTypeOfQuestion(options, answer)
+
     const isValidQuestion = await parserService.validateQuestion({
       questionHeader,
       options,
@@ -125,6 +126,7 @@ export async function parseTextToQuestionInputs(
     if (isValidQuestion) questions.push(isValidQuestion)
   }
 
+  QuestionRepo.bulkCreate(questions)
   return questions
 }
 
