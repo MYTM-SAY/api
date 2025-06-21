@@ -88,12 +88,18 @@ export async function parseQuestionFileFile(
 ) {
   const existingClassroom = await ClassroomRepo.findbyId(classroomId)
 
+  console.log(
+    'parseQuestionFileFile',
+    userId,
+    classroomId,
+    existingClassroom?.communityId,
+  )
   if (!existingClassroom) throw new APIError('Classroom not found', 404)
   const role = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,
     existingClassroom.communityId,
   )
-
+  console.log(role)
   if (role != Role.OWNER)
     throw new APIError('You must be an Owner to edit it', 403)
   const content = await fs.readFileSync(file.path, 'utf-8')

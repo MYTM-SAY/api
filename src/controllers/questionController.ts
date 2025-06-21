@@ -58,8 +58,8 @@ export const ParseQuestionFile = asyncHandler(
       return res.status(400).json(ResponseHelper.error('No file uploaded'))
 
     const questions = await QuestionService.parseQuestionFileFile(
-      parseInt(req.params.classroomId),
       req.claims!.id,
+      parseInt(req.params.classroomId),
       req.file!,
     )
     return res
