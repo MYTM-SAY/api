@@ -94,10 +94,28 @@ export const QuizService = {
     await QuizValidationService.validateViewPermissions(userId, classroomId)
     return QuizRepo.getQuizzesByClassroom(classroomId)
   },
-  async getQuizzesByCommunity(userId: number, communityId: number) {
-    await QuizValidationService.validateViewPermissions(userId, communityId)
-    return QuizRepo.getQuizzesByCommunity(communityId)
-  },
+async getQuizzesByCommunity(userId: number, communityId: number) {
+  await QuizValidationService.validateViewPermissions(userId, communityId)
+
+  const quizzes = await QuizRepo.getQuizzesByCommunity(communityId)
+  const quizIds = quizzes.map((q) => q.id)
+
+  const attempts = await QuizRepo.findAttemptsForUser(userId, quizIds)
+
+  const attemptMap = new Map<number, QuizStatus>()
+  attempts.forEach((a) => attemptMap.set(a.quizId, a.status))
+
+  const quizzesWithAttempts = quizzes.map((quiz) => {
+    const status = attemptMap.get(quiz.id)
+    const isAttempted = status && status !== QuizStatus.InProgress
+    return {
+      ...quiz,
+      isAttempted: !!isAttempted,
+    }
+  })
+
+  return quizzesWithAttempts
+},
   async getQuizById(userId: number, id: number) {
     const quiz = await QuizValidationService.validateQuizExists(id)
     await QuizValidationService.validateViewPermissions(

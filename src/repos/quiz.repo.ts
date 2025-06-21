@@ -101,6 +101,18 @@ export const QuizRepo = {
       orderBy: { startDate: 'asc' },
     })
   },
+async   findAttemptsForUser(userId: number, quizIds: number[]) {
+  return prisma.quizAttempted.findMany({
+    where: {
+      userId,
+      quizId: { in: quizIds },
+    },
+    select: {
+      quizId: true,
+      status: true,
+    },
+  })
+},
 
   async hasOverlappingQuiz(
     classroomId: number,
