@@ -157,7 +157,6 @@ export const QuizService = {
       quizId,
       data.startDate,
       data.endDate,
-      QuizStatus.Completed,
     )
 
     return {
@@ -183,10 +182,11 @@ export const QuizService = {
       )
 
     const updatedAttempt = await QuizAttemptRepo.startQuiz(
-      quizId,
       userId,
+      quizId,
       data.startDate,
       data.endDate,
+      data.score,
       QuizStatus.Completed,
     )
 

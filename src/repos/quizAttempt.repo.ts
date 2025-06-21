@@ -10,14 +10,14 @@ export const QuizAttemptRepo = {
     quizId: number,
     startDate: Date,
     endDate: Date,
+    score: number = 0,
     status: QuizStatus = QuizStatus.InProgress,
   ) {
-    console.log(startDate, endDate, status)
     return prisma.quizAttempted.create({
       data: {
         status: status,
         userId,
-        score: 0,
+        score: score,
         startDate,
         endDate,
         quizId,
