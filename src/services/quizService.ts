@@ -95,8 +95,7 @@ export const QuizService = {
     return QuizRepo.getQuizzesByClassroom(classroomId)
   },
 async getQuizzesByCommunity(userId: number, communityId: number) {
-  await QuizValidationService.validateViewPermissions(userId, communityId)
-
+ 
   const quizzes = await QuizRepo.getQuizzesByCommunity(communityId)
   const quizIds = quizzes.map((q) => q.id)
 

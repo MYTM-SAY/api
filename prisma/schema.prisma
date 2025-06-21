@@ -83,6 +83,7 @@ model Community {
   JoinRequests        JoinRequest[]
   favoriteCommunities favoriteCommunities[]
   Tags                Tag[]                 @relation("CommunityToTag")
+  Quiz Quiz[]
 }
 
 model JoinRequest {
@@ -259,12 +260,14 @@ model Quiz {
   startDate     DateTime
   endDate       DateTime
   classroomId   Int
+  communityId   Int?
   active        Boolean
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   Classroom     Classroom       @relation(fields: [classroomId], references: [id], onDelete: Cascade)
   QuizAttempted QuizAttempted[]
   QuizQuestions QuizQuestion[]
+  Community      Community?   @relation(fields: [communityId], references: [id], onDelete: Cascade)
 }
 
 model QuizQuestion {

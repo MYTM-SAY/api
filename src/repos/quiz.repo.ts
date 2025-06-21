@@ -94,9 +94,7 @@ export const QuizRepo = {
   async getQuizzesByCommunity(communityId: number) {
     return prisma.quiz.findMany({
       where: {
-        Classroom: {
-          communityId,
-        },
+       communityId
       },
       orderBy: { startDate: 'asc' },
     })
