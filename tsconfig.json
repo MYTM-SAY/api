@@ -15,5 +15,5 @@
 	"paths": {
       "@/*": ["./src/*"]
     },
-	"include": ["./*.js", "src/**/*.ts", "test/**/*.ts", "prisma/seed.mjs"]
+	"include": ["./*.js", "src/**/*.ts", "test/**/*.ts", "prisma/seed.mjs", "src/seed.js"]
 }
