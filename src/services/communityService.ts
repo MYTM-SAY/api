@@ -142,7 +142,7 @@ async function deleteCommunity(communityId: number, userId: number) {
   if (community.Classrooms?.length > 0)
     throw new APIError(
       'Community has classrooms, You must delete classrooms first',
-      400,
+      409,
     )
   const role = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,
