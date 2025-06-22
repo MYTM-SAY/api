@@ -88,12 +88,6 @@ export async function parseQuestionFileFile(
 ) {
   const existingClassroom = await ClassroomRepo.findbyId(classroomId)
 
-  console.log(
-    'parseQuestionFileFile',
-    userId,
-    classroomId,
-    existingClassroom?.communityId,
-  )
   if (!existingClassroom) throw new APIError('Classroom not found', 404)
   const role = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,

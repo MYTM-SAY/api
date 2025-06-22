@@ -13,6 +13,7 @@ import {
   submitQuizInput,
 } from '../utils/zod/quizAttemptSchemes'
 import { QuestionRepo } from '../repos/question.repo.'
+import { ClassroomRepo } from '../repos/classroom.repo'
 type CorrectAnswerEntry = {
   correctAnswers: string[]
   points: number
@@ -94,27 +95,28 @@ export const QuizService = {
     await QuizValidationService.validateViewPermissions(userId, classroomId)
     return QuizRepo.getQuizzesByClassroom(classroomId)
   },
-async getQuizzesByCommunity(userId: number, communityId: number) {
- 
-  const quizzes = await QuizRepo.getQuizzesByCommunity(communityId)
-  const quizIds = quizzes.map((q) => q.id)
+  async getQuizzesByCommunity(userId: number, communityId: number) {
+    const classrooms = await ClassroomRepo.findByCommunityId(communityId)
 
-  const attempts = await QuizRepo.findAttemptsForUser(userId, quizIds)
+    const quizzes = await QuizRepo.getQuizzesByClassroomIds(
+      classrooms.map((c) => c.id),
+    )
+    const quizIds = quizzes.map((q) => q.id)
+    const attempts = await QuizRepo.findAttemptsForUser(userId, quizIds)
+    const attemptMap = new Map<number, QuizStatus>()
+    attempts.forEach((a) => attemptMap.set(a.quizId, a.status))
 
-  const attemptMap = new Map<number, QuizStatus>()
-  attempts.forEach((a) => attemptMap.set(a.quizId, a.status))
+    const quizzesWithAttempts = quizzes.map((quiz) => {
+      const status = attemptMap.get(quiz.id)
+      const isAttempted = status && status !== QuizStatus.InProgress
+      return {
+        ...quiz,
+        isAttempted: !!isAttempted,
+      }
+    })
 
-  const quizzesWithAttempts = quizzes.map((quiz) => {
-    const status = attemptMap.get(quiz.id)
-    const isAttempted = status && status !== QuizStatus.InProgress
-    return {
-      ...quiz,
-      isAttempted: !!isAttempted,
-    }
-  })
-
-  return quizzesWithAttempts
-},
+    return quizzesWithAttempts
+  },
   async getQuizById(userId: number, id: number) {
     const quiz = await QuizValidationService.validateQuizExists(id)
     await QuizValidationService.validateViewPermissions(
