@@ -91,26 +91,39 @@ export const QuizRepo = {
       orderBy: { startDate: 'asc' },
     })
   },
+  async getQuizzesByClassroomIds(classroomIds: number[]) {
+    return prisma.quiz.findMany({
+      where: {
+        classroomId: {
+          in: classroomIds,
+        },
+      },
+      orderBy: {
+        startDate: 'asc',
+      },
+    })
+  },
+
   async getQuizzesByCommunity(communityId: number) {
     return prisma.quiz.findMany({
       where: {
-       communityId
+        communityId,
       },
       orderBy: { startDate: 'asc' },
     })
   },
-async   findAttemptsForUser(userId: number, quizIds: number[]) {
-  return prisma.quizAttempted.findMany({
-    where: {
-      userId,
-      quizId: { in: quizIds },
-    },
-    select: {
-      quizId: true,
-      status: true,
-    },
-  })
-},
+  async findAttemptsForUser(userId: number, quizIds: number[]) {
+    return prisma.quizAttempted.findMany({
+      where: {
+        userId,
+        quizId: { in: quizIds },
+      },
+      select: {
+        quizId: true,
+        status: true,
+      },
+    })
+  },
 
   async hasOverlappingQuiz(
     classroomId: number,

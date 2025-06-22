@@ -58,7 +58,7 @@ async function getCommunityById(communityId: number, userId: number) {
       : JoinRequestRepo.findByCommunityAndUser(communityId, userId),
   ])
 
-  const response = {  
+  const response = {
     ...omitForums(community),
     forumId,
     membersCount,
@@ -139,7 +139,11 @@ async function updateCommunity(
 async function deleteCommunity(communityId: number, userId: number) {
   const community = await CommunityRepo.findById(communityId)
   if (!community) throw new APIError('Community not found', 404)
-
+  if (community.Classrooms?.length > 0)
+    throw new APIError(
+      'Community has classrooms, You must delete classrooms first',
+      409,
+    )
   const role = await CommunityMembersRepo.getUserRoleInCommunity(
     userId,
     communityId,

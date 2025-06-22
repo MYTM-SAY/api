@@ -38,4 +38,11 @@ export const QuestionRepo = {
       },
     })
   },
+
+  async bulkCreate(questions: QuestionInput[]) {
+    return await prisma.question.createMany({
+      data: questions,
+      skipDuplicates: true,
+    })
+  },
 }

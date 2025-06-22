@@ -93,7 +93,7 @@ export async function parseQuestionFileFile(
     userId,
     existingClassroom.communityId,
   )
-
+  console.log(role)
   if (role != Role.OWNER)
     throw new APIError('You must be an Owner to edit it', 403)
   const content = await fs.readFileSync(file.path, 'utf-8')
@@ -114,6 +114,7 @@ export async function parseTextToQuestionInputs(
     if (!parts) continue
     const { questionHeader, options, answer } = parts
     const type = parserService.getTypeOfQuestion(options, answer)
+
     const isValidQuestion = await parserService.validateQuestion({
       questionHeader,
       options,
@@ -125,6 +126,7 @@ export async function parseTextToQuestionInputs(
     if (isValidQuestion) questions.push(isValidQuestion)
   }
 
+  QuestionRepo.bulkCreate(questions)
   return questions
 }
 

@@ -9,10 +9,9 @@ export const CommunityRepo = {
       orderBy: {
         createdAt: 'desc',
       },
-      include:{
-        Tags:true,
-        
-      }
+      include: {
+        Tags: true,
+      },
     })
     return results
   },
@@ -25,7 +24,6 @@ export const CommunityRepo = {
           include: {
             Tags: true,
             Owner: true,
-            
           },
         },
       },
@@ -68,6 +66,12 @@ export const CommunityRepo = {
           },
         },
         Tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        Classrooms: {
           select: {
             id: true,
             name: true,

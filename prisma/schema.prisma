@@ -83,7 +83,7 @@ model Community {
   JoinRequests        JoinRequest[]
   favoriteCommunities favoriteCommunities[]
   Tags                Tag[]                 @relation("CommunityToTag")
-  Quiz Quiz[]
+  Quiz                Quiz[]
 }
 
 model JoinRequest {
@@ -93,8 +93,8 @@ model JoinRequest {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   status      JoinRequestStatus @default(PENDING)
-  Community   Community         @relation(fields: [communityId], references: [id])
-  User        User              @relation(fields: [userId], references: [id])
+  Community   Community         @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  User        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, communityId])
 }
@@ -106,7 +106,7 @@ model CommunityMembers {
   updatedAt   DateTime  @updatedAt
   Role        Role
   Community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  User        User      @relation(fields: [userId], references: [id])
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([communityId, userId])
   @@map("CommunityMembers")
@@ -116,8 +116,8 @@ model favoriteCommunities {
   userId      Int
   communityId Int
   createdAt   DateTime  @default(now())
-  Community   Community @relation(fields: [communityId], references: [id])
-  User        User      @relation(fields: [userId], references: [id])
+  Community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, communityId])
 }
@@ -154,8 +154,8 @@ model Post {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Comments    Comment[]
-  Author      User       @relation(fields: [authorId], references: [id])
-  Forum       Forum      @relation(fields: [forumId], references: [id], onDelete: NoAction)
+  Author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  Forum       Forum      @relation(fields: [forumId], references: [id], onDelete: Cascade)
   PostVotes   PostVote[]
 }
 
@@ -179,7 +179,7 @@ model PostVote {
   postId Int
   type   VoteType @default(NONE)
   Post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  User   User     @relation(fields: [userId], references: [id])
+  User   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
 }
@@ -189,7 +189,7 @@ model CommentVote {
   commentId Int
   type      VoteType @default(NONE)
   Comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, commentId])
 }
@@ -234,8 +234,8 @@ model Lesson {
 model CompletedLessons {
   userId   Int
   lessonId Int
-  Lesson   Lesson @relation(fields: [lessonId], references: [id])
-  User     User   @relation(fields: [userId], references: [id])
+  Lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  User     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
@@ -267,7 +267,7 @@ model Quiz {
   Classroom     Classroom       @relation(fields: [classroomId], references: [id], onDelete: Cascade)
   QuizAttempted QuizAttempted[]
   QuizQuestions QuizQuestion[]
-  Community      Community?   @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  Community     Community?      @relation(fields: [communityId], references: [id], onDelete: Cascade)
 }
 
 model QuizQuestion {
